@@ -1,0 +1,93 @@
+<input type="hidden" id="session-workout-id" value="">
+
+<div id="training-ui" class="training-page">
+  <div class="training-entry-grid">
+    <aside class="training-parsing">
+      <div class="training-log-head training-parser-log-head" aria-hidden="true">
+        <span class="entry-panel-kicker">Eingabe</span>
+        <span class="training-log-head-copy">Parser</span>
+      </div>
+      <section id="parser-panel" class="parser-panel" aria-label="Training als Freitext eingeben">
+        <div class="parser-input-area">
+          <textarea id="parser-input" rows="8" placeholder="Bench&#10;6x80@8 4x80@9 8x72,5@8" spellcheck="false" autocorrect="off" autocomplete="off" autocapitalize="off"></textarea>
+          <div id="parser-status" class="parser-status">Parsed: 0 Übungen · 0 Sets · 0 Errors</div>
+          <div id="parser-errors" class="parser-errors"></div>
+        </div>
+      </section>
+      <section class="parser-preview-panel" id="parser-preview-panel" aria-label="So wurde es geparst">
+        <div class="parser-preview-head">So wurde es geparst</div>
+        <div class="parser-preview-body" id="parser-preview-body">Noch kein Parsing.</div>
+      </section>
+    </aside>
+
+    <section class="training-session-setup" aria-labelledby="session-setup-title">
+      <div class="entry-panel-heading training-session-heading">
+        <span class="entry-panel-kicker">Einheit</span>
+        <h2 id="session-setup-title" class="entry-panel-title">Sessiondaten</h2>
+      </div>
+      <div class="session-header-card" data-testid="training-plan-card">
+        <div class="session-header-columns">
+          <div class="field-group">
+            <label>Datum</label>
+            <div class="session-date-control">
+              <span id="session-date-display" class="session-date-display" aria-hidden="true"></span>
+              <svg class="session-date-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 2v4M16 2v4M3 9h18"></path>
+                <rect x="3" y="4" width="18" height="17" rx="3"></rect>
+              </svg>
+              <input type="date" id="session-date" value="{{ today_iso }}" lang="de-DE" aria-label="Trainingsdatum">
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Training</label>
+            <input type="text" id="session-name" placeholder="Upper A">
+          </div>
+
+          <div class="field-group plan-label-group">
+            <label>Plan</label>
+            <div id="plan-label" class="plan-label">Auto</div>
+          </div>
+
+          <div class="session-stats">
+            <div class="stat-block">
+              <div id="session-sets" class="stat-value">0</div>
+              <div class="stat-label">Sets</div>
+            </div>
+            <div class="stat-block">
+              <div id="session-load" class="stat-value">—</div>
+              <div class="stat-label">Progression</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="session-summary-row">
+        <span id="summary-exercises">0</span> Übungen · <span id="summary-sets">0</span> Sets
+        <span class="summary-divider">|</span>
+        <span id="plan-coverage-wrap">Plan: <span id="plan-coverage">0/0</span></span>
+        <span id="plan-coverage-divider" class="summary-divider">|</span>
+        Hinweise: <span id="validation-count">0</span>
+        <button type="button" id="validation-toggle" class="text-link">Details</button>
+      </div>
+
+      <div id="validation-list" class="validation-list"></div>
+    </section>
+  </div>
+
+  <section class="training-main">
+    <div class="training-log-head" aria-hidden="true">
+      <span class="entry-panel-kicker">Sätze</span>
+      <span class="training-log-head-copy">Übungen &amp; Leistung</span>
+    </div>
+    <div id="exercise-list"></div>
+
+    <div class="session-footer">
+      <button id="add-exercise-btn" class="secondary-btn">+ Übung</button>
+      <div class="session-footer-right">
+        <span id="save-status" class="save-status"></span>
+        <button id="save-session-btn" class="primary-btn">Speichern</button>
+      </div>
+    </div>
+  </section>
+</div>

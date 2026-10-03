@@ -1,0 +1,8 @@
+[Unit]
+Description=LIVA public availability watchdog
+After=network-online.target liva.service liva-mcp-remote.service tailscale-funnel.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/liva/scripts/liva_availability_watchdog.sh

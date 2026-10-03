@@ -1,0 +1,1178 @@
+openapi: 3.1.1
+info:
+  title: LIVA AI + Memory API
+  version: 4.1.1
+  description: LIVA AI API with existing endpoints plus integrated local markdown memory endpoints.
+
+servers:
+  - url: "https://liva.example.com"
+
+security:
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Use the LIVA AI write key. The backend accepts either `Bearer <key>` or the raw key value.
+
+  schemas:
+    OkMeta:
+      type: object
+      additionalProperties: true
+      properties:
+        cursor_next:
+          type: string
+          nullable: true
+        limit:
+          type: integer
+
+    OkResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        ok:
+          type: boolean
+          const: true
+        data:
+          nullable: true
+        meta:
+          $ref: "#/components/schemas/OkMeta"
+      required: [ok]
+
+    ErrorResponse:
+      type: object
+      additionalProperties: true
+      properties:
+        ok: { type: boolean }
+        error:
+          anyOf:
+            - type: string
+            - type: "null"
+        error_code:
+          anyOf:
+            - type: string
+            - type: "null"
+        detail:
+          anyOf:
+            - type: string
+            - type: "null"
+      required: [ok]
+
+    IndexResponse:
+      type: object
+      additionalProperties: true
+      properties:
+        ok: { type: boolean }
+        max_operations: { type: integer }
+        defaults: { type: object }
+        endpoints:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      required: [ok, max_operations, endpoints]
+
+    MetaResponse:
+      type: object
+      additionalProperties: true
+      properties:
+        ok: { type: boolean }
+        service: { type: string }
+        ts: { type: integer }
+        timezone: { type: string }
+        db_bounds: { type: object }
+        counts: { type: object }
+        active_plan_id:
+          anyOf:
+            - type: integer
+            - type: "null"
+        build:
+          anyOf:
+            - type: string
+            - type: "null"
+        targets_live:
+          $ref: "#/components/schemas/TargetsLive"
+      required: [ok, service, ts]
+
+    TargetsLive:
+      type: object
+      additionalProperties: false
+      properties:
+        kcal: { type: number }
+        p: { type: number }
+        c: { type: number }
+        f: { type: number }
+        source: { type: string }
+        effective_date: { type: string, format: date }
+        updated_at:
+          anyOf:
+            - type: string
+            - type: "null"
+      required: [kcal, p, c, f, source]
+
+    NutritionMealItem:
+      type: object
+      additionalProperties: false
+      properties:
+        food_id: { type: integer }
+        amount: { type: number }
+        unit: { type: string }
+        sort_index: { type: integer }
+        resolved_food:
+          $ref: "#/components/schemas/FoodResolved"
+      required: [food_id, amount, unit]
+
+    FoodResolved:
+      type: object
+      additionalProperties: false
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        brand:
+          anyOf:
+            - type: string
+            - type: "null"
+        kcal: { type: number }
+        p: { type: number }
+        c: { type: number }
+        f: { type: number }
+        serving_g:
+          anyOf:
+            - type: number
+            - type: "null"
+        unit: { type: string }
+        is_active: { type: integer }
+      required: [id, name, kcal, p, c, f, unit, is_active]
+
+    MealTemplate:
+      type: object
+      additionalProperties: false
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        mode: { type: string }
+        notes:
+          anyOf:
+            - type: string
+            - type: "null"
+        is_favorite: { type: integer }
+        created_at: { type: string }
+        updated_at: { type: string }
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/NutritionMealItem"
+      required: [id, title, mode, is_favorite]
+
+    MemoryStatusResponse:
+      type: object
+      additionalProperties: true
+      properties:
+        ok: { type: boolean }
+        data:
+          type: object
+          additionalProperties: true
+          properties:
+            enabled: { type: boolean }
+            configured: { type: boolean }
+            storage_mode: { type: string }
+            root_path: { type: string }
+            root_exists: { type: boolean }
+            folders:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+            logical_files:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+            last_sync:
+              anyOf:
+                - type: string
+                - type: "null"
+            last_archive:
+              anyOf:
+                - type: string
+                - type: "null"
+            warnings:
+              type: array
+              items: { type: string }
+            missing_runtime:
+              type: array
+              items: { type: string }
+          required: [enabled, configured, storage_mode, root_path, root_exists, logical_files]
+      required: [ok]
+
+    MemoryContextRequest:
+      type: object
+      additionalProperties: true
+      properties:
+        domains:
+          type: array
+          items:
+            type: string
+            enum: [athlete, training, health, projects, reviews, profile]
+        query:
+          anyOf:
+            - type: string
+            - type: "null"
+        include_recent:
+          type: boolean
+          default: false
+        max_items:
+          type: integer
+          minimum: 1
+          maximum: 20
+          default: 8
+      required: [domains]
+
+    MemoryContextResponse:
+      type: object
+      additionalProperties: true
+      properties:
+        ok: { type: boolean }
+        data:
+          type: object
+          additionalProperties: true
+          properties:
+            domains:
+              type: array
+              items: { type: string }
+            query:
+              anyOf:
+                - type: string
+                - type: "null"
+            include_recent: { type: boolean }
+            known_files:
+              type: array
+              items: { type: string }
+            memory_blocks:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+                properties:
+                  logical_file: { type: string }
+                  file: { type: string }
+                  section:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  heading:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  text: { type: string }
+                  confidence: { type: number }
+                  importance: { type: string }
+                  last_updated:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                required: [logical_file, file, text, confidence]
+          required: [domains, include_recent, known_files, memory_blocks]
+      required: [ok]
+
+    MemoryCandidate:
+      type: object
+      additionalProperties: true
+      properties:
+        id: { type: string }
+        text: { type: string }
+        domain: { type: string }
+        kind: { type: string }
+        target_file:
+          type: string
+          enum: [master_profile, athlete_dossier, training_history, core_patterns, health_notes, project_memory, review_log]
+        section:
+          type: string
+          description: Canonical section id or a common alias like `preferences`, `current_block`, `active_experiments`.
+        strategy: { type: string }
+        confidence: { type: number }
+        importance: { type: string }
+        evidence_count: { type: integer }
+        stable: { type: boolean }
+        speculative: { type: boolean }
+        source: { type: string }
+        observed_at: { type: string }
+
+    MemoryWritePlanItem:
+      type: object
+      additionalProperties: true
+      properties:
+        logical_file:
+          type: string
+          enum: [master_profile, athlete_dossier, training_history, core_patterns, health_notes, project_memory, review_log]
+        section:
+          type: string
+          description: Canonical section id or a common alias. Backend resolves common aliases to the matching canonical section when possible.
+        strategy:
+          type: string
+          enum: [append, append_log_entry, append_section_note, replace_section, mark_stale]
+        content: { type: string }
+        candidate_ids:
+          type: array
+          items: { type: string }
+        importance: { type: string }
+        confidence: { type: number }
+        requires_archive: { type: boolean }
+        reason: { type: string }
+      required: [logical_file, section, strategy, content]
+
+    MemoryProposeRequest:
+      type: object
+      additionalProperties: true
+      properties:
+        conversation_summary: { type: string }
+        extracted_facts:
+          type: array
+          items:
+            $ref: "#/components/schemas/MemoryCandidate"
+        candidates:
+          type: array
+          items:
+            $ref: "#/components/schemas/MemoryCandidate"
+        dry_run:
+          type: boolean
+          default: true
+
+    MemoryProposeResponse:
+      type: object
+      additionalProperties: true
+      properties:
+        ok: { type: boolean }
+        data:
+          type: object
+          additionalProperties: true
+          properties:
+            conversation_summary: { type: string }
+            accepted_candidates:
+              type: array
+              items:
+                $ref: "#/components/schemas/MemoryCandidate"
+            rejected_candidates:
+              type: array
+              items:
+                $ref: "#/components/schemas/MemoryCandidate"
+            write_plan:
+              type: array
+              items:
+                $ref: "#/components/schemas/MemoryWritePlanItem"
+            requires_archive: { type: boolean }
+            dry_run: { type: boolean }
+            stats:
+              type: object
+              additionalProperties: true
+          required: [accepted_candidates, rejected_candidates, write_plan, requires_archive, dry_run]
+      required: [ok]
+
+    MemoryApplyRequest:
+      type: object
+      additionalProperties: true
+      properties:
+        write_plan:
+          type: array
+          items:
+            $ref: "#/components/schemas/MemoryWritePlanItem"
+        requires_archive: { type: boolean }
+        reason: { type: string }
+      required: [write_plan]
+
+    MemoryApplyResponse:
+      type: object
+      additionalProperties: true
+      properties:
+        ok: { type: boolean }
+        data:
+          type: object
+          additionalProperties: true
+          properties:
+            success: { type: boolean }
+            updated_files:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+            snapshots:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+            errors:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+          required: [success, updated_files, snapshots, errors]
+      required: [ok]
+
+    MemoryArchiveRequest:
+      type: object
+      additionalProperties: true
+      properties:
+        logical_files:
+          type: array
+          items: { type: string }
+        reason: { type: string }
+
+    MemoryArchiveResponse:
+      type: object
+      additionalProperties: true
+      properties:
+        ok: { type: boolean }
+        data:
+          type: object
+          additionalProperties: true
+          properties:
+            success: { type: boolean }
+            snapshots:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+          required: [success, snapshots]
+      required: [ok]
+
+    MemoryFileResponse:
+      type: object
+      additionalProperties: true
+      properties:
+        ok: { type: boolean }
+        data:
+          type: object
+          additionalProperties: true
+          properties:
+            logical_name: { type: string }
+            title: { type: string }
+            folder_name: { type: string }
+            filename: { type: string }
+            path: { type: string }
+            relative_path: { type: string }
+            last_updated:
+              anyOf:
+                - type: string
+                - type: "null"
+            raw_markdown: { type: string }
+            rendered_html: { type: string }
+          required: [logical_name, title, folder_name, filename, path, relative_path, raw_markdown, rendered_html]
+      required: [ok]
+
+paths:
+  /api/memory/status:
+    get:
+      summary: Memory backend status
+      operationId: memoryStatus
+      x-openai-isConsequential: false
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/memory/context:
+    post:
+      summary: Resolve compact long-term memory context
+      operationId: memoryContext
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemoryContextRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/memory/propose:
+    post:
+      summary: Evaluate memory-worthiness and build a write plan without writing
+      operationId: memoryPropose
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemoryProposeRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/memory/apply:
+    post:
+      summary: Execute a memory write plan against local markdown files
+      operationId: memoryApply
+      x-openai-isConsequential: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemoryApplyRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "502":
+          description: Partial or failed write
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/memory/archive:
+    post:
+      summary: Create archive snapshots before major memory updates
+      operationId: memoryArchive
+      x-openai-isConsequential: false
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemoryArchiveRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/memory/file/{logical_name}:
+    get:
+      summary: Read a single logical memory file
+      operationId: memoryFile
+      x-openai-isConsequential: false
+      parameters:
+        - name: logical_name
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/ai/index:
+    get:
+      summary: AI API discovery index
+      operationId: aiIndex
+      security:
+        - ApiKeyAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IndexResponse"
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/ai/meta:
+    get:
+      summary: API meta
+      operationId: aiMeta
+      security:
+        - ApiKeyAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetaResponse"
+
+  /api/ai/hrv/latest:
+    get:
+      summary: Latest HRV
+      operationId: aiHrvLatest
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/hrv/series:
+    get:
+      summary: HRV series
+      operationId: aiHrvSeries
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+        - name: last
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 5000, default: 500 }
+        - name: cursor
+          in: query
+          schema: { type: string }
+        - name: fields
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/hrv/summary:
+    get:
+      summary: HRV summary
+      operationId: aiHrvSummary
+      parameters:
+        - name: last
+          in: query
+          schema: { type: string }
+        - name: baseline_days
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 365, default: 28 }
+        - name: trend_days
+          in: query
+          schema: { type: integer, minimum: 2, maximum: 365, default: 7 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/hrv/events/latest:
+    get:
+      summary: Latest sickness/alcohol events
+      operationId: aiHrvEventsLatest
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/gym/workouts:
+    get:
+      summary: Workouts list
+      operationId: aiGymWorkouts
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+        - name: last
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 500, default: 200 }
+        - name: cursor
+          in: query
+          schema: { type: string }
+        - name: fields
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/gym/workout/{workout_id}:
+    get:
+      summary: Workout detail
+      operationId: aiGymWorkout
+      parameters:
+        - name: workout_id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/gym/exercise_frequency:
+    get:
+      summary: Exercise frequency
+      operationId: aiGymExerciseFrequency
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+        - name: last
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 1000, default: 200 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/gym/summary_weekly:
+    get:
+      summary: Weekly gym summary
+      operationId: aiGymSummaryWeekly
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+        - name: last
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/gym/prs:
+    get:
+      summary: Gym PRs
+      operationId: aiGymPrs
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+        - name: last
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 1000, default: 200 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/gym/progression/overview:
+    get:
+      summary: Exercise progression overview
+      operationId: aiGymProgressionOverview
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+        - name: last
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 500, default: 100 }
+        - name: exercise
+          in: query
+          schema: { type: string }
+        - name: variation
+          in: query
+          schema: { type: string }
+        - name: device
+          in: query
+          schema: { type: string }
+        - name: laterality
+          in: query
+          schema: { type: string }
+        - name: fields
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/gym/progression/exercise:
+    get:
+      summary: Exercise progression timeline
+      operationId: aiGymProgressionExercise
+      parameters:
+        - name: exercise
+          in: query
+          required: true
+          schema: { type: string }
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+        - name: last
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 500, default: 100 }
+        - name: variation
+          in: query
+          schema: { type: string }
+        - name: device
+          in: query
+          schema: { type: string }
+        - name: laterality
+          in: query
+          schema: { type: string }
+        - name: fields
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/gym/progression/monthly:
+    get:
+      summary: Monthly exercise progression overview
+      operationId: aiGymProgressionMonthly
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+        - name: last
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 500, default: 200 }
+        - name: exercise
+          in: query
+          schema: { type: string }
+        - name: variation
+          in: query
+          schema: { type: string }
+        - name: device
+          in: query
+          schema: { type: string }
+        - name: laterality
+          in: query
+          schema: { type: string }
+        - name: fields
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/runs/latest:
+    get:
+      summary: Latest run
+      operationId: aiRunsLatest
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/runs/list:
+    get:
+      summary: Runs list
+      operationId: aiRunsList
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+        - name: last
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 500, default: 200 }
+        - name: cursor
+          in: query
+          schema: { type: string }
+        - name: fields
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/runs/run/{run_id}:
+    get:
+      summary: Run detail
+      operationId: aiRunsRun
+      parameters:
+        - name: run_id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/runs/summary_weekly:
+    get:
+      summary: Weekly runs summary
+      operationId: aiRunsSummaryWeekly
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+        - name: last
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/plans/active:
+    get:
+      summary: Active plan
+      operationId: aiPlansActive
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/plans/{plan_id}:
+    get:
+      summary: Plan detail
+      operationId: aiPlansGet
+      parameters:
+        - name: plan_id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/nutrition/targets/live:
+    get:
+      summary: Live nutrition targets
+      operationId: aiNutritionTargetsLive
+      security:
+        - ApiKeyAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  ok: { type: boolean }
+                  data:
+                    $ref: "#/components/schemas/TargetsLive"
+                required: [ok, data]
+
+  /api/ai/nutrition/actuals/daily:
+    get:
+      summary: Nutrition actuals daily
+      operationId: aiNutritionActualsDaily
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+        - name: last
+          in: query
+          schema: { type: string }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 500, default: 200 }
+        - name: cursor
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/nutrition/adherence/summary:
+    get:
+      summary: Nutrition adherence summary
+      operationId: aiNutritionAdherenceSummary
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+        - name: last
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+
+  /api/ai/nutrition/meals/list:
+    get:
+      summary: Meal templates list
+      operationId: aiNutritionMealsList
+      parameters:
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 500, default: 200 }
+        - name: cursor
+          in: query
+          schema: { type: string }
+        - name: fields
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                properties:
+                  ok: { type: boolean }
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/MealTemplate"
+                  meta:
+                    $ref: "#/components/schemas/OkMeta"
+                required: [ok, data]

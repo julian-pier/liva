@@ -1,0 +1,11 @@
+[Unit]
+Description=LIVA LIVA watchdog timer
+
+[Timer]
+OnCalendar=*:0/5
+RandomizedDelaySec=20
+Persistent=true
+Unit=liva-watchdog.service
+
+[Install]
+WantedBy=timers.target

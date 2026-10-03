@@ -1,0 +1,1736 @@
+.gym-planning-shell {
+  grid-template-columns: minmax(260px, 300px) minmax(0, 1fr) minmax(280px, 320px);
+  width: 100%;
+  max-width: 100%;
+  align-items: stretch;
+}
+
+@media (min-width: 1200px) {
+  html[data-layout-mode="compact"] .app-page-shell:has(.planning-page) {
+    width: min(100%, 1500px) !important;
+    max-width: 1500px !important;
+    margin-inline: auto !important;
+    padding-inline: 20px !important;
+  }
+
+  html[data-layout-mode="compact"] .planning-page {
+    max-width: none;
+    width: 100%;
+    margin-inline: 0;
+  }
+
+  html[data-layout-mode="compact"] .gym-planning-shell {
+    grid-template-columns: minmax(280px, 320px) minmax(0, 1.14fr) minmax(300px, 340px);
+    gap: 16px;
+  }
+
+  html[data-layout-mode="compact"] .gym-day-grid {
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1460px) {
+  html[data-layout-mode="compact"] .gym-planning-shell {
+    grid-template-columns: minmax(260px, 290px) minmax(0, 1fr) minmax(260px, 300px);
+    gap: 14px;
+  }
+}
+
+.gym-planning-shell,
+.gym-day-grid,
+.gym-plan-header-card,
+.gym-header-actions,
+.gym-header-pills,
+.gym-day-card,
+.gym-event-card,
+.gym-rules-card,
+.gym-coach-card,
+.gym-dsl-card {
+  min-width: 0;
+}
+
+.gym-plan-header-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "main meta"
+    "description description";
+  align-items: start;
+  column-gap: 18px;
+  row-gap: 8px;
+}
+
+.gym-plan-header-card .header-left {
+  grid-area: main;
+  display: flex;
+  min-width: 0;
+  width: 100%;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gym-plan-header-card .eyebrow,
+.gym-plan-header-card .hero-input,
+.gym-plan-header-card .sub-input,
+.gym-plan-header-card .header-left > * {
+  min-width: 0;
+}
+
+.gym-plan-header-card .hero-input {
+  width: 100%;
+  max-width: none;
+}
+
+.gym-title-input {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 0;
+  color: var(--text-main);
+  caret-color: var(--text-main);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: pre-wrap;
+  overflow: hidden !important;
+  resize: none !important;
+  display: block;
+  text-align: left;
+  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+}
+
+.gym-title-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.65;
+}
+
+.gym-title-input:focus,
+.gym-title-input:focus-visible {
+  outline: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--text-main);
+}
+
+.gym-plan-header-card .sub-input {
+  width: 100%;
+  max-width: none;
+}
+
+.gym-header-description {
+  grid-area: description;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.gym-focus-input {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 2px 0 0;
+  min-height: 0 !important;
+  resize: none !important;
+  overflow: hidden !important;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  display: block;
+  text-align: left;
+  caret-color: var(--text-main);
+  overflow-wrap: break-word;
+}
+
+.gym-focus-input:not(:focus):not(:focus-visible) {
+  color: var(--text-muted);
+}
+
+.gym-focus-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.65;
+}
+
+.gym-focus-input:focus,
+.gym-focus-input:focus-visible {
+  outline: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--text-main);
+}
+
+.gym-plan-header-card .header-actions {
+  grid-area: meta;
+  display: flex;
+  min-width: 220px;
+  max-width: 360px;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-self: end;
+  gap: 8px;
+}
+
+.gym-plan-list {
+  max-height: calc(100vh - 260px);
+}
+
+.gym-library-card {
+  overflow: visible;
+}
+
+.gym-plan-item {
+  position: relative;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  background: var(--bg-card);
+  padding: 10px;
+  transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.gym-plan-item.is-active {
+  border-color: var(--accent-blue);
+  background: color-mix(in srgb, var(--bg-card) 88%, var(--accent-blue));
+}
+
+.gym-plan-item.is-selected {
+  border-color: color-mix(in srgb, var(--border-soft) 30%, #ffffff);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.58);
+}
+
+.gym-plan-item.is-selected.is-active {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.72);
+}
+
+.gym-plan-item.is-archived {
+  opacity: 0.72;
+}
+
+.gym-plan-main {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text-main);
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+}
+
+.gym-plan-name {
+  font-weight: 650;
+}
+
+.gym-plan-sub {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.gym-plan-cycle {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  color: color-mix(in srgb, var(--accent-blue) 68%, #ffffff);
+  text-transform: uppercase;
+}
+
+.gym-cycle-status {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--bg-card) 70%, transparent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: color-mix(in srgb, var(--accent-blue) 62%, #ffffff);
+  text-transform: uppercase;
+}
+
+.gym-cycle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.gym-cycle-grid label {
+  display: grid;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.gym-cycle-grid input {
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--bg-card) 84%, transparent);
+  color: var(--text-main);
+  padding: 6px 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.gym-cycle-loop-toggle {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-main);
+}
+
+.gym-cycle-loop-toggle input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent-blue);
+  margin: 0;
+}
+
+.gym-cycle-loop-text {
+  color: var(--text-main);
+}
+
+.gym-cycle-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.gym-rules-note {
+  margin: 0 14px 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.gym-header-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-wrap: nowrap;
+  align-self: start;
+  margin-top: 6px;
+}
+
+.gym-header-pills {
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  overflow: visible;
+  scrollbar-width: thin;
+  width: 100%;
+  max-width: 360px;
+}
+
+.gym-header-pill {
+  font-size: 11px;
+  color: var(--text-muted);
+  border: 1px solid color-mix(in srgb, var(--border-soft) 82%, transparent);
+  border-radius: 999px;
+  padding: 2px 8px;
+  background: color-mix(in srgb, var(--bg-card) 72%, transparent);
+  white-space: nowrap;
+}
+
+.gym-header-pill strong {
+  color: color-mix(in srgb, var(--text-main) 76%, #ffffff);
+  font-weight: 650;
+}
+
+.gym-plan-active-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #22c55e;
+  margin-right: 6px;
+}
+
+.gym-plan-kebab {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  /* The fixed action menu remains inside this stacking context. Keep it
+     above the neighbouring plan panels instead of behind the main column. */
+  z-index: 1000;
+}
+
+.gym-kebab-btn {
+  border: 1px solid var(--border-soft);
+  background: transparent;
+  border-radius: 8px;
+  height: 28px;
+  width: 28px;
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.gym-day-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.gym-section-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 2px 0 4px;
+  grid-column: 1 / -1;
+}
+
+.gym-section-label__title {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-main);
+}
+
+.gym-section-label__sub {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.gym-block-library-card {
+  margin-top: 2px;
+}
+
+.gym-plan-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 2200;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--bg-card) 92%, transparent);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(6px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(240px, 90vw);
+}
+
+.gym-plan-menu .btn-ghost {
+  width: 100%;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 8px 12px;
+  border-radius: 10px;
+}
+
+.gym-block-hint {
+  margin: 0 14px 10px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.gym-block-hint code {
+  font-size: 11px;
+}
+
+.gym-day-card {
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+  padding: 12px;
+  overflow: hidden;
+}
+
+.gym-day-card.is-last {
+  grid-column: 1 / -1;
+}
+
+.gym-day-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.gym-day-head .title {
+  margin: 0;
+}
+
+.gym-event-list {
+  display: grid;
+  gap: 12px;
+}
+
+.session-card {
+  position: relative;
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--bg-card) 88%, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.gym-event-card {
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  padding: 0;
+  cursor: grab;
+  overflow: hidden;
+  transition: border-color 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+
+.session-card__rail {
+  display: none;
+}
+
+.gym-event-card:hover {
+  box-shadow: var(--shadow-card);
+}
+
+.gym-event-card.is-dragging {
+  opacity: 0.45;
+  cursor: grabbing;
+}
+
+.gym-event-card.is-drop-target {
+  border-color: color-mix(in srgb, var(--accent-blue) 70%, #ffffff);
+}
+
+.gym-event-list.is-drop-target {
+  outline: 1px dashed color-mix(in srgb, var(--accent-blue) 65%, #ffffff);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
+.session-card__header {
+  padding: 12px 14px 8px;
+  background: color-mix(in srgb, var(--bg-card) 90%, rgba(255, 255, 255, 0.032));
+}
+
+.gym-event-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  border-bottom: 0;
+}
+
+.gym-event-head-left {
+  display: grid;
+  align-content: flex-start;
+  gap: 6px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.session-card__topline {
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.session-card__badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.gym-event-topline {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.session-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border-soft) 82%, transparent);
+  background: color-mix(in srgb, var(--bg-card) 74%, transparent);
+}
+
+.gym-time-chip {
+  font-size: 10px;
+  color: var(--text-main);
+  cursor: text;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.gym-time-chip:focus {
+  outline: 1px solid color-mix(in srgb, var(--accent-blue) 60%, transparent);
+  outline-offset: 1px;
+  color: var(--text-main);
+}
+
+.gym-time-chip::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  margin-right: 6px;
+  background: color-mix(in srgb, var(--accent-blue) 72%, transparent);
+  opacity: 0.9;
+}
+
+.gym-type-badge {
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  color: var(--text-main);
+  text-transform: none;
+  position: relative;
+  padding-left: 18px;
+}
+
+.gym-type-badge::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  transform: translateY(-50%);
+  background: color-mix(in srgb, var(--text-muted) 56%, transparent);
+}
+
+.gym-type-badge.gym {
+  color: color-mix(in srgb, var(--accent-blue) 78%, #ffffff);
+}
+
+.gym-type-badge.gym::before {
+  background: color-mix(in srgb, var(--accent-blue) 82%, transparent);
+}
+.gym-type-badge.run {
+  color: color-mix(in srgb, #72d0b4 68%, #ffffff);
+}
+.gym-type-badge.ergo {
+  color: color-mix(in srgb, #72d0b4 68%, #ffffff);
+}
+.gym-type-badge.bike {
+  color: color-mix(in srgb, #72d0b4 68%, #ffffff);
+}
+.gym-type-badge.row {
+  color: color-mix(in srgb, #72d0b4 68%, #ffffff);
+}
+.gym-type-badge.swim {
+  color: color-mix(in srgb, #72d0b4 68%, #ffffff);
+}
+
+.gym-type-badge.run::before,
+.gym-type-badge.ergo::before,
+.gym-type-badge.bike::before,
+.gym-type-badge.row::before,
+.gym-type-badge.swim::before {
+  background: color-mix(in srgb, #62c7ae 74%, transparent);
+}
+.gym-type-badge.rest {
+  color: var(--text-muted);
+}
+
+.gym-type-badge.rest::before {
+  background: color-mix(in srgb, var(--text-muted) 54%, transparent);
+}
+
+.gym-event-title {
+  display: block;
+  min-width: 0;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  font-weight: 700;
+  line-height: 1.24;
+  font-size: 14px;
+  cursor: text;
+  border-radius: 8px;
+  padding: 0;
+  letter-spacing: -0.015em;
+}
+
+.session-card__title {
+  margin: 0;
+  flex: 1 1 auto;
+}
+
+.gym-event-meta {
+  font-size: 10px;
+  line-height: 1.45;
+  color: var(--text-muted);
+  letter-spacing: 0;
+}
+
+.session-card__summary {
+  margin: 0;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  text-align: right;
+  padding-left: 12px;
+}
+
+.session-card__titleblock {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border-soft) 88%, rgba(255, 255, 255, 0.18));
+}
+
+.gym-event-title:focus {
+  outline: 1px solid color-mix(in srgb, var(--accent-blue) 60%, transparent);
+  outline-offset: 1px;
+  background: color-mix(in srgb, var(--accent-blue) 8%, transparent);
+}
+
+.session-card__body {
+  margin: 0;
+}
+
+.gym-item-surface {
+  border-radius: 0;
+  background: color-mix(in srgb, var(--bg-card) 92%, rgba(255, 255, 255, 0.02));
+  border: 0;
+  overflow: hidden;
+}
+
+.gym-item-lines {
+  margin-top: 0;
+  display: grid;
+  gap: 0;
+}
+
+.session-exercise-list {
+  display: grid;
+  gap: 0;
+}
+
+.gym-item-line {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: hidden;
+  position: relative;
+}
+
+.gym-item-line + .gym-item-line {
+  border-top: 1px solid color-mix(in srgb, var(--border-soft) 60%, transparent);
+}
+
+.gym-item-lines .gym-item-line:first-child {
+  border-top: 0;
+}
+
+.gym-item-line > summary {
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.45;
+  padding: 11px 14px;
+  list-style: none;
+  display: block;
+  transition: background 140ms ease, color 140ms ease;
+}
+
+.gym-item-line > summary:hover {
+  background: color-mix(in srgb, var(--bg-card) 74%, rgba(255,255,255,0.02));
+}
+
+.gym-item-line > summary::-webkit-details-marker {
+  display: none;
+}
+
+.gym-item-line[open] > summary {
+  border-bottom: 1px solid color-mix(in srgb, var(--border-soft) 70%, transparent);
+  background: color-mix(in srgb, var(--bg-card) 72%, rgba(255,255,255,0.018));
+}
+
+.session-exercise-row,
+.gym-item-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  width: 100%;
+}
+
+.session-exercise-main,
+.gym-item-main {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  align-content: start;
+  flex-wrap: wrap;
+}
+
+.session-exercise-name {
+  min-width: 0;
+  font-weight: 650;
+  color: var(--text-main);
+  font-size: 13px;
+  line-height: 1.3;
+  flex: 0 1 auto;
+}
+
+.session-exercise-meta {
+  font-size: 10px;
+  line-height: 1.35;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.session-exercise-meta--note {
+  max-width: min(60ch, 100%);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.session-exercise-meta--note {
+  margin-left: 2px;
+}
+
+.session-exercise-values,
+.gym-item-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  color: var(--text-muted);
+}
+
+.session-exercise-target,
+.session-exercise-rpe,
+.gym-item-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border-soft) 82%, transparent);
+  background: color-mix(in srgb, var(--bg-card) 72%, transparent);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--text-main);
+  white-space: nowrap;
+  box-shadow: none;
+}
+
+.session-exercise-rpe {
+  border-color: color-mix(in srgb, var(--accent-blue) 62%, var(--border-soft));
+  background: color-mix(in srgb, var(--bg-card) 74%, transparent);
+  color: color-mix(in srgb, var(--text-main) 88%, #ffffff);
+}
+
+.session-exercise-row--cardio .session-exercise-name,
+.session-exercise-row--ref .session-exercise-name,
+.session-exercise-row--note .session-exercise-name {
+  font-size: 12px;
+}
+
+.session-exercise-row--cardio .session-exercise-main,
+.session-exercise-row--ref .session-exercise-main,
+.session-exercise-row--note .session-exercise-main {
+  display: grid;
+  gap: 1px;
+}
+
+.session-exercise-row--note .session-exercise-values {
+  display: none;
+}
+
+.session-exercise-row--ref .session-exercise-target {
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gym-core-change-accent {
+  color: #6ef0a6;
+  font-weight: 800;
+}
+
+.gym-item-edit {
+  margin-top: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 12px 14px 14px;
+  background: color-mix(in srgb, var(--bg-card) 78%, rgba(255,255,255,0.018));
+}
+
+.gym-item-edit .full {
+  grid-column: 1 / -1;
+}
+
+.gym-item-edit input,
+.gym-item-edit textarea,
+.gym-rule-row input,
+.gym-rule-row select {
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--bg-card) 84%, transparent);
+  color: var(--text-main);
+  padding: 6px 8px;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.gym-rule-row input,
+.gym-rule-row select {
+  padding-left: 8px;
+  padding-right: 8px;
+  white-space: nowrap;
+  overflow: visible;
+  text-overflow: clip;
+  appearance: textfield;
+  -moz-appearance: textfield;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+}
+
+.gym-rule-row input::-webkit-outer-spin-button,
+.gym-rule-row input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.gym-item-ctrl {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.gym-item-ctrl button,
+.gym-event-actions button,
+.gym-rule-row button,
+.gym-block-row button {
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-card) 88%, transparent);
+  color: var(--text-main);
+  padding: 5px 11px;
+  cursor: pointer;
+}
+
+.gym-event-actions {
+  margin-top: 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px 14px 14px;
+  border-top: 1px solid color-mix(in srgb, var(--border-soft) 60%, transparent);
+  background: color-mix(in srgb, var(--bg-card) 90%, rgba(255, 255, 255, 0.028));
+}
+
+.session-card__footer {
+  align-items: center;
+}
+
+.gym-sequence-head-actions,
+.session-card__actions {
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.session-action-btn,
+.gym-sequence-head-actions .gym-kebab-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid var(--border-soft);
+  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.session-footer-btn,
+.gym-event-actions button,
+.gym-item-ctrl button {
+  font-size: 12px;
+  line-height: 1;
+  min-height: 32px;
+}
+
+.session-footer-btn {
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--bg-card) 88%, transparent);
+  color: var(--text-main);
+  padding: 0 10px;
+}
+
+.session-footer-btn:hover,
+.session-action-btn:hover,
+.gym-event-actions button:hover,
+.gym-item-ctrl button:hover,
+.gym-sequence-head-actions .gym-kebab-btn:hover {
+  border-color: color-mix(in srgb, var(--border-soft) 30%, #ffffff);
+  background: color-mix(in srgb, var(--bg-card) 76%, transparent);
+  color: var(--text-main);
+}
+
+.gym-sequence-list > .pill.ghost {
+  justify-self: stretch;
+  min-height: 36px;
+  border-radius: 12px;
+}
+
+@media (max-width: 760px) {
+  .session-card__header {
+    padding: 11px 12px 8px;
+  }
+
+  .session-exercise-row,
+  .gym-item-summary {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+  }
+
+  .session-card__topline {
+    align-items: flex-start;
+  }
+
+  .session-card__actions {
+    align-self: flex-start;
+  }
+
+  .session-exercise-values,
+  .gym-item-meta {
+    justify-content: flex-start;
+  }
+
+  .session-card__body {
+    margin: 0;
+  }
+
+  .gym-event-title {
+    font-size: 14px;
+  }
+
+  .session-card__titleblock {
+    display: grid;
+    gap: 2px;
+  }
+
+  .session-card__summary {
+    text-align: left;
+    padding-left: 0;
+    white-space: normal;
+  }
+
+  .session-exercise-main,
+  .gym-item-main {
+    display: grid;
+    gap: 1px;
+  }
+
+  .session-exercise-meta,
+  .session-exercise-meta--note {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .gym-item-line > summary,
+  .gym-item-edit,
+  .gym-event-actions {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+.gym-coach-summary,
+.gym-coach-warnings,
+.gym-rules-list,
+.gym-block-list {
+  display: grid;
+  gap: 8px;
+}
+
+.gym-rules-head {
+  display: grid;
+  grid-template-columns: 40px repeat(3, minmax(0, 1fr)) 66px;
+  gap: 6px;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text-muted);
+  text-transform: none;
+  margin-bottom: 8px;
+  background: color-mix(in srgb, var(--bg-card) 44%, transparent);
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--border-soft) 70%, transparent);
+}
+
+.gym-rules-head > span {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.gym-coach-warnings[hidden] {
+  display: none !important;
+}
+
+.gym-coach-row,
+.gym-warning-row,
+.gym-rule-row,
+.gym-block-row {
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 8px;
+}
+
+.gym-coach-row-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.gym-coach-row-sets {
+  color: var(--text-muted);
+}
+
+.gym-coach-bar {
+  height: 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-card) 80%, var(--border-soft));
+  overflow: hidden;
+}
+
+.gym-coach-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent-blue) 55%, transparent);
+}
+
+.gym-coach-bar.low span {
+  background: color-mix(in srgb, #f59e0b 65%, transparent);
+}
+
+.gym-coach-bar.high span {
+  background: color-mix(in srgb, #ef4444 58%, transparent);
+}
+
+.gym-coach-bar-range {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--bg-card) 86%, transparent);
+}
+
+.gym-coach-bar-zones {
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, #f4b740 82%, transparent) 0%,
+      color-mix(in srgb, #f4b740 82%, transparent) var(--green-start),
+      color-mix(in srgb, #2ecc97 82%, transparent) var(--green-start),
+      color-mix(in srgb, #2ecc97 82%, transparent) var(--green-end),
+      color-mix(in srgb, #f4b740 82%, transparent) var(--green-end),
+      color-mix(in srgb, #f4b740 82%, transparent) 100%
+    );
+}
+
+.gym-coach-bar-marker {
+  position: absolute;
+  top: -2px;
+  width: 2px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 2px;
+  transform: translateX(-1px);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+.gym-coach-bar-scale {
+  display: grid;
+  gap: 4px;
+}
+
+.gym-coach-bar-labels {
+  position: relative;
+  height: 12px;
+}
+
+.gym-coach-bar-label {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-size: 10px;
+  line-height: 1;
+  color: var(--text-muted);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.gym-warning-row {
+  color: color-mix(in srgb, #f59e0b 78%, var(--text-main));
+}
+
+.gym-warn-toggle {
+  font-size: 12px;
+}
+
+.gym-coach-warning-details > summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.gym-coach-warning-title {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 4px 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.gym-coach-warning-arrow {
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 700;
+  transition: transform 140ms ease;
+}
+
+.gym-coach-warning-title.is-collapsed .gym-coach-warning-arrow {
+  transform: rotate(-90deg);
+}
+
+.gym-rule-row {
+  display: grid;
+  grid-template-columns: 40px repeat(3, minmax(0, 1fr)) 66px;
+  gap: 6px;
+  align-items: center;
+  border: 1px solid var(--border-soft);
+  border-radius: 10px;
+  padding: 8px;
+}
+
+.gym-rule-row > * {
+  min-width: 0;
+}
+
+.gym-rule-row.is-active {
+  border-color: var(--accent-blue);
+}
+
+.gym-warnings-scroll {
+  max-height: 130px;
+  overflow: auto;
+}
+
+.gym-dsl-warning-wrap > summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 6px 0;
+}
+
+.gym-dsl-card {
+  min-height: 560px;
+  display: flex;
+  flex-direction: column;
+}
+
+.gym-dsl-card.mfp-bridge-card .nutrition-mfp-segmented[data-active="import"] .nutrition-mfp-indicator {
+  transform: translateX(0);
+}
+
+.gym-dsl-card.mfp-bridge-card .nutrition-mfp-segmented[data-active="export"] .nutrition-mfp-indicator {
+  transform: translateX(100%);
+}
+
+.gym-dsl-card .nutrition-mfp-pane {
+  display: flex;
+  flex: 1;
+}
+
+.gym-dsl-card .nutrition-mfp-pane[hidden] {
+  display: none !important;
+}
+
+.gym-dsl-card .nutrition-mfp-import-block {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.gym-dsl-card .nutrition-mfp-import-input {
+  flex: 1;
+  min-height: 220px;
+}
+
+.gym-dsl-card .nutrition-mfp-import-warnings {
+  max-height: 130px;
+  overflow: auto;
+}
+
+.gym-block-row summary {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.gym-block-entry {
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 8px;
+  margin-top: 8px;
+}
+
+.gym-block-entry-head {
+  display: grid;
+  grid-template-columns: 70px 1fr auto;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.gym-block-entry select,
+.gym-block-entry input,
+.gym-block-entry textarea {
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--bg-card) 84%, transparent);
+  color: var(--text-main);
+  padding: 6px 8px;
+}
+
+.gym-block-entry textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.gym-block-controls {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.gym-block-controls button {
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-main);
+  padding: 4px 10px;
+}
+
+.gym-block-row.is-highlight {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-blue) 50%, transparent);
+}
+
+.gym-block-row-title {
+  font-weight: 600;
+}
+
+.gym-block-row-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.gym-block-lines {
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 1280px) {
+  .gym-planning-shell {
+    grid-template-columns: 270px minmax(0, 1fr) 300px;
+  }
+}
+
+@media (max-width: 980px) {
+  .gym-planning-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .gym-day-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gym-day-card.is-last {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 980px) {
+  .gym-planning-shell {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .gym-plan-header-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "main"
+      "meta"
+      "description";
+  }
+
+  .gym-plan-header-card .header-left {
+    width: 100%;
+  }
+
+  .gym-plan-header-card .hero-input,
+  .gym-plan-header-card .sub-input {
+    width: 100%;
+    max-width: none;
+  }
+
+  .gym-plan-header-card .header-actions {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    justify-self: start;
+    align-items: flex-start;
+  }
+
+  .gym-plan-header-card .header-actions .gym-header-pills {
+    justify-content: flex-start;
+    max-width: 100%;
+  }
+
+  .gym-header-actions,
+  .gym-header-pills {
+    flex-wrap: wrap;
+  }
+}
+
+@media (pointer: coarse) and (min-width: 768px) and (max-width: 1199px) {
+  .gym-planning-shell {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .gym-planning-shell > .nutrition-column-left,
+  .gym-planning-shell > .nutrition-column-center,
+  .gym-planning-shell > .nutrition-column-right {
+    display: contents;
+  }
+
+  .gym-library-card { order: 1; }
+  .gym-plan-header-card { order: 2; }
+  .gym-cycle-card { order: 3; }
+  .gym-day-grid { order: 4; }
+  .gym-block-library-card { order: 5; }
+  .gym-rules-card { order: 6; }
+  .gym-coach-card { order: 7; }
+  .gym-dsl-card { order: 8; }
+}
+
+.gym-plan-mode-card,
+.gym-sequence-list {
+  margin-top: 14px;
+}
+
+.gym-plan-mode-row,
+.gym-periodization-toggle,
+.gym-sequence-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gym-rules-card .panel-header {
+  align-items: center;
+}
+
+.gym-periodization-toggle {
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--border-soft) 84%, transparent);
+  border-radius: 999px;
+  padding: 5px 10px 5px 8px;
+  background: color-mix(in srgb, var(--bg-card) 86%, transparent);
+  cursor: pointer;
+  user-select: none;
+}
+
+.gym-periodization-toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gym-periodization-toggle-ui {
+  position: relative;
+  width: 34px;
+  height: 20px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-card) 64%, #000000);
+  border: 1px solid color-mix(in srgb, var(--border-soft) 80%, transparent);
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.gym-periodization-toggle-ui::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, #ffffff 88%, var(--bg-card));
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.28);
+  transition: transform 160ms ease;
+}
+
+.gym-periodization-toggle-text {
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.gym-periodization-toggle input:checked + .gym-periodization-toggle-ui {
+  background: color-mix(in srgb, var(--accent-blue) 28%, var(--bg-card));
+  border-color: color-mix(in srgb, var(--accent-blue) 55%, #ffffff);
+}
+
+.gym-periodization-toggle input:checked + .gym-periodization-toggle-ui::after {
+  transform: translateX(14px);
+}
+
+.gym-periodization-toggle input:checked ~ .gym-periodization-toggle-text {
+  color: var(--text-main);
+}
+
+.gym-plan-mode-row {
+  justify-content: space-between;
+}
+
+.gym-plan-mode-card .gym-mode-segmented {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 2px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-card) 86%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-soft) 85%, transparent);
+}
+
+.gym-plan-mode-card .gym-mode-segmented .nutrition-mfp-indicator {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: calc(50% - 2px);
+  height: calc(100% - 4px);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent-blue) 18%, var(--bg-card));
+  border: 1px solid color-mix(in srgb, var(--accent-blue) 48%, rgba(255,255,255,0.18));
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.24);
+  transition: transform 180ms ease;
+  z-index: 1;
+}
+
+.gym-plan-mode-card .gym-mode-segmented[data-active="rolling"] .nutrition-mfp-indicator {
+  transform: translateX(100%);
+}
+
+.gym-plan-mode-card .gym-mode-segmented .nutrition-mfp-tab {
+  position: relative;
+  z-index: 2;
+  min-width: 98px;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  transition: color 160ms ease;
+}
+
+.gym-plan-mode-card .gym-mode-segmented .nutrition-mfp-tab.is-active {
+  color: var(--text-main);
+}
+
+.gym-plan-mode-body {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.gym-mode-fixed-shell {
+  display: grid;
+  gap: 6px;
+}
+
+.gym-mode-fixed-note,
+.gym-mode-stats,
+.gym-coach-meta {
+  font-size: 12px;
+  color: var(--text-main);
+  border: 1px solid color-mix(in srgb, var(--border-soft) 72%, transparent);
+  border-radius: 12px;
+  padding: 9px 11px;
+  background: color-mix(in srgb, var(--bg-card) 78%, transparent);
+}
+
+.gym-mode-fixed-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 650;
+}
+
+.gym-mode-fixed-note span {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.gym-mode-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  padding-inline: 2px;
+}
+
+.gym-mode-week-pills {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.gym-mode-day-pill {
+  position: relative;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  min-height: 58px;
+  background: color-mix(in srgb, var(--bg-card) 90%, transparent);
+  color: var(--text-main);
+  padding: 8px 6px;
+  cursor: pointer;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 3px;
+  overflow: hidden;
+  transition: border-color 140ms ease, background 140ms ease, transform 140ms ease;
+}
+
+.gym-mode-day-pill:hover {
+  transform: translateY(-1px);
+}
+
+.gym-mode-day-pill.is-train {
+  border-color: color-mix(in srgb, var(--accent-blue) 62%, #ffffff);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-blue) 30%, transparent);
+}
+
+.gym-mode-day-pill.is-optional {
+  color: color-mix(in srgb, var(--text-main) 82%, #ffffff);
+  background:
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.04) 0 6px, rgba(255,255,255,0.01) 6px 12px),
+    color-mix(in srgb, var(--bg-card) 88%, transparent);
+}
+
+.gym-mode-day-pill.is-rest {
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--bg-card) 65%, #000000);
+}
+
+.gym-mode-day-pill.is-rest::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(135deg, transparent 0 10px, rgba(255,255,255,0.08) 10px 12px);
+  pointer-events: none;
+}
+
+.gym-mode-day-name {
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.gym-mode-day-state {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.92;
+}
+
+.gym-coach-meta {
+  margin: 4px 0 2px;
+}
+
+.gym-rules-card.is-disabled-card {
+  opacity: 0.72;
+}
+
+.gym-rules-card.is-disabled-card .gym-rules-head,
+.gym-rules-card.is-disabled-card .gym-rule-row {
+  background: color-mix(in srgb, var(--bg-card) 60%, transparent);
+}
+
+.gym-sequence-list {
+  display: grid;
+  gap: 12px;
+}
+
+.gym-rule-row.is-disabled {
+  opacity: 0.55;
+}

@@ -1,0 +1,11 @@
+[Unit]
+Description=Run LIVA WebUntis Update Watch every 5 minutes (06:00-22:00)
+
+[Timer]
+OnCalendar=*-*-* 06..21:00/5:00
+OnCalendar=*-*-* 22:00:00
+Unit=liva-webuntis-update-watch.service
+Persistent=true
+
+[Install]
+WantedBy=timers.target

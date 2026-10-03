@@ -1,0 +1,89 @@
+name: Quality
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  LIVA_FLASK_SECRET: ci-only-flask-secret
+  LIVA_MASTER_SECRET: ci-only-master-secret
+  LIVA_AUTH_PEPPER: ci-only-auth-pepper
+  LIVA_SESSION_COOKIE_SECURE: "0"
+  LIVA_DATABASE_DIR: /tmp/liva-ci-database
+
+jobs:
+  release-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.18.0"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --prefix frontend
+      - run: npm audit --omit=dev --prefix frontend
+      - run: npm run check --prefix frontend
+      - run: python -m pip install -e '.[test]' -e ./liva_mcp
+      - run: python scripts/public_release_audit.py
+      - name: Run release-critical application tests
+        run: >-
+          python -m pytest -q
+          tests/test_private_access_ip_resolution.py
+          tests/test_database_bootstrap.py
+          tests/test_gpt_openapi_audit.py
+          tests/test_full_recovery.py
+          tests/test_sqlite_backup.py
+          tests/test_telegram_calendar_parsers.py
+      - name: Run the complete MCP suite
+        run: python -m pytest -q liva_mcp/tests
+
+  container-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build --tag liva:ci .
+      - name: Start the hardened image
+        run: >-
+          docker run --detach --name liva-ci
+          --publish 127.0.0.1:15000:5000
+          --env LIVA_FLASK_SECRET=ci-only-flask-secret
+          --env LIVA_MASTER_SECRET=ci-only-master-secret
+          --env LIVA_AUTH_PEPPER=ci-only-auth-pepper
+          --env LIVA_SESSION_COOKIE_SECURE=0
+          --env LIVA_DATABASE_DIR=/var/lib/liva/database
+          liva:ci
+      - name: Verify health and non-root execution
+        run: |
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:15000/healthz | grep --quiet '"ok":true'; then
+              test "$(docker exec liva-ci id -u)" != "0"
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs liva-ci
+          exit 1
+
+  legacy-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: python -m pip install -e '.[test]'
+      - name: Track pre-1.0 legacy contract migration
+        run: python -m pytest -m "not live and not hardware"

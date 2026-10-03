@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% block title %}HRV & Recovery{% endblock %}
+
+{% block head %}
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/hrv.css') }}?v=20260731_range_presets_v9">
+{% endblock %}
+
+{% block content %}
+<div class="page-container hrv-dashboard" id="hrv-app">
+  <header class="hrv-page-header">
+    <div class="hrv-heading">
+      <p class="hrv-kicker">Recovery</p>
+      <h1>HRV &amp; Recovery</h1>
+      <p>Belastung entscheiden, Ursachen verstehen und Veränderungen früh erkennen.</p>
+    </div>
+
+    <div class="hrv-toolbar" role="group" aria-label="Recovery steuern">
+      <div class="hrv-range-control">
+        <span id="hrv-range-label">Zeitraum</span>
+        <div class="hrv-range-presets" role="group" aria-labelledby="hrv-range-label">
+          <button type="button" class="hrv-range-preset" data-range-value="7" aria-pressed="false">7 T</button>
+          <button type="button" class="hrv-range-preset" data-range-value="14" aria-pressed="false">14 T</button>
+          <button type="button" class="hrv-range-preset is-active" data-range-value="30" aria-pressed="true">30 T</button>
+          <button type="button" class="hrv-range-preset" data-range-value="90" aria-pressed="false">90 T</button>
+          <button type="button" class="hrv-range-preset" data-range-value="365" aria-pressed="false">1 J</button>
+          <button type="button" class="hrv-range-preset" data-range-value="all" aria-pressed="false">Alle</button>
+        </div>
+        <input type="hidden" id="hrv-range" value="30">
+      </div>
+      <button type="button" class="hrv-sync-button" id="hrv-sync-button">Neue Daten</button>
+      <div class="hrv-freshness">
+        <div>
+          <span>Messung</span>
+          <strong id="hrv-latest-measurement">–</strong>
+        </div>
+        <div>
+          <span>Sync</span>
+          <strong id="hrv-last-sync">–</strong>
+        </div>
+      </div>
+    </div>
+    <div class="hrv-control-error" id="hrv-controls-error"></div>
+  </header>
+
+  <main class="hrv-main">
+    <section class="hrv-morning-board" aria-labelledby="hrv-today-heading">
+      <article class="hrv-decision-panel" data-testid="hrv-summary-card">
+        <div class="hrv-section-head">
+          <div>
+            <p class="hrv-section-kicker">Heute</p>
+            <h2 id="hrv-today-heading">Belastungsentscheidung</h2>
+          </div>
+          <span class="hrv-status-pill" id="hrv-readiness-status">–</span>
+        </div>
+
+        <div class="hrv-decision-layout">
+          <div class="hrv-decision-primary">
+            <div class="hrv-decision-core">
+              <div class="hrv-decision-copy">
+                <h3 id="hrv-action-title">Daten werden ausgewertet</h3>
+                <p id="hrv-action-copy">–</p>
+              </div>
+              <div class="hrv-readiness-score" aria-label="Training Readiness">
+                <strong id="hrv-readiness-score">–</strong><span>/100</span>
+              </div>
+            </div>
+            <div class="hrv-gauge" aria-hidden="true"><div class="hrv-gauge-fill" id="hrv-readiness-gauge"></div></div>
+          </div>
+
+          <div class="hrv-decision-context">
+            <div class="hrv-readiness-flag" id="hrv-readiness-flag" hidden></div>
+            <div class="hrv-decision-reasons" id="hrv-signal-list"></div>
+          </div>
+        </div>
+
+        <div class="hrv-decision-footer">
+          <div class="hrv-polar-result">
+            <div>
+              <span>Polar Recovery heute</span>
+              <strong><b id="hrv-polar-score">–</b><small>/100</small></strong>
+            </div>
+            <div>
+              <span>Status</span>
+              <strong id="hrv-polar-status">–</strong>
+            </div>
+            <div>
+              <span>Datenqualität</span>
+              <strong id="hrv-polar-confidence">–</strong>
+            </div>
+          </div>
+          <p class="hrv-readiness-note" id="hrv-readiness-note">–</p>
+        </div>
+      </article>
+
+      <article class="hrv-driver-panel">
+        <div class="hrv-section-head">
+          <div>
+            <p class="hrv-section-kicker">Treiber</p>
+            <h2>Was heute wirkt</h2>
+          </div>
+          <span class="hrv-baseline-label">gegen 28-Tage-Basis</span>
+        </div>
+        <div class="hrv-driver-list" id="hrv-key-grid"></div>
+      </article>
+
+      <article class="hrv-night-panel">
+        <div class="hrv-section-head">
+          <div>
+            <p class="hrv-section-kicker">Letzte Nacht</p>
+            <h2>Nachtprofil</h2>
+          </div>
+        </div>
+        <div id="hrv-sleep-profile" class="hrv-sleep-profile"></div>
+      </article>
+    </section>
+
+    <section class="hrv-history-section" aria-labelledby="hrv-history-heading">
+      <div class="hrv-history-head">
+        <div>
+          <p class="hrv-section-kicker">Verlauf</p>
+          <h2 id="hrv-history-heading">Erholung über Zeit</h2>
+        </div>
+      </div>
+
+      <div class="hrv-week-strip" aria-label="7-Tage-Zusammenfassung">
+        <div class="hrv-week-stat">
+          <span id="mini-rmssd-label">Ø Recovery</span>
+          <strong id="mini-rmssd-value">–</strong>
+          <small id="mini-rmssd-trend">–</small>
+        </div>
+        <div class="hrv-week-stat">
+          <span id="mini-pulse-label">Ø RMSSD</span>
+          <strong id="mini-pulse-value">–</strong>
+          <small id="mini-pulse-trend">–</small>
+        </div>
+        <div class="hrv-week-stat">
+          <span id="mini-balance-label">Ø Nachtpuls</span>
+          <strong id="mini-balance-value">–</strong>
+          <small id="mini-balance-trend">–</small>
+        </div>
+        <div class="hrv-week-stat">
+          <span id="mini-sleep-label">Ø Schlafscore</span>
+          <strong id="mini-sleep-value">–</strong>
+          <small id="mini-sleep-trend">–</small>
+        </div>
+      </div>
+
+      <div class="hrv-chart-layout">
+        <article class="hrv-chart-panel hrv-chart-main">
+          <div class="hrv-chart-head">
+            <div>
+              <span>Entscheidungsgrundlage</span>
+              <h3>Recovery-Score</h3>
+            </div>
+            <span>0–100</span>
+          </div>
+          <div class="chart-wrap"><canvas id="chart-rmssd"></canvas></div>
+          <div class="hrv-chart-status" id="chart-rmssd-status"></div>
+        </article>
+
+        <article class="hrv-chart-panel hrv-chart-drivers">
+          <div class="hrv-chart-head">
+            <div>
+              <span>Abweichung zur Basis</span>
+              <h3>Treiber</h3>
+            </div>
+            <span>positiv = erholter</span>
+          </div>
+          <div class="chart-wrap"><canvas id="chart-pulse"></canvas></div>
+          <div class="hrv-chart-status" id="chart-pulse-status"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="hrv-table-section" data-testid="hrv-flags-card">
+      <div class="hrv-table-head">
+        <div>
+          <p class="hrv-section-kicker">Tage</p>
+          <h2>Alle Messungen</h2>
+        </div>
+        <div class="hrv-table-meta" id="hrv-table-meta">–</div>
+      </div>
+
+      <div class="hrv-table-wrapper">
+        <table class="hrv-table">
+          <thead>
+            <tr>
+              <th data-sort="date"><button type="button" class="hrv-sort-btn">Datum <span class="hrv-sort-indicator"></span></button></th>
+              <th data-sort="recovery"><button type="button" class="hrv-sort-btn">Recovery <span class="hrv-sort-indicator"></span></button></th>
+              <th data-sort="sleep_start"><button type="button" class="hrv-sort-btn">Einschlafzeit <span class="hrv-sort-indicator"></span></button></th>
+              <th data-sort="sleep_end"><button type="button" class="hrv-sort-btn">Aufwachzeit <span class="hrv-sort-indicator"></span></button></th>
+              <th data-sort="sleep_duration"><button type="button" class="hrv-sort-btn">Schlafdauer <span class="hrv-sort-indicator"></span></button></th>
+              <th data-sort="sleep_score"><button type="button" class="hrv-sort-btn">Schlafscore <span class="hrv-sort-indicator"></span></button></th>
+              <th data-sort="rmssd"><button type="button" class="hrv-sort-btn">RMSSD <span class="hrv-sort-indicator"></span></button></th>
+              <th data-sort="sleep_pulse"><button type="button" class="hrv-sort-btn">Schlafpuls <span class="hrv-sort-indicator"></span></button></th>
+              <th data-sort="ans"><button type="button" class="hrv-sort-btn">ANS <span class="hrv-sort-indicator"></span></button></th>
+              <th data-sort="rem"><button type="button" class="hrv-sort-btn">REM <span class="hrv-sort-indicator"></span></button></th>
+              <th data-sort="interruptions"><button type="button" class="hrv-sort-btn">Wachzeit <span class="hrv-sort-indicator"></span></button></th>
+              <th data-sort="flag"><button type="button" class="hrv-sort-btn">Flag <span class="hrv-sort-indicator"></span></button></th>
+            </tr>
+          </thead>
+          <tbody id="hrv-table-body"></tbody>
+        </table>
+      </div>
+      <div class="hrv-table-error" id="hrv-table-error"></div>
+    </section>
+  </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script defer src="{{ url_for('static', filename='js/hrv.js') }}?v=20260731_range_presets_v7"></script>
+{% endblock %}

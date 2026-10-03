@@ -1,0 +1,13 @@
+[Unit]
+Description=LIVA full recovery catch-up evaluation
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/liva
+ExecStart=/opt/liva/.venv/bin/python -m recovery.automation catchup --config /etc/liva/recovery/config.toml --target /mnt/liva-recovery/backups/full-recovery
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=read-only
+ReadWritePaths=/mnt/liva-recovery /var/lib/liva-recovery /opt/liva/database

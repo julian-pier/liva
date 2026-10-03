@@ -1,0 +1,13 @@
+[Unit]
+Description=LIVA Telegram Inbox Long-Poll Worker
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/liva
+ExecStart=/opt/liva/venv/bin/python -m jobs.telegram_inbox_daemon
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

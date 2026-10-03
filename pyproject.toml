@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools==82.0.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "liva"
+version = "0.1.0"
+description = "Self-hosted personal performance hub"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "Flask==3.1.2",
+    "garminconnect==0.3.11",
+    "google-api-python-client==2.187.0",
+    "google-auth-httplib2==0.3.0",
+    "google-auth-oauthlib==1.3.0",
+    "gunicorn==23.0.0",
+    "httplib2==0.31.2",
+    "Pillow==12.0.0",
+    "pillow-heif==1.5.0",
+    "playwright==1.58.0",
+    "psutil==7.1.3",
+    "python-dotenv==1.2.1",
+    "python-kasa==0.10.2",
+    "reportlab==4.4.7",
+    "requests==2.34.2",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest==9.0.2",
+]
+
+[tool.setuptools]
+py-modules = ["app"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = [
+    "ai*",
+    "activity*",
+    "analysis*",
+    "app_support*",
+    "core*",
+    "database*",
+    "gcalsync*",
+    "integrations*",
+    "jobs*",
+    "kienzl*",
+    "liva_memory*",
+    "memory*",
+    "nutrition*",
+    "plans*",
+    "schoolsync*",
+    "security*",
+    "smart_home*",
+    "strava_sync*",
+    "terminal*",
+    "training*",
+    "clients*",
+]
+exclude = ["tests*", "liva_mcp*"]
+namespaces = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["--strict-markers"]
+markers = [
+    "integration: crosses module or persistence boundaries",
+    "live: requires configured external services and may change external state",
+    "hardware: requires local physical devices",
+]

@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_new.css') }}?v=20260911_local_cardio_v1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_professional.css') }}?v=20260727_professional_v9">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout dashboard-overview" id="dashboard-app">
+  <header class="dashboard-header">
+    <div class="dashboard-title-block">
+      <div class="dashboard-title">Dashboard</div>
+      <div class="dashboard-meta-pills" id="dashboard-meta-pills">
+        <span class="meta-pill" id="dashboard-pill-plan">Plan: Lade…</span>
+        <span class="meta-pill" id="dashboard-pill-hrv">HRV: Lade…</span>
+        <span class="meta-pill" id="dashboard-pill-gym">Gym: Lade…</span>
+        <span class="meta-pill" id="dashboard-pill-run">Cardio: Lade…</span>
+        <span class="meta-pill" id="dashboard-pill-nutrition">Ernährung: Lade…</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="dashboard-top-grid" id="dashboard-top-grid">
+    <article class="dashboard-card today-hero" data-card="today" id="dashboard-today-card">
+      <div class="today-shell">
+
+        <header class="today-head">
+          <div class="today-head-left">
+            <div class="today-eyebrow">HEUTE</div>
+            <h2 class="today-title" id="today-headline">--</h2>
+          </div>
+
+          <div class="today-week-line" id="today-week-line">
+            <div class="today-week-label" id="today-week-label"></div>
+            <div class="today-week-pill" id="today-week-pill"></div>
+            <div class="today-week-note" id="today-week-note"></div>
+          </div>
+        </header>
+
+        <div class="today-status-line" id="today-status-line"></div>
+
+        <div class="today-tiles">
+          <section class="today-tile" data-tile="recovery">
+            <div class="today-tile-label">Recovery</div>
+            <div class="today-tile-body" id="today-signal-recovery"></div>
+          </section>
+
+          <section class="today-tile" data-tile="energy">
+            <div class="today-tile-label">Energy</div>
+            <div class="today-tile-body" id="today-signal-energy"></div>
+          </section>
+
+          <section class="today-tile" data-tile="load">
+            <div class="today-tile-label">Load</div>
+            <div class="today-tile-body" id="today-signal-load"></div>
+          </section>
+        </div>
+
+        <footer class="today-footer" id="today-footer-line"></footer>
+
+      </div>
+    </article>
+
+    <article class="dashboard-card signals-card" id="dashboard-signals-card">
+      <div class="signals-card-head card-head">
+        <div class="card-eyebrow">SIGNALS</div>
+        <div class="card-title" id="signals-range-title">Letzte 14 Tage</div>
+      </div>
+      <div class="signals-body">
+        <div class="signals-lanes">
+          <div class="signals-lane">
+            <div class="signals-label">Recovery</div>
+            <div class="signals-bars" id="signal-recovery"></div>
+          </div>
+          <div class="signals-lane">
+            <div class="signals-label">Energy</div>
+            <div class="signals-bars" id="signal-energy"></div>
+          </div>
+          <div class="signals-lane">
+            <div class="signals-label">Cardio</div>
+            <div class="signals-bars" id="signal-run"></div>
+          </div>
+          <div class="signals-lane">
+            <div class="signals-label">Strength</div>
+            <div class="signals-bars" id="signal-strength"></div>
+          </div>
+          <div class="signals-days" id="signal-day-labels"></div>
+        </div>
+      </div>
+    </article>
+
+    <div class="dashboard-context-row" id="dashboard-context-row">
+        <article class="dashboard-card meals-card mealplan-card" id="dashboard-mealplan-card">
+          <div class="card-head mealplan-head">
+            <div class="plan-check-head-left">
+              <div class="card-eyebrow">ERNÄHRUNG</div>
+              <div class="card-title">Mealplan</div>
+            </div>
+            <div class="mealplan-head-meta">
+              <div class="mealplan-date" id="dashboard-mealplan-date">{{ dashboard_initial_mealplan.date_label or '--' }}</div>
+              <div class="mealplan-progress" id="dashboard-mealplan-progress">{% if dashboard_initial_mealplan.rows %}{% set done = namespace(count=0) %}{% set total = namespace(count=0) %}{% for row in dashboard_initial_mealplan.rows %}{% set total.count = total.count + 1 %}{% if row.state in ['done', 'skipped', 'replaced', 'historical'] %}{% set done.count = done.count + 1 %}{% endif %}{% endfor %}{% if done.count == 0 %}{{ total.count }} Meals geplant{% else %}{{ total.count - done.count }} offen · {{ done.count }} erledigt{% endif %}{% else %}Heute ist nichts geplant{% endif %}</div>
+            </div>
+          </div>
+          <div class="mealplan-body" id="dashboard-mealplan-body">{% if dashboard_initial_mealplan.rows %}{% for row in dashboard_initial_mealplan.rows %}<div class="mealplan-meal is-{{ row.state }}{% if row.state in ['historical', 'replaced', 'skipped'] %} is-historical{% endif %}"><div class="mealplan-meal-header"><span class="mealplan-time">{{ row.time }}</span><span class="mealplan-name">{{ row.name }}</span>{% if row.badge %}<span class="mealplan-status-dot is-{{ row.state }}">{{ row.badge }}</span>{% endif %}</div>{% if row.items_inline %}<div class="mealplan-items-inline">{{ row.items_inline }}</div>{% endif %}</div>{% endfor %}{% else %}<div class="mealplan-empty">Heute ist nichts geplant.</div>{% endif %}</div>
+        </article>
+
+        <article class="dashboard-card endurance-approval-card" id="dashboard-endurance-card">
+          <div class="card-head endurance-head">
+            <div class="plan-check-head-left">
+              <div class="card-eyebrow">CARDIO</div>
+              <div class="card-title">Nächster Lauf</div>
+            </div>
+            <div class="endurance-head-meta">
+              <span class="endurance-source" id="dashboard-endurance-source">LIVA · lokal</span>
+              <span class="endurance-status-badge is-unknown" id="dashboard-endurance-status">Sync offen</span>
+            </div>
+          </div>
+          <div class="endurance-body" id="dashboard-endurance-body">
+            <div class="endurance-empty">Lade Cardio-Plan…</div>
+          </div>
+        </article>
+
+    </div>
+  </section>
+
+  <section class="dashboard-plan-tools" id="dashboard-plan-tools">
+    <article class="dashboard-card today-agenda-card" id="today-agenda-card">
+      <div class="today-agenda-card-head card-head">
+        <div class="today-agenda-card-head-left">
+          <div class="card-eyebrow">HEUTE</div>
+          <div class="card-title">Kalender</div>
+        </div>
+        <div class="today-agenda-card-head-meta">
+          <span class="today-agenda-day-meta" id="today-agenda-day-meta">-</span>
+          <span class="today-agenda-count-pill" id="today-agenda-count-pill">0</span>
+        </div>
+      </div>
+      <div class="today-agenda-body" id="today-agenda-body">
+        <div class="today-agenda-empty">Heute wird geladen…</div>
+      </div>
+    </article>
+
+    <div class="chip-card plan-check-card core-explain-host" id="plan-check-card">
+      <div class="card-head plan-check-head">
+        <div class="plan-check-head-left">
+          <div class="card-eyebrow">TRAINING</div>
+          <div class="card-title" id="plan-check-card-title">Nächste Einheit</div>
+        </div>
+        <div class="plan-check-week-meta">
+          <button type="button" class="autopilot-badge" id="autopilot-badge" hidden aria-expanded="false" aria-controls="core-explain-panel">CORE steuert</button>
+        </div>
+      </div>
+      <div class="plan-check-body core-explain-card-body">
+        <div class="plan-check-static-day" id="plan-check-static-day">Heute: —</div>
+        <div class="plan-check-mode-line" id="plan-check-mode-line">Lade Trainingsvorgaben…</div>
+        <div class="plan-check-changes-box" id="plan-check-changes-box" hidden></div>
+        <div class="plan-check-select-row" hidden>
+          <div class="plan-check-header-row">
+          </div>
+          <select id="plan-check-select"></select>
+          <div class="pc-day-select" id="plan-check-select-ui" hidden></div>
+        </div>
+        <a class="plan-check-link" id="plan-check-link" href="#" hidden>Letzte Ausführung: Lade…</a>
+        <div class="plan-check-exercises" id="plan-check-exercises"></div>
+        <div class="plan-check-message" id="plan-check-message"></div>
+        <div id="dashboard-core-training-card" class="dashboard-core-training-card" hidden></div>
+      </div>
+      <div class="core-explain-panel-slot" id="plan-check-core-explain-slot" hidden></div>
+    </div>
+  </section>
+
+  <div class="core-explain-sheet-backdrop" id="core-explain-sheet-backdrop" hidden></div>
+  <div class="core-explain-sheet-host" id="core-explain-sheet-host" hidden></div>
+  <div id="kienzl-modal" aria-hidden="true" hidden></div>
+
+  <template id="core-explain-panel-template">
+    <section class="core-explain-panel" id="core-explain-panel" role="dialog" aria-modal="false" aria-labelledby="core-explain-panel-title">
+      <header class="core-explain-panel-header">
+        <div class="core-explain-panel-head-main">
+          <div class="core-explain-panel-label">CORE Decision Panel</div>
+          <h3 class="core-explain-panel-title" id="core-explain-panel-title"></h3>
+        </div>
+        <div class="core-explain-panel-head-actions">
+          <div class="core-explain-panel-status" id="core-explain-panel-status" hidden></div>
+          <button type="button" class="core-explain-panel-close" id="core-explain-panel-close" aria-label="CORE-Erklärung schließen">×</button>
+        </div>
+      </header>
+      <div class="core-explain-panel-meta" id="core-explain-panel-meta" hidden></div>
+
+      <section class="core-explain-hero">
+        <p class="core-explain-hero-verdict" id="core-explain-hero-verdict"></p>
+        <p class="core-explain-hero-subtext" id="core-explain-hero-subtext"></p>
+      </section>
+
+      <section class="core-explain-panel-section">
+        <div class="core-explain-panel-section-title">Entscheidungstreiber</div>
+        <div class="core-explain-driver-grid" id="core-explain-driver-grid"></div>
+      </section>
+
+      <section class="core-explain-panel-section">
+        <div class="core-explain-panel-section-title">Entscheidungsmatrix</div>
+        <div class="core-explain-matrix">
+          <div class="core-explain-matrix-col">
+            <div class="core-explain-matrix-title">CORE erlaubt heute</div>
+            <div class="core-explain-panel-list" id="core-explain-matrix-allow"></div>
+          </div>
+          <div class="core-explain-matrix-col">
+            <div class="core-explain-matrix-title">CORE vermeidet bewusst</div>
+            <div class="core-explain-panel-list core-explain-panel-list-avoid" id="core-explain-matrix-avoid"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="core-explain-panel-section">
+        <div class="core-explain-panel-section-title">Darum genau so</div>
+        <div class="core-explain-panel-list" id="core-explain-rationale"></div>
+      </section>
+
+      <section class="core-explain-panel-section">
+        <div class="core-explain-panel-section-title">Signal-Layer</div>
+        <div class="core-explain-signal-chips" id="core-explain-signal-chips"></div>
+      </section>
+
+      <section class="core-explain-panel-section core-explain-practical">
+        <div class="core-explain-panel-section-title">Praktische Folge für heute</div>
+        <div class="core-explain-panel-list" id="core-explain-practical"></div>
+      </section>
+
+      <footer class="core-explain-panel-footer" id="core-explain-panel-footer" hidden></footer>
+    </section>
+  </template>
+
+    <div class="calOverlay calFull" id="calendar-full-overlay" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="calFull__backdrop" data-calendar-close="true"></div>
+      <div class="calFull__panel">
+        <div class="calFull__topbar">
+          <div class="calFull__title" id="cal-full-title">Kalender</div>
+          <div class="calFull__controls">
+            <button type="button" class="calendar-nav-btn" id="calendar-modal-prev" aria-label="Vorheriger Monat">‹</button>
+            <button type="button" class="calendar-nav-btn" id="calendar-modal-next" aria-label="Nächster Monat">›</button>
+            <select id="calendar-modal-month-select" aria-label="Monat"></select>
+            <select id="calendar-modal-year-select" aria-label="Jahr"></select>
+            <button type="button" class="calendar-nav-btn" id="calendar-modal-today-btn" aria-label="Heute">Heute</button>
+            <button type="button" class="calendar-nav-btn" id="calendar-problems-toggle" aria-label="Nur Probleme">Problems</button>
+            <div class="calendar-mode-toggle" id="calendar-mode-toggle">
+              <button type="button" class="calendar-mode-btn is-active" data-mode="both">Beides</button>
+              <button type="button" class="calendar-mode-btn" data-mode="actual">Ist</button>
+              <button type="button" class="calendar-mode-btn" data-mode="plan">Plan</button>
+            </div>
+            <button class="hrv-modal-close" data-calendar-close="true" aria-label="Close">x</button>
+          </div>
+        </div>
+        <div class="calFull__spans" id="cal-full-bars"></div>
+        <div class="calFull__gridWrap">
+          <div class="calFull__weekdays" id="cal-full-weekdays"></div>
+          <div class="calFull__grid" id="cal-full-grid"></div>
+        </div>
+        <div class="calFull__footer">
+          <div class="calendar-filter-chips calendar-filter-chips--inline" id="calendar-filter-chips">
+            <button type="button" class="calendar-filter-chip is-active" data-filter="strength">Strength</button>
+            <button type="button" class="calendar-filter-chip is-active" data-filter="run">Run</button>
+            <button type="button" class="calendar-filter-chip is-active" data-filter="sick">Sick</button>
+            <button type="button" class="calendar-filter-chip is-active" data-filter="functional_overreach">FO</button>
+            <button type="button" class="calendar-filter-chip is-active" data-filter="deload">Deload</button>
+            <button type="button" class="calendar-filter-chip is-active" data-filter="rest">Rest</button>
+          </div>
+          <div class="calFull__counts" id="cal-full-counts"></div>
+          <div class="calFull__summary" id="cal-full-summary"></div>
+        </div>
+      </div>
+    </div>
+	</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+window.__DASHBOARD_BOOTSTRAP__ = {{ (dashboard_bootstrap or {})|tojson }};
+</script>
+<script defer src="{{ url_for('static', filename='js/dashboard_vnext.js') }}?v=20260911_local_cardio_v1"></script>
+{% endblock %}

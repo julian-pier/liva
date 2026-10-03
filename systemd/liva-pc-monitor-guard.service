@@ -1,0 +1,16 @@
+[Unit]
+Description=LIVA PC monitor automation service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/liva
+Environment=PYTHONUNBUFFERED=1
+EnvironmentFile=-/opt/liva/.env.pc-monitor
+ExecStart=/opt/liva/venv/bin/python -m smart_home.pc_monitor_automation
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

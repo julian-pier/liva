@@ -1,0 +1,242 @@
+<div class="page-container makros-dashboard" id="makros-app" data-auth-level="{{ auth_level }}">
+  <header class="evaluation-section-header evaluation-section-header--nutrition">
+    <div class="evaluation-section-copy">
+      <p class="liva-subpage-kicker">Ernährung</p>
+      <h2>Intake &amp; Entwicklung</h2>
+      <p>Kalorien, Makros und Gewichtstrend im gemeinsamen Ernährungskontext.</p>
+    </div>
+    <div class="makros-streak-bar streak-bar" id="makros-streak-bar" aria-label="Logging Streaks">
+          <div class="makros-streak-pill streak-pill" data-pill="current">
+            <div class="streak-pill__top">
+              <span class="streak-pill__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25">
+                  <path d="M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4" />
+                </svg>
+              </span>
+              <div class="streak-pill__label">Streak</div>
+            </div>
+            <div class="pill-value" id="logging-current-value">
+              <span class="pill-num">--</span><span class="pill-unit is-hidden">d</span>
+            </div>
+          </div>
+          <div class="makros-streak-pill streak-pill" data-pill="best">
+            <div class="streak-pill__top">
+              <span class="streak-pill__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25">
+                  <path d="M10 14.66v1.626a2 2 0 0 1-.976 1.696A5 5 0 0 0 7 21.978" />
+                  <path d="M14 14.66v1.626a2 2 0 0 0 .976 1.696A5 5 0 0 1 17 21.978" />
+                  <path d="M18 9h1.5a1 1 0 0 0 0-5H18" />
+                  <path d="M4 22h16" />
+                  <path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z" />
+                  <path d="M6 9H4.5a1 1 0 0 1 0-5H6" />
+                </svg>
+              </span>
+              <div class="streak-pill__label">Best</div>
+            </div>
+            <div class="pill-value" id="logging-best-value">
+              <span class="pill-num">--</span><span class="pill-unit is-hidden">d</span>
+            </div>
+          </div>
+          <div class="makros-streak-pill streak-pill" data-pill="total">
+            <div class="streak-pill__top">
+              <span class="streak-pill__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25">
+                  <path d="M8 2v4" />
+                  <path d="M16 2v4" />
+                  <rect width="18" height="18" x="3" y="4" rx="2" />
+                  <path d="M3 10h18" />
+                </svg>
+              </span>
+              <div class="streak-pill__label">Gesamt</div>
+            </div>
+            <div class="pill-value" id="logging-total-value">
+              <span class="pill-num">--</span><span class="pill-unit is-hidden">d</span>
+            </div>
+          </div>
+    </div>
+    <div class="makros-control-error" id="makros-controls-error" role="status" aria-live="polite"></div>
+  </header>
+
+  <main class="makros-main">
+    <section class="hero-grid">
+      <article class="makros-card makros-status-card" id="makros-status-card">
+        <div class="makros-card-header">
+            <div class="makros-card-title" id="makros-score-title">Ernährungs-Score (90T)</div>
+        </div>
+        <div class="makros-score-top">
+          <div>
+            <div class="makros-score-value" id="makros-score-value">--</div>
+            <div class="makros-score-label" id="makros-score-label">für --</div>
+          </div>
+          <div class="makros-score-badge" id="makros-score-badge" data-status="neutral">--</div>
+        </div>
+        <div class="makros-score-bar">
+          <div class="makros-score-bar-fill" id="makros-score-bar-fill"></div>
+        </div>
+        <div class="makros-driver-list">
+          <div class="makros-driver-row">
+            <div class="makros-driver-name" id="makros-driver-kcal-label">Kalorien (Ø90T)</div>
+            <div class="makros-driver-value" id="makros-driver-kcal-value">--</div>
+            <div class="makros-driver-delta" id="makros-driver-kcal-delta">--</div>
+            <div class="makros-driver-pill" id="makros-driver-kcal-pill" data-status="neutral">--</div>
+          </div>
+          <div class="makros-driver-row">
+            <div class="makros-driver-name" id="makros-driver-protein-label">Protein (Ø90T)</div>
+            <div class="makros-driver-value" id="makros-driver-protein-value">--</div>
+            <div class="makros-driver-delta" id="makros-driver-protein-delta">--</div>
+            <div class="makros-driver-pill" id="makros-driver-protein-pill" data-status="neutral">--</div>
+          </div>
+          <div class="makros-driver-row">
+            <div class="makros-driver-name" id="makros-driver-weight-label">Gewicht (90T Trend)</div>
+            <div class="makros-driver-value" id="makros-driver-weight-value">--</div>
+            <div class="makros-driver-delta" id="makros-driver-weight-delta">--</div>
+            <div class="makros-driver-pill" id="makros-driver-weight-pill" data-status="neutral">--</div>
+          </div>
+        </div>
+        <div class="makros-score-context makros-hidden" id="makros-score-context"></div>
+      </article>
+
+      <article class="makros-card makros-insights-card" id="makros-insights-card">
+        <div class="makros-card-header">
+          <div>
+            <div class="makros-card-label">Insights</div>
+            <div class="makros-card-title">Heute / Diese Woche im Kontext</div>
+          </div>
+        </div>
+        <div class="makros-insights-list" id="makros-insights-list"></div>
+      </article>
+    </section>
+
+    <section class="top-grid">
+      <div class="makros-card makros-mini-card">
+        <div class="makros-mini-label" id="makros-mini-protein-label">Ø Protein</div>
+        <div class="makros-mini-value" id="makros-mini-protein">--</div>
+        <div class="makros-mini-trend" id="makros-mini-protein-trend">--</div>
+        <canvas class="makros-spark" id="makros-spark-protein" width="240" height="60"></canvas>
+      </div>
+      <div class="makros-card makros-mini-card">
+        <div class="makros-mini-label" id="makros-mini-carbs-label">Ø Carbs</div>
+        <div class="makros-mini-value" id="makros-mini-carbs">--</div>
+        <div class="makros-mini-trend" id="makros-mini-carbs-trend">--</div>
+        <canvas class="makros-spark" id="makros-spark-carbs" width="240" height="60"></canvas>
+      </div>
+      <div class="makros-card makros-mini-card">
+        <div class="makros-mini-label" id="makros-mini-fat-label">Ø Fett</div>
+        <div class="makros-mini-value" id="makros-mini-fat">--</div>
+        <div class="makros-mini-trend" id="makros-mini-fat-trend">--</div>
+        <canvas class="makros-spark" id="makros-spark-fat" width="240" height="60"></canvas>
+      </div>
+    </section>
+
+    <section class="trend-grid">
+      <article class="makros-card makros-chart-card is-wide" id="makros-kcal-card">
+        <div class="makros-card-header">
+          <div>
+            <div class="makros-card-label">Kalorien vs Ziel</div>
+            <div class="makros-card-title" id="makros-range-label">--</div>
+          </div>
+          <div class="makros-card-meta" id="makros-range-meta"></div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="makros-kcal-chart"></canvas>
+        </div>
+        <div class="makros-chart-status" id="makros-kcal-status"></div>
+      </article>
+
+      <article class="makros-card makros-chart-card" id="makros-weight-card">
+        <div class="makros-card-header">
+          <div>
+            <div class="makros-card-label">Gewicht (7T Avg)</div>
+            <div class="makros-card-title">Trend</div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="makros-weight-chart"></canvas>
+        </div>
+        <div class="makros-chart-status" id="makros-weight-status"></div>
+      </article>
+    </section>
+
+    <section class="bottom-grid">
+      <article class="makros-card makros-table-card">
+        <div class="makros-card-header makros-table-header">
+          <div>
+            <div class="makros-card-label">Historie</div>
+            <div class="makros-card-title makros-table-title">Einträge</div>
+          </div>
+          <div class="makros-table-tools">
+            {% if not auth_is_key %}
+              <button class="primary-button" id="makros-export" type="button">Export CSV</button>
+              <button id="addRowBtn" class="primary-button" type="button">+ Neue Zeile</button>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="table-wrapper makros-table-wrapper">
+          <table id="nutritionTable" class="data-table nutrition-table makros-table">
+            <colgroup>
+              <col style="width:100px;">
+              <col style="width:80px;">
+              <col style="width:80px;">
+              <col style="width:80px;">
+              <col style="width:80px;">
+              <col style="width:80px;">
+              <col style="width:80px;">
+              <col style="width:90px;">
+            </colgroup>
+            <thead>
+              <tr>
+                <th data-sort="date"><button type="button" class="makros-sort-btn">Datum <span class="makros-sort-indicator"></span></button></th>
+                <th data-sort="weight" class="makros-weight-cell"><button type="button" class="makros-sort-btn">Gewicht <span class="makros-sort-indicator"></span></button></th>
+                <th data-sort="kcal"><button type="button" class="makros-sort-btn">Kalorien <span class="makros-sort-indicator"></span></button></th>
+                <th data-sort="protein"><button type="button" class="makros-sort-btn">Protein <span class="makros-sort-indicator"></span></button></th>
+                <th data-sort="carbs"><button type="button" class="makros-sort-btn">Carbs <span class="makros-sort-indicator"></span></button></th>
+                <th data-sort="fat"><button type="button" class="makros-sort-btn">Fett <span class="makros-sort-indicator"></span></button></th>
+                <th data-sort="sugar"><button type="button" class="makros-sort-btn">Zucker <span class="makros-sort-indicator"></span></button></th>
+                {% if not auth_is_key %}<th>Aktionen</th>{% endif %}
+              </tr>
+            </thead>
+            <tbody id="makros-tbody">
+              {% for r in rows %}
+              <tr data-id="{{ r[0] }}">
+                <td>{{ r[1] }}</td>
+                <td class="makros-weight-cell">{{ "%.1f"|format(r[2]) if r[2] is not none else "" }}</td>
+                <td>{{ "%.0f"|format(r[3]) if r[3] is not none else "" }}</td>
+                <td>{{ "%.0f"|format(r[4]) if r[4] is not none else "" }}</td>
+                <td>{{ "%.0f"|format(r[5]) if r[5] is not none else "" }}</td>
+                <td>{{ "%.0f"|format(r[6]) if r[6] is not none else "" }}</td>
+                <td>{{ "%.0f"|format(r[7]) if r[7] is not none else "" }}</td>
+                {% if not auth_is_key %}<td class="actions-col">
+                  <div class="actions-flex">
+                    <button class="icon-btn edit-btn" title="Bearbeiten">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/>
+                        <path d="M14.06 6.19l2.75-2.75a1.5 1.5 0 0 1 2.12 0l1.63 1.63a1.5 1.5 0 0 1 0 2.12l-2.75 2.75"/>
+                      </svg>
+                    </button>
+                    <button class="icon-btn danger delete-btn" title="Löschen">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M3 6h18" stroke-linecap="round"/>
+                        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke-linecap="round"/>
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                        <path d="M10 11v6" stroke-linecap="round"/>
+                        <path d="M14 11v6" stroke-linecap="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </td>{% endif %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="makros-table-footer">
+          <div class="makros-table-meta" id="makros-table-meta">--</div>
+          <div class="makros-table-error" id="makros-table-error"></div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+</div>

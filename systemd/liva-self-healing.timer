@@ -1,0 +1,11 @@
+[Unit]
+Description=Run LIVA bounded self-healing every five minutes
+
+[Timer]
+OnCalendar=*:0/5
+Persistent=true
+RandomizedDelaySec=0
+Unit=liva-self-healing.service
+
+[Install]
+WantedBy=timers.target

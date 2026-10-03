@@ -1,0 +1,52 @@
+[Unit]
+Description=LIVA Remote Coach MCP (canonical reads and controlled live writes)
+After=network-online.target tailscaled.service
+Wants=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=liva
+Group=liva
+WorkingDirectory=/opt/liva
+EnvironmentFile=/var/lib/liva/.config/liva-mcp-remote/env
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/var/lib/liva/.local/share/liva-mcp-remote/venv/bin/liva-mcp-remote
+Restart=always
+RestartSec=2s
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadOnlyPaths=/opt/liva /var/lib/liva/.config/liva-mcp-remote /var/lib/liva/.local/share/liva-mcp-remote/venv
+ReadWritePaths=/var/lib/liva/.local/share/liva-mcp-remote
+BindReadOnlyPaths=/opt/liva/database/training.sqlite3:/var/lib/liva/.local/share/liva-mcp-remote/database-view/training.sqlite3
+BindReadOnlyPaths=/opt/liva/database/plans.sqlite3:/var/lib/liva/.local/share/liva-mcp-remote/database-view/plans.sqlite3
+BindReadOnlyPaths=/opt/liva/database/hrv.sqlite3:/var/lib/liva/.local/share/liva-mcp-remote/database-view/hrv.sqlite3
+BindReadOnlyPaths=/opt/liva/database/ernaehrung.sqlite3:/var/lib/liva/.local/share/liva-mcp-remote/database-view/ernaehrung.sqlite3
+BindReadOnlyPaths=/opt/liva/database/runs.sqlite3:/var/lib/liva/.local/share/liva-mcp-remote/database-view/runs.sqlite3
+BindReadOnlyPaths=/opt/liva/database/polar.sqlite3:/var/lib/liva/.local/share/liva-mcp-remote/database-view/polar.sqlite3
+BindReadOnlyPaths=/opt/liva/database/core.sqlite3:/var/lib/liva/.local/share/liva-mcp-remote/database-view/core.sqlite3
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictRealtime=true
+ProtectProc=invisible
+ProcSubset=pid
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectKernelLogs=true
+ProtectClock=true
+SystemCallArchitectures=native
+UMask=0077
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

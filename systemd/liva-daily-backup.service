@@ -1,0 +1,20 @@
+[Unit]
+Description=LIVA daily code and database backup
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# Runs as root so USB volumes mounted below /media/$USER can be traversed
+# and unmounted USB partitions can be automounted. Git operations are
+# explicitly dropped back to the liva user by jobs.daily_backup.
+WorkingDirectory=/opt/liva
+EnvironmentFile=-/opt/liva/.env
+Environment=GIT_TERMINAL_PROMPT=0
+Environment=LIVA_CODE_SNAPSHOT_ENABLED=1
+Environment=LIVA_CODE_PUSH_REQUIRED=1
+ExecStart=/opt/liva/venv/bin/python -m jobs.daily_backup
+Nice=10
+
+[Install]
+WantedBy=multi-user.target

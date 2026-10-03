@@ -1,0 +1,667 @@
+{% extends "base.html" %}
+{% block title %}Planung{% endblock %}
+{% block head %}
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/planning.css') }}?v=20260510_ipad_breakpoint_fix_1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/nutrition_planning.css') }}?v=20260806_ui_lab_group_palette">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/planning_gym.css') }}?v=20260804_plan_menu_portal_1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/planning_refined.css') }}?v=20260911_planned_workout_chart_1">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/planning_endurance.css') }}?v=20260914_cardio_history_1">
+{% endblock %}
+
+{% block content %}
+<div class="planning-page page-container liva-subpage-shell" id="planning-page">
+  <nav class="planning-domain-tabs" role="tablist" aria-label="Planungsbereich">
+    <button type="button" class="planning-domain-tab is-active" data-planning-tab="gym" role="tab" aria-selected="true">Gym</button>
+    <button type="button" class="planning-domain-tab" data-planning-tab="cardio" role="tab" aria-selected="false">Cardio</button>
+    <button type="button" class="planning-domain-tab" data-planning-tab="nutrition" role="tab" aria-selected="false">Ernährung</button>
+  </nav>
+  <section class="mobile-plan-view mpv4" id="mobile-plan-view" aria-live="polite">
+    <header class="mpv4-top">
+      <button type="button" class="mpv4-domain-toggle" id="mpv4-domain-toggle" aria-label="Zu Ernährung wechseln">
+        <span class="mpv4-title" id="mpv4-title">Training</span>
+        <span class="mpv4-domain-arrows" aria-hidden="true"><i></i><i></i></span>
+      </button>
+    </header>
+    <div class="mpv4-switchbar" id="mpv4-gym-switch">
+      <button type="button" class="mpv4-switch-btn" id="mpv4-gym-prev" aria-label="Vorherige Woche">‹</button>
+      <div class="mpv4-switch-label" id="mpv4-gym-label">Woche —</div>
+      <button type="button" class="mpv4-switch-btn" id="mpv4-gym-next" aria-label="Nächste Woche">›</button>
+    </div>
+    <div class="mpv4-grid">
+      <section class="mpv4-section" id="mpv4-gym"></section>
+      <section class="mpv4-section is-hidden" id="mpv4-cardio"></section>
+      <section class="mpv4-section is-hidden" id="mpv4-nutrition">
+      </section>
+    </div>
+    <div class="mobile-plan-empty" id="mobile-plan-empty">Keine Planungsdaten verfügbar.</div>
+  </section>
+
+  <div class="planning-pane" id="planning-pane-gym" data-pane="gym" role="tabpanel">
+    <section class="nutrition-planning-shell gym-planning-shell" data-gym-planning>
+      <aside class="nutrition-column nutrition-column-left">
+        <section class="panel nutrition-card gym-library-card">
+          <div class="panel-header nutrition-meals-header">
+            <div>
+              <div class="eyebrow">Gym</div>
+              <div class="title">Plan-Bibliothek</div>
+            </div>
+            <button type="button" class="pill ghost outlined" id="gym-new-plan-btn">Neu</button>
+          </div>
+          <div class="nutrition-food-search-row">
+            <input id="gym-plan-search" type="search" placeholder="Plan suchen" />
+          </div>
+          <div id="gym-plan-list" class="nutrition-scroll-list gym-plan-list"></div>
+        </section>
+
+        <section class="panel nutrition-card gym-cycle-card">
+          <div class="panel-header">
+            <div>
+              <div class="title">Zyklus</div>
+              <div class="sub">Startdatum & Woche</div>
+            </div>
+          </div>
+          <div id="gym-cycle-status" class="gym-cycle-status">Woche 1/8 · BUILD</div>
+          <div class="gym-cycle-grid">
+            <label>Start
+              <input id="gym-cycle-start-date" type="date" />
+            </label>
+            <label>Total
+              <input id="gym-cycle-total-weeks" type="number" min="1" max="260" step="1" />
+            </label>
+            <label>Block
+              <input id="gym-cycle-block-length" type="number" min="1" max="12" step="1" />
+            </label>
+            <label>Override
+              <input id="gym-cycle-week-override" type="number" min="1" max="260" step="1" placeholder="auto" />
+            </label>
+          </div>
+          <label class="gym-cycle-loop-toggle">
+            <input id="gym-cycle-loop-enabled" type="checkbox" />
+            <span class="gym-cycle-loop-text">Loop (nach Ende wieder ab Woche 1)</span>
+          </label>
+          <div class="gym-cycle-actions">
+            <button type="button" class="pill ghost" id="gym-cycle-set-today">Heute als Start</button>
+            <button type="button" class="pill ghost" id="gym-cycle-clear-override">Override löschen</button>
+          </div>
+        </section>
+      </aside>
+
+      <section class="nutrition-column nutrition-column-center">
+        <div class="nutrition-plan-header gym-plan-header-card">
+          <div class="header-left">
+            <div class="eyebrow">PLANUNG</div>
+            <textarea id="gym-plan-title" class="hero-input gym-title-input" rows="1" placeholder="Plan-Titel"></textarea>
+          </div>
+          <div class="header-actions gym-header-actions">
+            <div class="planning-header-switch" role="tablist" aria-label="Plan-Bereich">
+              <button type="button" class="planning-desktop-switch-btn is-active" data-planning-tab="gym" role="tab" aria-selected="true">Training</button>
+              <button type="button" class="planning-desktop-switch-btn" data-planning-tab="nutrition" role="tab" aria-selected="false">Ernährung</button>
+            </div>
+            <button id="gym-save-btn" class="version-status-pill" type="button">Speichern</button>
+            <div class="gym-header-pills" id="gym-plan-header-pills" aria-live="polite">
+              <span class="gym-header-pill">Gym <strong id="gym-plan-stat-gym">0</strong></span>
+              <span class="gym-header-pill">Runs <strong id="gym-plan-stat-runs">0</strong></span>
+              <span class="gym-header-pill">Sets <strong id="gym-plan-stat-sets">0</strong></span>
+              <span class="gym-header-pill">Ø RPE <strong id="gym-plan-stat-rpe">-</strong></span>
+            </div>
+          </div>
+          <textarea id="gym-plan-focus" class="sub-input gym-focus-input gym-header-description" rows="1" placeholder="Ziel / Fokus"></textarea>
+        </div>
+        <section class="panel nutrition-card gym-plan-mode-card">
+          <div class="gym-plan-mode-row">
+            <div>
+              <div class="title">Plan-Modus</div>
+              <div class="sub" id="gym-mode-subline">Fixe Woche oder Rolling Rotation</div>
+            </div>
+            <div class="nutrition-mfp-segmented gym-mode-segmented" data-active="fixed" role="tablist" aria-label="Plan-Modus">
+              <span class="nutrition-mfp-indicator" aria-hidden="true"></span>
+              <button type="button" class="nutrition-mfp-tab is-active" id="gym-mode-fixed-btn">Fixe Woche</button>
+              <button type="button" class="nutrition-mfp-tab" id="gym-mode-rolling-btn">Rolling Rotation</button>
+            </div>
+          </div>
+          <div id="gym-plan-mode-body" class="gym-plan-mode-body"></div>
+        </section>
+        <div class="gym-day-grid" id="gym-day-grid"></div>
+        <div class="gym-sequence-list" id="gym-sequence-list" hidden></div>
+        <section class="panel nutrition-card gym-block-library-card">
+          <div class="panel-header">
+            <div>
+              <div class="title">Block Library</div>
+              <div class="sub">Referenzblöcke</div>
+            </div>
+            <button type="button" class="pill ghost outlined" id="gym-new-block-btn">+ Block erstellen</button>
+          </div>
+          <div class="gym-block-hint">
+            Blöcke kannst du im Plan referenzieren über: <code>Squats (LH): siehe "Squat Block (8 Wochen)" unten</code>
+          </div>
+          <div id="gym-block-list" class="gym-block-list"></div>
+        </section>
+      </section>
+
+      <aside class="nutrition-column nutrition-column-right">
+        <section class="panel nutrition-card gym-rules-card">
+          <div class="panel-header">
+            <div>
+              <div class="title">Periodisierung</div>
+              <div class="sub" id="gym-periodization-label">Optionales Regel-Layer</div>
+            </div>
+            <label class="gym-periodization-toggle">
+              <input type="checkbox" id="gym-periodization-enabled" />
+              <span class="gym-periodization-toggle-ui" aria-hidden="true"></span>
+              <span class="gym-periodization-toggle-text">Aktiv</span>
+            </label>
+          </div>
+          <div class="gym-rules-head">
+            <span>W</span>
+            <span>RPE</span>
+            <span>Kraft</span>
+            <span>Cardio</span>
+            <span>Phase</span>
+          </div>
+          <div id="gym-rules-list" class="gym-rules-list"></div>
+        </section>
+
+        <section class="panel nutrition-card gym-coach-card">
+          <div class="panel-header">
+            <div>
+              <div class="title">Coach</div>
+              <div class="sub" id="gym-coach-subline">Volumen & Balance</div>
+            </div>
+          </div>
+          <div id="gym-coach-meta" class="gym-coach-meta"></div>
+          <div id="gym-coach-summary" class="gym-coach-summary"></div>
+          <div class="gym-coach-warning-details">
+            <button type="button" id="gym-coach-warning-toggle" class="gym-coach-warning-title" aria-expanded="true">
+              <span>Warnungen</span>
+              <span class="gym-coach-warning-arrow" aria-hidden="true">▾</span>
+            </button>
+            <div id="gym-coach-warnings" class="gym-coach-warnings"></div>
+          </div>
+        </section>
+
+        <section class="panel nutrition-card nutrition-card-mfp mfp-bridge-card gym-dsl-card">
+          <div class="panel-header nutrition-mfp-header">
+            <div>
+              <div class="title">Import / Export DSL</div>
+              <div class="sub">Parsen, Preview, Übernehmen</div>
+            </div>
+            <div class="nutrition-mfp-segmented" role="tablist" aria-label="Gym DSL">
+              <span class="nutrition-mfp-indicator" aria-hidden="true"></span>
+              <button id="gymDslSegImport" type="button" class="nutrition-mfp-tab is-active" data-gym-dsl-mode="import">Import</button>
+              <button id="gymDslSegExport" type="button" class="nutrition-mfp-tab" data-gym-dsl-mode="export">Export</button>
+            </div>
+          </div>
+
+          <div class="nutrition-mfp-pane" data-gym-dsl-pane="import">
+            <div class="nutrition-mfp-import-block">
+              <textarea id="gym-dsl-text" class="nutrition-mfp-import-input" rows="9" placeholder="## Mo&#10;- [18:30] Gym – Upper A (1x)&#10;  - Schrägbankdrücken (Smith): 4x6-10 @RPE 8/8/8/9"></textarea>
+              <div class="nutrition-mfp-import-actions">
+                <button type="button" class="pill ghost" id="gym-parse-btn">Parsen / Validieren</button>
+                <button type="button" class="pill primary" id="gym-apply-parse-btn">Übernehmen</button>
+              </div>
+              <div id="gym-parse-preview" class="nutrition-mfp-import-summary"></div>
+              <details class="gym-dsl-warning-wrap" id="gym-dsl-warning-wrap">
+                <summary>Warnings (<span id="gym-warning-count">0</span>)</summary>
+                <div id="gym-parse-warnings" class="nutrition-mfp-import-warnings gym-warnings-scroll"></div>
+              </details>
+            </div>
+          </div>
+
+          <div class="nutrition-mfp-pane nutrition-mfp-pane--import" data-gym-dsl-pane="export" hidden>
+            <div class="nutrition-mfp-import-block">
+              <textarea id="gym-dsl-export-text" class="nutrition-mfp-import-input" rows="9" readonly placeholder="Export erscheint hier"></textarea>
+              <div class="nutrition-mfp-import-actions">
+                <button type="button" class="pill ghost" id="gym-export-dsl-btn">Export generieren</button>
+                <button type="button" class="pill ghost" id="gym-copy-dsl-btn">Copy</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </aside>
+    </section>
+  </div>
+
+  <div class="planning-pane endurance-planning hidden" id="planning-pane-cardio" data-pane="cardio" role="tabpanel" aria-hidden="true">
+    <div id="endurance-planner" class="endurance-planner" aria-live="polite">
+      <div class="endurance-loading">Cardio-Planung wird geladen …</div>
+    </div>
+  </div>
+
+  <div class="planning-pane planning-nutrition hidden" id="planning-pane-nutrition" data-pane="nutrition" role="tabpanel" aria-hidden="true">
+    <section class="nutrition-planning-shell" data-nutrition-plan>
+      <aside class="nutrition-column nutrition-column-left">
+        <div class="planning-library-tabs" role="tablist" aria-label="Ernährungsbibliothek">
+          <button type="button" class="planning-library-tab is-active" data-library-tab="meals" role="tab" aria-selected="true">Meals</button>
+          <button type="button" class="planning-library-tab" data-library-tab="foods" role="tab" aria-selected="false">Foods</button>
+        </div>
+
+        <section class="panel nutrition-card nutrition-meals-card" data-library-panel="meals">
+          <div class="panel-header nutrition-meals-header">
+            <div>
+              <div class="eyebrow">MFP</div>
+              <div class="title">Meal Templates</div>
+            </div>
+            <div class="nutrition-meals-header-actions">
+              <input id="meal-search" type="search" placeholder="Meal suchen" />
+              <button id="copy-meal-collection-btn" class="pill ghost outlined" type="button" title="Meal Templates kopieren">
+                <span aria-hidden="true">⧉</span>
+              </button>
+              <button id="delete-meal-collection-btn" class="pill ghost outlined" type="button" title="Alle Meal Templates löschen">
+                <span aria-hidden="true">🗑</span>
+              </button>
+            </div>
+          </div>
+          <div id="meal-template-list" class="nutrition-scroll-list"></div>
+          <details class="nutrition-builder">
+            <summary><span aria-hidden="true">+</span> Neues Meal</summary>
+            <form id="meal-builder-form" class="nutrition-form">
+              <div class="nutrition-form-row">
+                <input name="title" class="meta-input" type="text" placeholder="Titel" required />
+                <input name="default_servings" class="meta-input" type="number" step="0.1" min="0.1" placeholder="Servings" value="1.0" />
+              </div>
+              <div id="ingredient-tray" class="ingredient-tray"></div>
+              <button type="button" id="add-ingredient-btn" class="pill ghost">+ Ingredient hinzufügen</button>
+              <div class="nutrition-form-row meal-actions-row">
+                <button type="submit" class="pill ghost" id="meal-save-btn">Mahlzeit speichern</button>
+                <button type="button" class="pill ghost" id="meal-delete-btn">Mahlzeit löschen</button>
+              </div>
+            </form>
+          </details>
+          <button type="button" class="pill primary nutrition-full" id="meal-add-to-day-btn">Zum Tag hinzufügen</button>
+        </section>
+
+        <section class="panel nutrition-card nutrition-foods-card" data-library-panel="foods">
+          <div class="panel-header nutrition-foods-header">
+            <div>
+              <div class="eyebrow">Foods</div>
+              <div class="title">Food Sammlung</div>
+            </div>
+            <div class="nutrition-foods-header-actions">
+              <button id="copy-food-collection-btn" class="pill ghost outlined" type="button" title="Food Sammlung kopieren">
+                <span aria-hidden="true">⧉</span>
+              </button>
+            </div>
+          </div>
+          <div class="nutrition-food-search-row">
+            <input id="food-search" type="search" placeholder="Food suchen" />
+          </div>
+          <div id="food-list" class="nutrition-scroll-list"></div>
+          <details class="nutrition-builder">
+            <summary><span aria-hidden="true">+</span> Neues Food</summary>
+            <form id="food-form" class="nutrition-form">
+              <label class="nutrition-field">
+                <span class="nutrition-field-label">Food Name</span>
+                <input name="name" class="meta-input" type="text" placeholder="Name" required />
+              </label>
+              <div class="nutrition-form-row">
+                <label class="nutrition-field">
+                  <span class="nutrition-field-label">Standard-Einheit</span>
+                  <select name="unit_default" class="meta-input">
+                    <option value="g" selected>g</option>
+                    <option value="ml">ml</option>
+                    <option value="pcs">pcs</option>
+                  </select>
+                </label>
+                <label class="nutrition-field">
+                  <span class="nutrition-field-label" id="food-label-kcal">kcal / 100g</span>
+                  <input name="kcal_per_100" class="meta-input" type="number" step="0.1" placeholder="kcal" required />
+                </label>
+              </div>
+              <div class="nutrition-form-row">
+                <label class="nutrition-field">
+                  <span class="nutrition-field-label" id="food-label-protein">Protein / 100g</span>
+                  <input name="p_per_100" class="meta-input" type="number" step="0.1" placeholder="Protein" required />
+                </label>
+                <label class="nutrition-field">
+                  <span class="nutrition-field-label" id="food-label-carbs">Carbs / 100g</span>
+                  <input name="c_per_100" class="meta-input" type="number" step="0.1" placeholder="Carbs" required />
+                </label>
+              </div>
+              <div class="nutrition-form-row">
+                <label class="nutrition-field">
+                  <span class="nutrition-field-label" id="food-label-sugar">Sugar / 100g</span>
+                  <input name="sugar_per_100" class="meta-input" type="number" step="0.1" placeholder="Sugar" required />
+                </label>
+                <label class="nutrition-field">
+                  <span class="nutrition-field-label" id="food-label-fat">Fett / 100g</span>
+                  <input name="f_per_100" class="meta-input" type="number" step="0.1" placeholder="Fett" required />
+                </label>
+              </div>
+              <div class="nutrition-form-row meal-actions-row">
+                <button type="submit" class="pill ghost" id="food-submit-btn">Food speichern</button>
+                <button type="button" class="pill ghost" id="food-delete-btn">Food löschen</button>
+              </div>
+            </form>
+          </details>
+          <button type="button" class="pill primary nutrition-full" id="food-add-to-day-btn">Zum Tag hinzufügen</button>
+        </section>
+      </aside>
+
+      <section class="nutrition-column nutrition-column-center">
+        <div class="nutrition-plan-header" id="nutrition-header">
+          <div class="header-left">
+            <div class="eyebrow">PLANUNG</div>
+            <h2 class="nutrition-week-title">Wochenplan</h2>
+            <p class="planning-header-subtitle">Mahlzeiten, Makros und MFP-Übergabe in einer klaren Wochenansicht.</p>
+          </div>
+
+          <div class="header-actions planning-workspace-actions">
+            <div class="planning-header-switch" role="tablist" aria-label="Plan-Bereich">
+              <button type="button" class="planning-desktop-switch-btn" data-planning-tab="gym" role="tab" aria-selected="false">Training</button>
+              <button type="button" class="planning-desktop-switch-btn is-active" data-planning-tab="nutrition" role="tab" aria-selected="true">Ernährung</button>
+            </div>
+            <div class="planning-header-action-row">
+              <div class="version-pill" id="version-pill" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false">
+                <span class="version-pill-label">Version</span>
+                <span id="version-pill-name" class="version-pill-name">—</span>
+                <span id="version-pill-dot" class="version-pill-dot" aria-hidden="true"></span>
+                <span class="version-pill-chevron" aria-hidden="true">▾</span>
+              </div>
+              <button id="version-status" class="version-status-pill" type="button" data-action="save" disabled>Gespeichert</button>
+              <button id="btn-overflow" class="btn-ghost" type="button" aria-haspopup="menu" aria-expanded="false">⋯</button>
+              <div id="overflow-menu" class="version-overflow-menu" role="menu" hidden>
+                <button id="overflow-activate" type="button" class="btn-ghost" role="menuitem" data-action="activate">Aktivieren</button>
+                <button type="button" class="btn-ghost" role="menuitem" data-action="duplicate">Duplizieren</button>
+                <button type="button" class="btn-ghost" role="menuitem" data-action="new">Neue Version</button>
+                <button type="button" class="btn-ghost" role="menuitem" data-action="target-settings">Ziel anpassen</button>
+                <div class="version-menu-divider" aria-hidden="true"></div>
+                <button id="overflow-clear-week" role="menuitem" class="btn-ghost" data-action="clear-week">Woche leeren</button>
+                <button id="overflow-archive" role="menuitem" class="btn-ghost danger" data-action="archive">Version archivieren</button>
+                <button id="overflow-delete" role="menuitem" class="btn-ghost danger" data-action="delete">Version löschen</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="version-picker" class="version-picker" role="dialog" aria-label="Versionen" hidden>
+            <div class="version-picker-header">
+              <input id="version-search-input" class="meta-input" type="search" placeholder="Version suchen..." aria-label="Version suchen" />
+              <div class="version-segment" role="tablist" aria-label="Versionen">
+                <button id="segment-active" class="seg-btn is-active" role="tab" aria-selected="true" data-segment="active">Aktiv</button>
+                <button id="segment-archived" class="seg-btn" role="tab" aria-selected="false" data-segment="archived">Archiv</button>
+              </div>
+            </div>
+            <div class="version-section">
+              <div class="version-section-title">Zuletzt genutzt</div>
+              <div id="version-list-recent" class="version-list"></div>
+            </div>
+            <div class="version-section">
+              <div class="version-section-title" id="version-list-title">Alle</div>
+              <div id="version-list-all" class="version-list"></div>
+            </div>
+          </div>
+
+          <div id="version-rename-dialog" class="modal-backdrop" role="dialog" aria-modal="true" hidden>
+            <div class="modal-card">
+              <div class="modal-title">Version umbenennen</div>
+              <input id="rename-input" class="meta-input" type="text" placeholder="Name" />
+              <div class="modal-actions">
+                <button id="rename-cancel" class="btn-ghost" type="button">Abbrechen</button>
+                <button id="rename-save" class="btn-primary" type="button">Speichern</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="version-create-dialog" class="modal-backdrop" role="dialog" aria-modal="true" hidden>
+            <div class="modal-card">
+              <div class="modal-title">Neue Version</div>
+              <div class="modal-body">Wie soll die Version starten?</div>
+              <div class="modal-actions">
+                <button id="create-cancel" class="btn-ghost" type="button">Abbrechen</button>
+                <button id="create-empty" class="btn-ghost" type="button">Leer</button>
+                <button id="create-copy" class="btn-primary" type="button">Kopie</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <section class="nutrition-week-board" aria-label="Wocheneditor">
+          <div class="day-chip-row nutrition-day-tabs" id="nutrition-day-tabs-v2" aria-label="Wochentage: ziehen zum Verbinden, Shift-Klick für einzelne Tage"></div>
+          <div class="nutrition-template-dialog" id="nutrition-template-dialog" role="dialog" aria-modal="true" aria-labelledby="nutrition-template-dialog-title" hidden>
+            <div class="nutrition-template-dialog-backdrop" data-template-dialog-close></div>
+            <div class="nutrition-template-dialog-card">
+              <div class="eyebrow" id="nutrition-template-dialog-kicker">Tages-Template</div>
+              <h3 id="nutrition-template-dialog-title">Tage verbinden?</h3>
+              <p id="nutrition-template-dialog-copy"></p>
+              <div class="nutrition-template-dialog-actions">
+                <button type="button" class="pill ghost" id="nutrition-template-dialog-cancel">Abbrechen</button>
+                <button type="button" class="pill primary" id="nutrition-template-dialog-confirm">Verbinden</button>
+              </div>
+            </div>
+          </div>
+          <div class="nutrition-day-panel">
+            <div class="day-header">
+              <div>
+                <div class="chip-day" id="nutrition-day-title">Mo</div>
+                <div class="chip-session" id="nutrition-day-meta">Slots</div>
+              </div>
+            </div>
+            <div class="nutrition-slot-list" id="nutrition-day-content"></div>
+          </div>
+        </section>
+      </section>
+
+      <aside class="nutrition-column nutrition-column-right">
+        <section class="panel nutrition-card macro-insight-card">
+          <div class="macro-card-header">
+            <div class="macro-card-head-left">
+              <div class="title macro-card-title">Makro-Übersicht</div>
+              <div class="macro-card-subtitle">Diese Woche</div>
+            </div>
+          </div>
+          <div id="week-summary" class="macro-overview-body"></div>
+          <div id="gap-notes" class="macro-gap-widget"></div>
+        </section>
+        <section class="panel nutrition-card nutrition-card-mfp mfp-bridge-card">
+          <div class="panel-header nutrition-mfp-header">
+            <div>
+              <div class="title">MFP Bridge</div>
+              <div class="sub">Export &amp; Import</div>
+            </div>
+            <div id="nutrition-mfp-segmented" class="nutrition-mfp-segmented" role="tablist" aria-label="MFP Bridge">
+              <span class="nutrition-mfp-indicator" aria-hidden="true"></span>
+              <button id="mfpSegExport" type="button" class="nutrition-mfp-tab is-active" data-mfp-mode="export">Export</button>
+              <button id="mfpSegImport" type="button" class="nutrition-mfp-tab" data-mfp-mode="import">Import</button>
+            </div>
+          </div>
+
+          <div class="nutrition-mfp-pane" data-mfp-pane="export">
+            <div class="nutrition-mfp-row" data-mfp-row="shopping">
+              <div class="nutrition-mfp-row-head">
+                <div>
+                  <div class="nutrition-mfp-row-title">Einkaufsliste</div>
+                  <div class="nutrition-mfp-row-sub">Erstellen &amp; kopieren</div>
+                </div>
+                <div class="nutrition-mfp-row-actions">
+                  <button id="generate-shopping-btn" class="pill ghost" type="button">Erstellen</button>
+                  <button id="copy-shopping-btn" class="pill ghost" type="button" title="Copy">Copy</button>
+                  <button type="button" class="pill ghost mfp-toggle-btn" data-mfp-toggle="shopping" aria-expanded="false">▾</button>
+                </div>
+              </div>
+              <div id="drawerShopping" class="nutrition-mfp-row-drawer" data-mfp-drawer="shopping">
+                <pre id="shopping-output" class="nutrition-export-output"></pre>
+              </div>
+            </div>
+
+            <div class="nutrition-mfp-row" data-mfp-row="checklist">
+              <div class="nutrition-mfp-row-head">
+                <div>
+                  <div class="nutrition-mfp-row-title">MFP-Checklist</div>
+                  <div class="nutrition-mfp-row-sub">Erstellen &amp; kopieren</div>
+                </div>
+                <div class="nutrition-mfp-row-actions">
+                  <button id="export-checklist-btn" class="pill ghost" type="button">Erstellen</button>
+                  <button id="copy-checklist-btn" class="pill ghost" type="button" title="Copy">Copy</button>
+                  <button type="button" class="pill ghost mfp-toggle-btn" data-mfp-toggle="checklist" aria-expanded="false">▾</button>
+                </div>
+              </div>
+              <div id="drawerChecklist" class="nutrition-mfp-row-drawer" data-mfp-drawer="checklist">
+                <pre id="checklist-output" class="nutrition-export-output"></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="nutrition-mfp-pane nutrition-mfp-pane--import" data-mfp-pane="import" hidden>
+            <div class="nutrition-mfp-import-block">
+              <div class="nutrition-mfp-import-hint">
+                Füge den MFP-Exporttext ein, um die Mahlzeiten direkt zu übernehmen.
+              </div>
+              <textarea id="mfpImportText" class="nutrition-mfp-import-input" rows="8" placeholder="## Mo&#10;- Meal 1: …&#10;  - 1 pcs Brot"></textarea>
+              <div id="mfpImportError" class="nutrition-mfp-import-error" hidden>
+                Füge einen Exporttext ein, um zu validieren.
+              </div>
+
+              <div class="nutrition-mfp-import-row">
+                <span class="nutrition-mfp-import-label">Ziel</span>
+                <select id="mfpTargetSelect">
+                  <option value="overwrite">Aktuelle Version überschreiben</option>
+                  <option value="new_template">Neue Version anlegen</option>
+                </select>
+              </div>
+
+              <div class="nutrition-mfp-import-row" id="mfpNewNameWrap" hidden>
+                <span class="nutrition-mfp-import-label">Name</span>
+                <input type="text" id="mfpNewName" placeholder="Imported Woche" />
+              </div>
+
+              <div class="nutrition-mfp-import-scope">
+                <div class="nutrition-mfp-scope-label">Importieren</div>
+                <label class="nutrition-mfp-scope-option">
+                  <input type="checkbox" id="mfpScopeSlots" checked />
+                  <span>Slots</span>
+                </label>
+                <label class="nutrition-mfp-scope-option">
+                  <input type="checkbox" id="mfpScopeTemplates" checked />
+                  <span>Meal-Templates</span>
+                </label>
+                <div class="nutrition-mfp-inline-hint">Slots = Plan befüllen · Templates = Rezepte/Zutaten anlegen</div>
+                <div id="mfpScopeHint" class="nutrition-mfp-import-error" hidden>Wähle mindestens eine Option.</div>
+              </div>
+
+              <div class="nutrition-mfp-import-actions">
+                <button type="button" class="pill ghost" id="mfpValidateBtn">Validieren</button>
+                <button type="button" class="pill primary nutrition-mfp-import-btn" id="mfpImportBtn">Importieren</button>
+              </div>
+
+              <div class="nutrition-mfp-import-result hidden" id="mfp-import-result">
+                <div class="nutrition-mfp-import-summary" id="mfp-import-summary"></div>
+                <div class="nutrition-mfp-import-errors" id="mfp-import-errors"></div>
+                <div class="nutrition-mfp-import-warnings" id="mfp-import-warnings"></div>
+                <div class="nutrition-mfp-import-unmatched" id="mfp-import-unmatched"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="planning-macro-modal" id="planning-macro-modal" aria-hidden="true">
+          <div class="planning-macro-modal-backdrop" data-close="true"></div>
+          <div class="planning-macro-modal-card" role="dialog" aria-modal="true">
+            <div class="planning-macro-modal-header">
+              <div>
+                <div class="makros-card-label">Kalorienziel</div>
+                <div class="makros-card-title">Ziel-Definition</div>
+              </div>
+              <button class="planning-macro-modal-close" data-close="true" aria-label="Close">x</button>
+            </div>
+            <div class="planning-macro-modal-body">
+              <div class="planning-macro-modal-modes" role="tablist" aria-label="Mode wählen">
+                <button class="planning-macro-modal-tab" data-mode="cut" type="button">Cut</button>
+                <button class="planning-macro-modal-tab" data-mode="lean_bulk" type="button">Lean Bulk</button>
+                <button class="planning-macro-modal-tab" data-mode="maintenance" type="button">Maintenance</button>
+                <button class="planning-macro-modal-tab" data-mode="custom" type="button">Custom</button>
+              </div>
+              <div class="planning-macro-band-panel">
+                <div class="planning-macro-scale-shell">
+                  <div class="planning-macro-band-preview" id="planning-macro-band-preview">
+                    <div class="planning-macro-scale-wrap">
+                      <div class="planning-macro-scale" id="planning-macro-scale">
+                        <div class="planning-macro-scale-bar">
+                          <div class="planning-macro-scale-seg is-red" data-seg="red-left"></div>
+                          <div class="planning-macro-scale-seg is-yellow" data-seg="yellow-left"></div>
+                          <div class="planning-macro-scale-seg is-green" data-seg="green"></div>
+                          <div class="planning-macro-scale-seg is-yellow" data-seg="yellow-right"></div>
+                          <div class="planning-macro-scale-seg is-red" data-seg="red-right"></div>
+                        </div>
+                        <div class="planning-macro-scale-markers">
+                          <button type="button" class="planning-macro-marker is-boundary" data-marker="redLow" aria-label="Rote Untergrenze"></button>
+                          <button type="button" class="planning-macro-marker is-transition" data-marker="greenLow" aria-label="Gelbe Untergrenze"></button>
+                          <button type="button" class="planning-macro-marker is-target" data-marker="target" aria-label="Ziel"></button>
+                          <button type="button" class="planning-macro-marker is-ok" data-marker="greenHigh" aria-label="Grüne Obergrenze"></button>
+                          <button type="button" class="planning-macro-marker is-transition" data-marker="yellowHigh" aria-label="Gelbe Obergrenze"></button>
+                        </div>
+                        <div class="planning-macro-scale-tooltip" id="planning-macro-scale-tooltip" hidden></div>
+                      </div>
+                      <div class="planning-macro-scale-axis">
+                        <span id="planning-macro-scale-min">--</span>
+                        <span id="planning-macro-scale-max">--</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="planning-macro-zone-chips" id="planning-macro-zone-chips"></div>
+                </div>
+
+                <div class="planning-macro-band-grid is-editor">
+                  <div class="planning-macro-form-field is-span-2">
+                    <label for="planning-macro-target">kcal Ziel</label>
+                    <div class="planning-macro-input-wrap">
+                      <input id="planning-macro-target" type="number" placeholder="z.B. 2900" inputmode="numeric">
+                      <span class="planning-macro-input-suffix">kcal</span>
+                    </div>
+                  </div>
+                  <div class="planning-macro-form-field">
+                    <label for="planning-macro-protein">Protein</label>
+                    <div class="planning-macro-input-wrap">
+                      <input id="planning-macro-protein" type="number" placeholder="z.B. 180" inputmode="numeric">
+                      <span class="planning-macro-input-suffix">g</span>
+                    </div>
+                  </div>
+                  <div class="planning-macro-form-field">
+                    <label for="planning-macro-fat">Fett</label>
+                    <div class="planning-macro-input-wrap">
+                      <input id="planning-macro-fat" type="number" placeholder="z.B. 70" inputmode="numeric">
+                      <span class="planning-macro-input-suffix">g</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="planning-macro-secondary-card">
+                  <div class="planning-macro-secondary-label">Carbs</div>
+                  <div class="planning-macro-secondary-value"><span id="planning-macro-carbs-live">--</span><span class="planning-macro-secondary-unit">g</span></div>
+                  <div class="planning-macro-secondary-sub" id="planning-macro-carbs-sub">Automatisch aus kcal, Protein und Fett berechnet</div>
+                </div>
+                <input id="planning-macro-carbs" type="hidden">
+                <input id="planning-macro-yellow-low" type="hidden">
+                <input id="planning-macro-green-low" type="hidden">
+                <input id="planning-macro-green-high" type="hidden">
+                <input id="planning-macro-yellow-high" type="hidden">
+              </div>
+              <div class="planning-macro-modal-error" id="planning-macro-modal-error"></div>
+              <div class="planning-macro-modal-actions">
+                <button class="btn-primary" id="planning-macro-settings-save" type="button">Speichern</button>
+                <button class="btn-ghost" id="planning-macro-settings-cancel" type="button">Abbrechen</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.exerciseSuggestions = {{ (exercise_suggestions or [])|tojson|safe }};
+</script>
+
+<script defer src="{{ url_for('static', filename='js/planning_tabs.js') }}?v=20260805_library_tabs_1"></script>
+<script defer src="{{ url_for('static', filename='js/planning_workout_chart.js') }}?v=20260911_planned_workout_chart_1"></script>
+<script defer src="{{ url_for('static', filename='js/planning_endurance.js') }}?v=20260914_cardio_history_1"></script>
+<script defer src="{{ url_for('static', filename='js/planning_mobile.js') }}?v=20260911_guest_readonly_v1"></script>
+<script defer src="{{ url_for('static', filename='js/planning_gym.js') }}?v=20260804_plan_menu_portal_2"></script>
+<script defer src="{{ url_for('static', filename='js/planning_nutrition.js') }}?v=20260911_guest_readonly_v1"></script>
+{% endblock %}

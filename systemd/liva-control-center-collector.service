@@ -1,0 +1,12 @@
+[Unit]
+Description=LIVA Control Center technical event collector
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=liva
+WorkingDirectory=/opt/liva
+EnvironmentFile=-/opt/liva/.env
+ExecStart=/opt/liva/venv/bin/python -m control_center.collector
+Nice=10

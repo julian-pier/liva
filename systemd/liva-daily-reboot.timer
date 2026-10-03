@@ -1,0 +1,10 @@
+[Unit]
+Description=LIVA daily LIVA reboot
+
+[Timer]
+OnCalendar=*-*-* 04:05:00
+Persistent=true
+Unit=liva-daily-reboot.service
+
+[Install]
+WantedBy=timers.target

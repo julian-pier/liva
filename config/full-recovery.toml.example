@@ -1,0 +1,14 @@
+# Install as /etc/liva/recovery/config.toml. It deliberately contains no key.
+[recovery]
+staging_root = "/var/lib/liva-recovery/staging"
+
+[usb]
+uuid = "65CA-09BE"
+label = "LIVA_RECOVERY"
+filesystem = "vfat"
+min_capacity_bytes = 64000000000
+fat_max_file_bytes = 4294967295
+mount_options = ["nodev", "nosuid", "noexec", "uid=0", "gid=0", "umask=077"]
+
+[crypto]
+recipients_file = "/etc/liva/recovery/recipients.txt"

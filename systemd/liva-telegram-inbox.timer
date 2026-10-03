@@ -1,0 +1,11 @@
+[Unit]
+Description=Run LIVA Telegram Inbox Processor every minute
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=1min
+Unit=liva-telegram-inbox.service
+
+[Install]
+WantedBy=timers.target
+

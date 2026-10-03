@@ -1,0 +1,11 @@
+{
+  "server_url": "https://liva.example.invalid",
+  "api_key": "SET_LOCALLY_NEVER_COMMIT",
+  "device_id": "00000000-0000-0000-0000-000000000000",
+  "device_name": "iPhone 13",
+  "stayfree_db_path": "C:\\Users\\USER\\AppData\\Local\\Packages\\37081StayFreeApps.StayFree3_fqhk48m1tsma0\\LocalCache\\Roaming\\StayFree\\config.db",
+  "history_days": 90,
+  "request_timeout_seconds": 20,
+  "verification_day": "2026-08-16",
+  "verification_total_seconds": 8906
+}

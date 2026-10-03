@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% block title %}MFP{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/meals.css') }}?v=20260917_mfp_units_v1_ios_zoom_v1">
+{% endblock %}
+
+{% block content %}
+<div class="meals-page liva-subpage-shell" data-meals-app>
+  <header class="log-topbar">
+    <div class="topbar-main">
+      <div class="title-wrap">
+        <p class="liva-subpage-kicker">Ernährung</p>
+        <h1 id="meals-day-title">Heute</h1>
+        <p id="meals-day-label" class="meals-day-label">Montag, 07. September</p>
+      </div>
+      <div class="date-row">
+        <button type="button" class="ghost icon-btn" id="meals-prev-day" aria-label="Vorheriger Tag">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"></path></svg>
+        </button>
+        <div class="meals-date-control">
+          <span id="meals-date-display" class="meals-date-display" aria-hidden="true"></span>
+          <svg class="meals-date-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 2v4M16 2v4M3 9h18"></path>
+            <rect x="3" y="4" width="18" height="17" rx="3"></rect>
+          </svg>
+          <input type="date" id="meals-date-input" lang="de-DE" aria-label="Logdatum">
+        </div>
+        <button type="button" class="ghost icon-btn" id="meals-next-day" aria-label="Nächster Tag">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"></path></svg>
+        </button>
+        <button type="button" class="ghost today-btn" id="meals-today-btn">Heute</button>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button type="button" class="ghost" id="copy-yesterday-btn">Gestern übernehmen</button>
+      <button type="button" class="primary" id="open-quick-add-btn">+ Essen</button>
+    </div>
+  </header>
+
+  <div class="mobile-quickbar">
+    <button type="button" id="mobile-quickadd-btn">+ Essen</button>
+  </div>
+
+  <aside class="macro-column" aria-label="Tagesstatus">
+    <div id="sidebar-macro-summary" class="sidebar-macro-summary" aria-live="polite"></div>
+  </aside>
+
+  <main class="day-feed" aria-labelledby="day-feed-heading">
+    <div class="day-feed-head">
+      <div><p class="section-kicker">Tagesverlauf</p><h2 id="day-feed-heading">Essen</h2></div>
+      <span id="day-feed-count"></span>
+    </div>
+    <div id="day-feed-list" class="day-feed-list"></div>
+  </main>
+
+</div>
+
+<dialog id="quick-add-modal" class="quick-add-modal" aria-labelledby="quick-add-title">
+  <form method="dialog" id="quick-add-form">
+    <header>
+      <div><p class="dialog-kicker">Schnell loggen</p><h3 id="quick-add-title">Essen</h3></div>
+      <button type="button" class="ghost icon-only" id="quick-add-close-btn" aria-label="Schließen" aria-keyshortcuts="Escape">×</button>
+    </header>
+    <div class="quick-dialog-body">
+    <div class="quick-add-meta">
+      <input id="quick-title-input" type="hidden">
+      <input id="quick-slot-input" type="hidden">
+      <label class="dialog-time-field" for="quick-time-input">
+        <span>Uhrzeit</span>
+        <input id="quick-time-input" type="time" lang="de-DE" aria-label="Uhrzeit">
+      </label>
+    </div>
+    <div class="quick-add-mode" aria-label="Logging-Art">
+      <button type="button" class="ghost is-active" id="quick-mode-recents" aria-keyshortcuts="Alt+1">Zuletzt</button>
+      <button type="button" class="ghost" id="quick-mode-foods" aria-keyshortcuts="Alt+2">Foods</button>
+      <button type="button" class="ghost" id="quick-mode-meals" aria-keyshortcuts="Alt+3">Meals</button>
+      <button type="button" class="ghost" id="quick-mode-macros" aria-keyshortcuts="Alt+4">Makros</button>
+    </div>
+    <label class="quick-search-shell" for="quick-search-input">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+      <input id="quick-search-input" type="search" placeholder="Food oder Meal suchen …" autocomplete="off">
+      <span aria-hidden="true">/</span>
+    </label>
+    <div id="quick-items-list" class="quick-items"></div>
+    <div id="quick-recent-results" class="quick-recents"></div>
+    <div id="quick-search-results" class="search-results"></div>
+    <div id="quick-meal-results" class="search-results" hidden></div>
+    <div id="quick-macro-panel" class="quick-macro-panel" hidden>
+      <div class="quick-macro-grid">
+        <label class="quick-macro-field">
+          <span>Name</span>
+          <input id="quick-macro-name-input" type="text" placeholder="Food-Name, z. B. Riegel">
+        </label>
+        <label class="quick-macro-field">
+          <span>Portion</span>
+          <input id="quick-macro-portion-input" type="number" min="0.1" step="0.1" inputmode="decimal" value="1">
+        </label>
+        <label class="quick-macro-field">
+          <span>Einheit</span>
+          <select id="quick-macro-unit-input"><option value="pcs">Stück</option><option value="g">Gramm</option><option value="ml">ml</option></select>
+        </label>
+        <label class="quick-macro-field">
+          <span>kcal</span>
+          <input id="quick-macro-kcal-input" type="number" min="0" step="0.1" inputmode="decimal" placeholder="optional">
+        </label>
+        <label class="quick-macro-field">
+          <span>Protein</span>
+          <input id="quick-macro-p-input" type="number" min="0" step="0.1" inputmode="decimal" placeholder="g">
+        </label>
+        <label class="quick-macro-field">
+          <span>Carbs</span>
+          <input id="quick-macro-c-input" type="number" min="0" step="0.1" inputmode="decimal" placeholder="g">
+        </label>
+        <label class="quick-macro-field">
+          <span>Zucker</span>
+          <input id="quick-macro-sugar-input" type="number" min="0" step="0.1" inputmode="decimal" placeholder="g">
+        </label>
+        <label class="quick-macro-field">
+          <span>Fett</span>
+          <input id="quick-macro-f-input" type="number" min="0" step="0.1" inputmode="decimal" placeholder="g">
+        </label>
+      </div>
+      <p class="quick-macro-note">Makros pro Portion. Wird gespeichert und direkt geloggt.</p>
+    </div>
+    </div>
+    <footer>
+      <p class="dialog-hotkeys" aria-label="Tastenkürzel"><b>↑↓</b> wählen <i>·</i> <b>Enter</b> hinzufügen <i>·</i> <b>Ctrl Enter</b> loggen</p>
+      <div class="quick-dialog-actions">
+        <button type="button" class="ghost" id="quick-clear-btn">Leeren</button>
+        <button type="button" class="primary" id="quick-save-btn" aria-keyshortcuts="Control+Enter Meta+Enter">Loggen</button>
+      </div>
+    </footer>
+  </form>
+</dialog>
+
+<dialog id="copy-day-modal" class="copy-day-modal" aria-labelledby="copy-day-title">
+  <form method="dialog" id="copy-day-form">
+    <header>
+      <div>
+        <p class="dialog-kicker">Wiederholen</p>
+        <h3 id="copy-day-title">Gestern übernehmen</h3>
+      </div>
+      <button type="button" class="ghost icon-only" id="copy-day-close-btn" aria-label="Schließen">×</button>
+    </header>
+    <p id="copy-day-note" class="copy-day-note"></p>
+    <div id="copy-day-list" class="copy-day-list"></div>
+    <footer>
+      <button type="button" class="ghost" id="copy-day-cancel-btn">Abbrechen</button>
+      <button type="button" class="primary" id="copy-day-save-btn">Auswahl übernehmen</button>
+    </footer>
+  </form>
+</dialog>
+
+<dialog id="meal-editor-modal" class="meal-editor-modal" aria-labelledby="editor-title">
+  <form method="dialog" id="meal-editor-form">
+    <header class="meal-editor-header">
+      <div class="meal-editor-heading">
+        <div class="meal-editor-context-row">
+          <p id="editor-title" class="dialog-kicker">Meal bearbeiten</p>
+          <label class="dialog-time-field" for="editor-time">
+            <span>Uhrzeit</span>
+            <input id="editor-time" type="time" lang="de-DE" aria-label="Uhrzeit">
+          </label>
+        </div>
+        <label class="editor-title-field" for="editor-meal-title">
+          <input id="editor-meal-title" type="text" maxlength="120" autocomplete="off" required aria-label="Meal-Name">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 20h4l11-11-4-4L4 16v4Z"></path><path d="m13.5 6.5 4 4"></path></svg>
+        </label>
+      </div>
+      <button type="button" class="ghost icon-only" id="editor-close-btn" aria-label="Schließen" aria-keyshortcuts="Escape">×</button>
+    </header>
+    <div class="editor-dialog-body">
+      <input id="editor-meal-slot" type="hidden">
+      <label class="editor-search-shell" for="editor-food-search">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+        <input id="editor-food-search" type="search" placeholder="Food hinzufügen oder Zutat ersetzen" autocomplete="off">
+        <span class="search-activity" aria-hidden="true"></span>
+      </label>
+      <div id="editor-search-results" class="search-results editor-search-results"></div>
+      <div id="editor-items-list" class="quick-items"></div>
+    </div>
+    <footer>
+      <p class="dialog-hotkeys" aria-label="Tastenkürzel"><b>↑↓</b> wählen <i>·</i> <b>Enter</b> hinzufügen <i>·</i> <b>Ctrl Enter</b> speichern</p>
+      <button type="button" class="primary" id="editor-save-btn" aria-keyshortcuts="Control+Enter Meta+Enter">Speichern</button>
+    </footer>
+  </form>
+</dialog>
+
+<dialog id="food-editor-modal" class="food-editor-modal" aria-labelledby="food-editor-title">
+  <form method="dialog" id="food-editor-form">
+    <header>
+      <div>
+        <p class="dialog-kicker">Food-Datensatz</p>
+        <h3 id="food-editor-title">Food bearbeiten</h3>
+      </div>
+      <button type="button" class="ghost icon-only" id="food-editor-close-btn" aria-label="Schließen">×</button>
+    </header>
+    <div class="food-editor-body">
+      <p class="food-editor-context">Die Änderung gilt überall – auch in der Planung und in zukünftigen Einträgen.</p>
+      <label class="food-editor-field food-editor-field--wide">
+        <span>Name</span>
+        <input name="name" type="text" autocomplete="off" required>
+      </label>
+      <div class="food-editor-grid">
+        <label class="food-editor-field">
+          <span data-food-macro-label="kcal">Kalorien / 100 g</span>
+          <input name="kcal_per_100" type="number" min="0" step="0.1" inputmode="decimal" required>
+        </label>
+        <label class="food-editor-field">
+          <span data-food-macro-label="protein">Protein / 100 g</span>
+          <input name="p_per_100" type="number" min="0" step="0.1" inputmode="decimal" required>
+        </label>
+        <label class="food-editor-field">
+          <span data-food-macro-label="carbs">Carbs / 100 g</span>
+          <input name="c_per_100" type="number" min="0" step="0.1" inputmode="decimal" required>
+        </label>
+        <label class="food-editor-field">
+          <span data-food-macro-label="fat">Fett / 100 g</span>
+          <input name="f_per_100" type="number" min="0" step="0.1" inputmode="decimal" required>
+        </label>
+        <label class="food-editor-field">
+          <span data-food-macro-label="sugar">Zucker / 100 g</span>
+          <input name="sugar_per_100" type="number" min="0" step="0.1" inputmode="decimal" required>
+        </label>
+      </div>
+      <p class="food-editor-error" id="food-editor-error" role="status" aria-live="polite"></p>
+    </div>
+    <footer>
+      <button type="button" class="ghost" id="food-editor-cancel-btn">Abbrechen</button>
+      <button type="submit" class="primary" id="food-editor-save-btn">Änderungen speichern</button>
+    </footer>
+  </form>
+</dialog>
+
+{% endblock %}
+
+{% block scripts %}
+<script defer src="{{ url_for('static', filename='js/meals.js') }}?v=20260917_mfp_units_v1"></script>
+{% endblock %}

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LIVA Activity – Einstellungen</title>
+  <style>
+    body { max-width: 640px; margin: 48px auto; padding: 0 20px; background: #11161c; color: #eef2f5; font: 15px/1.5 system-ui, sans-serif; }
+    h1 { margin-bottom: 8px; } p { color: #a8b2bf; } label { display: grid; gap: 7px; margin: 22px 0; font-weight: 650; }
+    input { padding: 11px 12px; border: 1px solid #394451; border-radius: 8px; background: #192028; color: inherit; }
+    button { padding: 10px 16px; border: 0; border-radius: 8px; background: #74bfa7; color: #102019; font-weight: 750; cursor: pointer; }
+    #status { margin-left: 10px; color: #91a196; }
+  </style>
+</head>
+<body>
+  <h1>LIVA Activity</h1>
+  <p>Der lokale Token muss mit <code>LIVA_ACTIVITY_LOCAL_TOKEN</code> des Windows-Agenten übereinstimmen. Er wird nur lokal im Browserprofil gespeichert.</p>
+  <label>Lokaler Pairing-Token<input id="local-token" type="password" autocomplete="off" minlength="24"></label>
+  <label>Agent-Endpoint<input id="endpoint" type="url" value="http://127.0.0.1:8765/browser-context"></label>
+  <button id="save" type="button">Speichern</button><span id="status" aria-live="polite"></span>
+  <script src="options.js"></script>
+</body>
+</html>

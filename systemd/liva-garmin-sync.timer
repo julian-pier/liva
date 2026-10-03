@@ -1,0 +1,11 @@
+[Unit]
+Description=LIVA direct Garmin sync every ten minutes
+
+[Timer]
+OnCalendar=*:0/10
+Persistent=true
+RandomizedDelaySec=20
+Unit=liva-garmin-sync.service
+
+[Install]
+WantedBy=timers.target

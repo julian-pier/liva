@@ -1,0 +1,9 @@
+[Unit]
+Description=LIVA System Telegram Watch
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/liva
+ExecStart=/opt/liva/venv/bin/python -m jobs.system_telegram_watch
+

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="de" class="dark">
+<head>
+  <script>
+    (function () {
+      try {
+        if (window.localStorage.getItem("theme_public") === "light") {
+          document.documentElement.classList.remove("dark");
+        }
+      } catch (_) {}
+    })();
+  </script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>LIVA – Heute</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/brand/liva-peak.svg') }}?v=liva-peak-1">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='img/brand/apple-touch-icon.png') }}?v=liva-peak-apple-1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='dist/liva-ui/liva-ui.css') }}?v=dashboard-20260911-ipad-pairs-v3">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}?v=20260731_mobile_nav_scale_2">
+</head>
+<body>
+  <div data-liva-sidebar-host></div>
+  <div
+    id="liva-dashboard-root"
+    data-liva-surface="dashboard"
+    data-test-mode="{{ 'true' if test_mode else 'false' }}"
+    data-auth-level="{{ auth_level or 'none' }}"
+  ></div>
+  <noscript>Für das LIVA-Dashboard muss JavaScript aktiviert sein.</noscript>
+  <script defer src="{{ url_for('static', filename='js/sidebar.js') }}?v=20260731_mobile_nav_order_3"></script>
+  <script type="module" src="{{ url_for('static', filename='dist/liva-ui/liva-ui.js') }}?v=dashboard-20260911-ipad-pairs-v3"></script>
+</body>
+</html>

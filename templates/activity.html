@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Activity{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/activity.css') }}?v=20260817_activity_live_v6">
+{% endblock %}
+
+{% block content %}
+<section class="activity-page app-page-shell" data-activity-root>
+  <header class="activity-header">
+    <div class="activity-heading">
+      <h1>Activity</h1>
+      <p>Deine digitale Aktivität auf Windows und iPhone</p>
+    </div>
+  </header>
+
+  <div class="activity-toolbar">
+    <nav class="activity-tabs" aria-label="Quelle">
+      <button type="button" class="is-active" data-tab="overview">Übersicht</button>
+      <button type="button" data-tab="windows">Windows</button>
+      <button type="button" data-tab="iphone">iPhone</button>
+    </nav>
+    <div class="activity-controls" aria-label="Zeitraum wählen">
+      <div class="activity-date-nav" aria-label="Datum wechseln">
+        <button type="button" id="activity-prev" aria-label="Vorheriger Zeitraum">‹</button>
+        <label class="activity-date-picker"><span id="activity-date-label">Datum</span><input type="date" id="activity-date" aria-label="Datum auswählen"></label>
+        <button type="button" id="activity-next" aria-label="Nächster Zeitraum">›</button>
+      </div>
+      <div class="activity-segmented" role="group" aria-label="Ansicht">
+        <button type="button" class="is-active" data-range="day">Tag</button>
+        <button type="button" data-range="7">7 Tage</button>
+        <button type="button" data-range="30">30 Tage</button>
+        <button type="button" data-range="custom">Zeitraum</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="activity-custom-range" id="activity-custom-range" hidden>
+    <label>Von <input type="date" id="activity-start-date"></label>
+    <label>Bis <input type="date" id="activity-end-date"></label>
+    <button type="button" id="activity-apply-range">Anwenden</button>
+  </div>
+
+  <main class="activity-dashboard" aria-live="polite">
+    <section id="activity-day-view">
+      <div class="activity-kpis" id="activity-kpis"></div>
+      <section class="activity-section activity-live-section" data-source-section="windows">
+        <header class="activity-section-head activity-live-head"><div><p><i class="activity-live-dot"></i> Live now</p><h2>Dein Arbeitsplatz</h2></div><time id="activity-live-clock">--:--:--</time><span id="activity-status-text" class="activity-sr-only">Verbinde …</span></header>
+        <div id="activity-now" class="activity-now"></div>
+      </section>
+      <section class="activity-section activity-rail-section" data-source-section="windows">
+        <header class="activity-section-head"><div><p>Tagesverlauf</p><h2>Nutzung über den Tag</h2></div></header>
+        <div id="activity-rail" class="activity-rail"></div>
+        <footer class="activity-details" id="activity-details"></footer>
+      </section>
+      <div class="activity-two-column" data-source-section="windows">
+        <section class="activity-section"><header class="activity-section-head"><div><p>Windows</p><h2>Apps</h2></div><span>sichtbar · parallel möglich</span></header><div id="activity-apps"></div></section>
+        <section class="activity-section"><header class="activity-section-head"><div><p>Browser</p><h2>Websites</h2></div><span>Metadaten · nicht addieren</span></header><div id="activity-domains"></div></section>
+      </div>
+      <section class="activity-section activity-iphone-section" data-source-section="iphone"><div id="activity-iphone-content"></div></section>
+    </section>
+    <section id="activity-period-view" hidden></section>
+  </main>
+</section>
+
+<div class="activity-drawer-backdrop" id="activity-drawer-backdrop" hidden></div>
+<aside class="activity-drawer" id="activity-drawer" aria-hidden="true" aria-labelledby="activity-drawer-title">
+  <button type="button" class="activity-drawer-close" id="activity-drawer-close" aria-label="Details schließen">×</button>
+  <p id="activity-drawer-kind">Details</p><h2 id="activity-drawer-title">–</h2><div id="activity-drawer-body"></div>
+</aside>
+<div class="activity-tooltip" id="activity-tooltip" hidden></div>
+{% endblock %}
+
+{% block scripts %}
+<script defer src="{{ url_for('static', filename='js/activity.js') }}?v=20260817_activity_live_v5"></script>
+{% endblock %}

@@ -1,0 +1,698 @@
+/* LIVA dashboard presentation layer. Data and feature behavior live elsewhere. */
+#dashboard-app {
+  --dash-gap: 0.875rem;
+  --dash-pad: 1rem;
+  --dash-radius: 1.375rem;
+  --dash-inner-radius: 0.875rem;
+  --dash-card: #151a21;
+  --dash-card-top: #181e27;
+  --dash-inner: rgba(148, 163, 184, 0.045);
+  --dash-inner-hover: rgba(148, 163, 184, 0.075);
+  --dash-border: rgba(148, 163, 184, 0.09);
+  --dash-border-soft: rgba(148, 163, 184, 0.075);
+  --dash-divider: rgba(148, 163, 184, 0.09);
+  --dash-text: var(--text-main);
+  --dash-muted: #94a3b8;
+  --dash-faint: #6f7d91;
+  --dash-shadow: 0 0.875rem 2.5rem rgba(0, 0, 0, 0.14);
+  width: 100%;
+  max-width: 82rem;
+  margin-inline: auto;
+  padding-block: 0.75rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dash-gap);
+  overflow-x: clip;
+}
+
+html:not(.dark) #dashboard-app {
+  --dash-card: #f7f9fc;
+  --dash-card-top: #fbfcfe;
+  --dash-inner: #eef2f7;
+  --dash-inner-hover: #e8edf4;
+  --dash-border: rgba(30, 41, 59, 0.1);
+  --dash-border-soft: rgba(30, 41, 59, 0.075);
+  --dash-divider: rgba(30, 41, 59, 0.08);
+  --dash-muted: #64748b;
+  --dash-faint: #8491a3;
+  --dash-shadow: 0 0.875rem 2.5rem rgba(15, 23, 42, 0.07);
+}
+
+#dashboard-app,
+#dashboard-app *,
+#dashboard-app *::before,
+#dashboard-app *::after {
+  box-sizing: border-box;
+}
+
+#dashboard-app .dashboard-mobile-stack {
+  display: none !important;
+}
+
+#dashboard-app .dashboard-header {
+  min-width: 0;
+  margin: 0 0 0.125rem;
+}
+
+#dashboard-app .dashboard-title {
+  margin: 0;
+  color: var(--dash-text);
+  font-size: clamp(1.625rem, 2.1vw, 2rem);
+  font-weight: 720;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+
+#dashboard-app .dashboard-meta-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-top: 0.6875rem;
+}
+
+#dashboard-app .dashboard-meta-pills .meta-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.25rem;
+  padding: 0 0.625rem;
+  border: 0;
+  border-right: 1px solid var(--dash-divider);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--dash-muted);
+  font-size: 0.6875rem;
+  font-weight: 560;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+#dashboard-app .dashboard-meta-pills .meta-pill:first-child {
+  padding-left: 0;
+}
+
+#dashboard-app .dashboard-meta-pills .meta-pill:last-child {
+  border-right: 0;
+}
+
+#dashboard-app.dashboard-layout.dashboard-overview .dashboard-top-grid,
+#dashboard-app.dashboard-layout.dashboard-overview .dashboard-plan-tools,
+#dashboard-app #dashboard-context-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-areas: none !important;
+  gap: var(--dash-gap) !important;
+  width: 100%;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  align-items: stretch !important;
+  border: 0 !important;
+}
+
+#dashboard-app #dashboard-context-row {
+  grid-column: 1 / -1;
+}
+
+#dashboard-app #dashboard-today-card,
+#dashboard-app #dashboard-signals-card,
+#dashboard-app #dashboard-mealplan-card,
+#dashboard-app #dashboard-endurance-card,
+#dashboard-app #today-agenda-card,
+#dashboard-app #plan-check-card {
+  grid-area: auto !important;
+  order: 0 !important;
+}
+
+#dashboard-app.dashboard-layout.dashboard-overview .dashboard-modules {
+  width: 100%;
+  margin: 0;
+}
+
+#dashboard-app .dashboard-card,
+#dashboard-app .chip-card {
+  position: relative;
+  isolation: isolate;
+  width: 100% !important;
+  min-width: 0;
+  max-width: none !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: var(--dash-pad) !important;
+  overflow: hidden;
+  border: 1px solid var(--dash-border) !important;
+  border-radius: var(--dash-radius) !important;
+  background: linear-gradient(180deg, var(--dash-card-top), var(--dash-card)) !important;
+  box-shadow: var(--dash-shadow) !important;
+  color: var(--dash-text);
+  transform: none !important;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+#dashboard-app .dashboard-card::before,
+#dashboard-app .dashboard-card::after,
+#dashboard-app .chip-card::before,
+#dashboard-app .chip-card::after {
+  content: none !important;
+  display: none !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #dashboard-app .dashboard-card:hover,
+  #dashboard-app .dashboard-card:focus-within,
+  #dashboard-app .chip-card:hover,
+  #dashboard-app .chip-card:focus-within {
+    border-color: rgba(125, 178, 217, 0.18) !important;
+    box-shadow: var(--dash-shadow) !important;
+  }
+}
+
+#dashboard-app .card-head,
+#dashboard-app .today-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
+  margin: 0 0 0.75rem;
+}
+
+#dashboard-app .card-eyebrow,
+#dashboard-app .today-eyebrow {
+  margin: 0 0 0.25rem;
+  color: var(--dash-muted);
+  font-size: 0.625rem;
+  font-weight: 720;
+  line-height: 1.2;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+#dashboard-app .card-title,
+#dashboard-app .today-title {
+  margin: 0;
+  color: var(--dash-text);
+  font-size: 1rem;
+  font-weight: 680;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
+}
+
+#dashboard-app .today-shell {
+  gap: 0.5rem !important;
+  height: 100%;
+}
+
+#dashboard-app .today-tiles {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  padding: 0.25rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: var(--dash-inner);
+}
+
+#dashboard-app .today-hero[data-card="today"] .today-tiles {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+#dashboard-app :is(
+  .today-tile,
+  .signals-lane,
+  .mealplan-meal,
+  .endurance-section,
+  .today-agenda-item,
+  .plan-check-static-day,
+  .plan-check-mode-line,
+  .plan-check-item,
+  .training-core-forecast
+) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#dashboard-app .today-hero[data-card="today"] .today-tile,
+#dashboard-app .signals-lane,
+#dashboard-app .today-agenda-item,
+#dashboard-app .plan-check-item {
+  padding: 0.75rem !important;
+}
+
+#dashboard-app .today-hero[data-card="today"] .today-tile {
+  border: 0 !important;
+  border-right: 1px solid var(--dash-divider) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 0.625rem 0.875rem !important;
+}
+
+#dashboard-app .today-hero[data-card="today"] .today-tile:last-child {
+  border-right: 0 !important;
+}
+
+#dashboard-app .today-hero[data-card="today"] .today-tile-body {
+  height: 4.5rem;
+}
+
+#dashboard-app .today-footer {
+  margin: 0 !important;
+  padding: 0.125rem 0 0 !important;
+  color: var(--dash-muted);
+}
+
+#dashboard-app .signals-body,
+#dashboard-app .signals-lanes {
+  gap: 0 !important;
+}
+
+#dashboard-app #dashboard-signals-card .signals-body {
+  --signal-label-w: 5.75rem;
+  --signal-gap: 0.5rem;
+}
+
+#dashboard-app .signals-card-head .card-eyebrow {
+  margin: 0;
+  color: var(--dash-muted);
+  font-size: 0.625rem;
+  font-weight: 720;
+  line-height: 1.2;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+#dashboard-app .signals-card-head .card-title {
+  color: var(--dash-muted);
+  font-size: 0.625rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+}
+
+#dashboard-app .signals-lanes {
+  padding: 0 0.75rem 0.5rem;
+  border-radius: 1rem;
+  background: var(--dash-inner);
+}
+
+#dashboard-app .signals-lane {
+  display: grid !important;
+  grid-template-columns: var(--signal-label-w) minmax(0, 1fr) !important;
+  column-gap: var(--signal-gap) !important;
+  align-items: center;
+  min-height: 2.25rem;
+  margin: 0 !important;
+  padding: 0.5rem 0 !important;
+  border-bottom: 1px solid var(--dash-divider) !important;
+}
+
+#dashboard-app .signals-lane:last-child {
+  border-bottom: 1px solid var(--dash-divider) !important;
+}
+
+#dashboard-app .signals-days {
+  display: grid !important;
+  grid-template-columns: var(--signal-label-w) minmax(0, 1fr) !important;
+  column-gap: var(--signal-gap) !important;
+  align-items: center;
+  width: 100%;
+  min-height: 1.125rem;
+  margin: 0;
+  padding: 0.25rem 0 0;
+  box-sizing: border-box;
+  transform: none !important;
+}
+
+#dashboard-app #dashboard-signals-card .signal-day-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--signal-columns, 14), minmax(0, 1fr));
+  width: 100%;
+  min-width: 0;
+}
+
+#dashboard-app #dashboard-signals-card .signals-bars {
+  display: grid !important;
+  grid-template-columns: repeat(var(--signal-columns, 14), minmax(0, 1fr)) !important;
+  column-gap: 0 !important;
+  width: 100%;
+  min-width: 0;
+  justify-content: stretch !important;
+}
+
+#dashboard-app #dashboard-signals-card .signal-cell {
+  width: 0.6875rem !important;
+  height: 0.6875rem !important;
+  min-width: 0.6875rem;
+  justify-self: center;
+  border-radius: 0.1875rem;
+}
+
+#dashboard-app #dashboard-signals-card .signal-day {
+  width: auto !important;
+  justify-self: center;
+  color: var(--dash-faint);
+  font-size: 0.5rem;
+  font-weight: 560;
+  line-height: 1;
+  text-align: center;
+  text-transform: none;
+}
+
+#dashboard-app .dashboard-card.mealplan-card .mealplan-body,
+#dashboard-app .dashboard-card.endurance-approval-card .endurance-body,
+#dashboard-app .today-agenda-body,
+#dashboard-app .plan-check-body {
+  margin-top: 0;
+  gap: 0.5rem;
+}
+
+#dashboard-app .dashboard-card.mealplan-card .mealplan-meal,
+#dashboard-app .dashboard-card.mealplan-card .mealplan-meal:first-child {
+  position: relative;
+  min-height: 2.5rem;
+  padding: 0.6875rem 0.125rem !important;
+  border-bottom: 1px solid var(--dash-divider) !important;
+  transition: background-color 150ms ease;
+}
+
+#dashboard-app .dashboard-card.mealplan-card .mealplan-meal:last-child {
+  border-bottom: 0 !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #dashboard-app .dashboard-card.mealplan-card .mealplan-meal:hover {
+    border-radius: 0.625rem !important;
+    background: var(--dash-inner-hover) !important;
+  }
+}
+
+#dashboard-app .dashboard-card.mealplan-card .mealplan-items-inline {
+  height: auto !important;
+  min-height: 0 !important;
+  background: transparent !important;
+}
+
+#dashboard-app .mealplan-meal::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* Long-press state is a ring overlay, never layout content. */
+#dashboard-app .dashboard-card.mealplan-card .mealplan-hold-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+  filter: drop-shadow(0 0 0.625rem rgba(52, 211, 153, 0.16));
+}
+
+#dashboard-app .dashboard-card.mealplan-card .mealplan-hold-ring-rect {
+  fill: none;
+  stroke: rgba(52, 211, 153, 0.9);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+#dashboard-app .dashboard-card.mealplan-card .mealplan-meal:is(.is-hold-arming, .is-hold-firing, .is-hold-complete, .is-done) .mealplan-hold-ring {
+  opacity: 1;
+}
+
+#dashboard-app .endurance-body {
+  min-height: 0;
+}
+
+#dashboard-app .endurance-empty {
+  color: var(--dash-muted);
+}
+
+#dashboard-app .today-agenda-item {
+  min-height: 3rem;
+  padding: 0.75rem 0 !important;
+  border-bottom: 1px solid var(--dash-divider) !important;
+}
+
+#dashboard-app .today-agenda-item:last-child {
+  border-bottom: 0 !important;
+}
+
+#dashboard-app .plan-check-body {
+  display: grid;
+}
+
+#dashboard-app #dashboard-core-training-card {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#dashboard-app .plan-check-static-day,
+#dashboard-app .plan-check-mode-line,
+#dashboard-app .training-core-forecast {
+  padding: 0.75rem !important;
+  border-left: 2px solid rgba(125, 178, 217, 0.32) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+#dashboard-app .autopilot-badge,
+#dashboard-app .mealplan-core-pill,
+#dashboard-app .today-agenda-count-pill,
+#dashboard-app .endurance-status-badge {
+  box-shadow: none !important;
+}
+
+#dashboard-app :is(button, select, [role="button"]):focus-visible,
+#dashboard-app a:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent-blue, #60a5fa) 68%, white);
+  outline-offset: 2px;
+}
+
+#dashboard-app :is(
+  .today-status-line,
+  .today-footer,
+  .mealplan-body,
+  .endurance-body,
+  .today-agenda-body,
+  .plan-check-message
+):empty {
+  display: none;
+}
+
+@media (min-width: 42rem) {
+  #dashboard-app #dashboard-context-row,
+  #dashboard-app.dashboard-layout.dashboard-overview .dashboard-plan-tools {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (min-width: 64rem) {
+  #dashboard-app.dashboard-layout.dashboard-overview .dashboard-top-grid {
+    grid-template-columns: minmax(0, 1.34fr) minmax(22rem, 0.96fr) !important;
+  }
+
+  #dashboard-app #dashboard-context-row {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 41.999rem) {
+  /* The shell already reserves the fixed mobile-nav height. */
+  .main-content {
+    padding-top: 0 !important;
+  }
+
+  #dashboard-app {
+    --dash-gap: 0.625rem;
+    --dash-pad: 0.75rem;
+    --dash-radius: 1.125rem;
+    --dash-inner-radius: 0.625rem;
+    padding-block: 0.375rem 1rem;
+  }
+
+  #dashboard-app .dashboard-title {
+    font-size: 1.5rem;
+  }
+
+  #dashboard-app .dashboard-meta-pills {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.125rem;
+    scrollbar-width: none;
+  }
+
+  #dashboard-app .dashboard-meta-pills::-webkit-scrollbar {
+    display: none;
+  }
+
+  #dashboard-app .dashboard-meta-pills .meta-pill:nth-child(n + 3) {
+    display: none;
+  }
+
+  #dashboard-app .card-head,
+  #dashboard-app .today-head {
+    gap: 0.5rem;
+    margin-bottom: 0.625rem;
+  }
+
+  #dashboard-app #dashboard-today-card {
+    order: 1 !important;
+  }
+
+  #dashboard-app #dashboard-signals-card {
+    order: 2 !important;
+  }
+
+  #dashboard-app #dashboard-context-row {
+    order: 3 !important;
+  }
+
+  #dashboard-app .today-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  #dashboard-app .today-week-note,
+  #dashboard-app .mealplan-progress,
+  #dashboard-app .endurance-source,
+  #dashboard-app .today-agenda-day-meta {
+    display: none;
+  }
+
+  #dashboard-app .today-hero[data-card="today"] .today-tiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0 !important;
+  }
+
+  #dashboard-app .today-hero[data-card="today"] .today-tile {
+    padding: 0.5rem !important;
+  }
+
+  #dashboard-app .today-hero[data-card="today"] .today-tile-meta {
+    gap: 0.25rem;
+  }
+
+  #dashboard-app .today-hero[data-card="today"] .today-tile-meta-label {
+    font-size: 0.5625rem;
+    letter-spacing: 0.08em;
+  }
+
+  #dashboard-app .today-hero[data-card="today"] .today-tile-meta-vs {
+    display: none;
+  }
+
+  #dashboard-app .today-hero[data-card="today"] .today-tile-body {
+    height: clamp(4rem, 18vw, 4.75rem);
+  }
+
+  #dashboard-app #dashboard-signals-card .signals-body {
+    --signal-columns: 7;
+    --signal-label-w: 4.75rem;
+    --signal-gap: 0.25rem;
+  }
+
+  #dashboard-app #dashboard-signals-card .signals-bars > .signal-cell,
+  #dashboard-app #dashboard-signals-card .signal-day-grid > .signal-day {
+    display: none;
+  }
+
+  #dashboard-app #dashboard-signals-card .signals-bars > .signal-cell:nth-last-child(-n + 7),
+  #dashboard-app #dashboard-signals-card .signal-day-grid > .signal-day:nth-last-child(-n + 7) {
+    display: block;
+  }
+
+  #dashboard-app #dashboard-signals-card .signals-lane {
+    grid-template-columns: minmax(0, var(--signal-label-w)) minmax(0, 1fr);
+    column-gap: var(--signal-gap);
+    min-height: 2.25rem;
+    padding: 0.5rem 0 !important;
+  }
+
+  #dashboard-app #dashboard-signals-card .signals-bars {
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  }
+
+  #dashboard-app #dashboard-signals-card .signal-day-grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  #dashboard-app #dashboard-signals-card .signal-cell {
+    width: 0.625rem !important;
+    height: 0.625rem !important;
+    min-width: 0.625rem;
+  }
+
+  #dashboard-app .dashboard-card.mealplan-card .mealplan-items-inline,
+  #dashboard-app #plan-check-card .training-plan-reference,
+  #dashboard-app #plan-check-card .training-core-forecast-body,
+  #dashboard-app .endurance-proposal,
+  #dashboard-app .endurance-reason {
+    display: none !important;
+  }
+
+  #dashboard-app .dashboard-card.mealplan-card .mealplan-meal:nth-child(n + 5),
+  #dashboard-app .today-agenda-body .today-agenda-item:nth-child(n + 4) {
+    display: none;
+  }
+
+  #dashboard-app .dashboard-card.mealplan-card .mealplan-meal-header {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.5rem;
+  }
+
+  #dashboard-app .plan-check-item {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #dashboard-app .plan-check-item-suggestion {
+    justify-self: start;
+    text-align: left;
+  }
+
+  #dashboard-app .today-agenda-card-head,
+  #dashboard-app .today-agenda-card-head-meta {
+    display: flex !important;
+  }
+
+  #dashboard-app .today-agenda-card-head {
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    text-align: left !important;
+  }
+
+  #dashboard-app .today-agenda-card-head-left {
+    text-align: left !important;
+  }
+
+  #dashboard-app .today-agenda-card-head-meta {
+    align-items: center;
+    margin-left: auto;
+  }
+
+  #dashboard-app :is(button, select, [role="button"]) {
+    min-height: 2.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #dashboard-app *,
+  #dashboard-app *::before,
+  #dashboard-app *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

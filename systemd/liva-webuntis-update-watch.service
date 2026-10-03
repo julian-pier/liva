@@ -1,0 +1,9 @@
+[Unit]
+Description=LIVA WebUntis Update Watch (fetch + sync + EVA/Entfall alerts)
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/liva
+ExecStart=/opt/liva/venv/bin/python -m jobs.webuntis_update_watch
+

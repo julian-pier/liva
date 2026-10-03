@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="de" class="dark">
+<head>
+
+    <!-- =========================================
+         THEME BOOT (NO FLASH)
+         Default = DARK for everyone
+         Only switch to LIGHT if user explicitly saved it
+    ========================================= -->
+    <script>
+        (function () {
+            const root = document.documentElement;
+            function safeGetStorage(key) {
+                try {
+                    return window.localStorage ? window.localStorage.getItem(key) : null;
+                } catch (_) {
+                    return null;
+                }
+            }
+            const serverTheme = {{ (auth_theme or "")|tojson }}; // "dark" | "light" | ""
+            const nonKeyTheme = safeGetStorage("theme_public");
+            const storedLayoutMode = safeGetStorage("liva.layoutMode");
+            const storedSidebarCollapsed = safeGetStorage("liva.sidebarCollapsed");
+            const layoutMode = storedLayoutMode === "compact" ? "compact" : "wide";
+            const sidebarCollapsed = storedSidebarCollapsed === null
+                ? true
+                : storedSidebarCollapsed === "true" || storedSidebarCollapsed === "1";
+
+            root.dataset.layoutMode = layoutMode;
+            root.classList.toggle("sidebar-collapsed", sidebarCollapsed);
+
+            if (serverTheme === "light") {
+                root.classList.remove("dark");
+            } else if (serverTheme === "dark") {
+                root.classList.add("dark");
+            } else if (nonKeyTheme === "light") {
+                root.classList.remove("dark");
+            } else {
+                root.classList.add("dark");
+            }
+        })();
+    </script>
+
+    <meta charset="UTF-8">
+    <title>LIVA – {% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="color-scheme" content="dark light">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/brand/liva-peak.svg') }}?v=liva-peak-1">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='img/brand/apple-touch-icon.png') }}?v=liva-peak-apple-1">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20260724_mobile_compact_v9">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dark.css') }}?v=20260314_smoked_nav_v2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/terminal.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/foundation.css') }}?v=20260910_mobile_interactions_v1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}?v=20260910_mobile_scale_v1">
+    {% if test_mode %}
+    <style>
+        .test-mode-banner {
+            margin: 0 0 16px;
+            padding: 12px 16px;
+            border: 1px solid rgba(125, 140, 158, 0.42);
+            border-radius: 14px;
+            background: linear-gradient(180deg, rgba(26, 33, 45, 0.94), rgba(19, 25, 37, 0.94));
+            color: #f3f6fb;
+            box-shadow: 0 10px 24px rgba(2, 6, 23, 0.22);
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.28);
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            position: relative;
+            z-index: 1;
+        }
+        .test-mode-dry-run {
+            position: sticky;
+            top: 12px;
+            z-index: 30;
+            margin: 0 0 12px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(120, 143, 102, 0.4);
+            background: rgba(39, 54, 34, 0.92);
+            color: #edf7ea;
+        }
+        .test-mode-dry-run[hidden] {
+            display: none !important;
+        }
+        .test-mode-dry-run.is-visible {
+            display: block;
+        }
+        @media (max-width: 640px) {
+            .test-mode-dry-run {
+                position: relative;
+                top: auto;
+                z-index: 1;
+            }
+        }
+    </style>
+    {% endif %}
+    {% block head %}{% endblock %}
+
+</head>
+
+<body data-auth-level="{{ auth_level or 'none' }}" data-auth-key-label="{{ auth_key_label or '' }}">
+{% set current_path = request.path %}
+{% set current_endpoint = request.endpoint or "" %}
+{% set nav_dashboard = test_mode_url('/dashboard') %}
+{% set nav_training = test_mode_url('/training') %}
+{% set nav_hrv = test_mode_url('/hrv') %}
+{% set nav_remote = test_mode_url('/remote') %}
+{% set desktop_page_title = "Dashboard" %}
+{% set desktop_page_subtitle = "Uebersicht deines heutigen Status" %}
+{% if current_path.startswith('/training') %}
+    {% set desktop_page_title = "Training" %}
+    {% set desktop_page_subtitle = "Sessionen erfassen und Logbuch pflegen" %}
+{% elif current_path.startswith('/mfp') or current_path.startswith('/meals') %}
+    {% set desktop_page_title = "MFP" %}
+    {% set desktop_page_subtitle = "MyFitnessPal Sync und Mahlzeitenverwaltung" %}
+{% elif current_path.startswith('/cardio') or current_path.startswith('/runs') %}
+    {% set desktop_page_title = "Cardio" %}
+    {% set desktop_page_subtitle = "Ausdauer, Laeufe und Belastungsentwicklung" %}
+{% elif current_path.startswith('/hrv') %}
+    {% set desktop_page_title = "HRV" %}
+    {% set desktop_page_subtitle = "Recovery, Readiness und autonome Marker" %}
+{% elif current_path.startswith('/auswertung') %}
+    {% set desktop_page_title = "Auswertung" %}
+    {% set desktop_page_subtitle = "Training und Ernaehrung auswerten" %}
+{% elif current_path.startswith('/planung') %}
+    {% set desktop_page_title = "Planung" %}
+    {% set desktop_page_subtitle = "Wochenplan, Training und Ernaehrungssteuerung" %}
+{% elif current_path.startswith('/remote') %}
+    {% set desktop_page_title = "Remote" %}
+    {% set desktop_page_subtitle = "Remote-Steuerung und externe Tools" %}
+{% elif current_path.startswith('/activity') %}
+    {% set desktop_page_title = "Activity" %}
+    {% set desktop_page_subtitle = "Digitale PC-Aktivität und Tagesverlauf" %}
+{% elif current_path.startswith('/settings') %}
+    {% set desktop_page_title = "System" %}
+    {% set desktop_page_subtitle = "Einstellungen, Theme und Plattformoptionen" %}
+{% endif %}
+
+<div class="app-layout">
+
+    <div data-liva-sidebar-host></div>
+
+    <!-- ========================= -->
+    <!--       TOP NAVBAR         -->
+    <!-- ========================= -->
+    <header class="top-nav">
+
+        <div class="nav-left">
+            <a href="{{ nav_dashboard }}" class="brand-pill">
+                <img src="{{ url_for('static', filename='img/brand/liva-peak-sidebar.svg') }}?v=liva-peak-1" alt="" class="navbar-logo brand-logo brand-peak-dark" width="24" height="24" aria-hidden="true">
+                <img src="{{ url_for('static', filename='img/brand/liva-peak-sidebar-light.svg') }}?v=liva-peak-1" alt="" class="navbar-logo brand-logo brand-peak-light" width="24" height="24" aria-hidden="true">
+                <span class="brand-text">LIVA</span>
+            </a>
+
+            <nav class="nav-links" data-testid="main-navigation">
+
+                <a href="{{ url_for('planung_page') }}"
+                   class="nav-link {% if current_path.startswith('/planung') %}is-active{% endif %}">
+                    Planung
+                </a>
+
+                <a href="{{ url_for('mfp_page') }}"
+                   class="nav-link {% if current_path.startswith('/mfp') or current_path.startswith('/meals') %}is-active{% endif %}">
+                    MFP
+                </a>
+
+                <a href="{{ nav_training }}"
+                   class="nav-link {% if current_path.startswith('/training') %}is-active{% endif %}">
+                    Training
+                </a>
+
+                <a href="{{ nav_hrv }}"
+                   class="nav-link {% if current_path.startswith('/hrv') %}is-active{% endif %}">
+                    HRV
+                </a>
+
+                <a href="{{ url_for('cardio_page') }}"
+                   class="nav-link {% if current_path.startswith('/cardio') or current_path.startswith('/runs') %}is-active{% endif %}">
+                    Cardio
+                </a>
+
+                <a href="{{ url_for('auswertung_page') }}"
+                   class="nav-link {% if current_path.startswith('/auswertung') %}is-active{% endif %}">
+                    Auswertung
+                </a>
+
+                <a href="{{ nav_remote }}"
+                   class="nav-link {% if current_path.startswith('/remote') %}is-active{% endif %}">
+                    Remote
+                </a>
+
+                {% if current_path.startswith('/planung') %}
+                <div class="nav-planning-switch" role="tablist" aria-label="Planung auswählen">
+                    <button class="nav-switch-btn is-active" id="planning-tab-gym" data-planning-tab="gym" type="button" role="tab" aria-selected="true">Gym</button>
+                    <button class="nav-switch-btn" id="planning-tab-nutrition" data-planning-tab="nutrition" type="button" role="tab" aria-selected="false">Ernährung</button>
+                </div>
+                {% endif %}
+
+            </nav>
+        </div>
+
+        <div class="nav-right">
+
+            <!-- ABOUT (PC/Pad only; hidden on phone via CSS) -->
+            <button class="nav-icon-btn nav-about-btn" id="about-toggle" aria-label="About">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20zm0 7a1.2 1.2 0 1 1 0-2.4A1.2 1.2 0 0 1 12 9zm1.5 9h-3v-1.6h.9V12.2h-.9V10.6h2.7v5.8h.3V18z"/>
+                </svg>
+            </button>
+
+            <button class="nav-icon-btn" id="chat-toggle" aria-label="Chat">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
+                </svg>
+            </button>
+
+            <a href="{{ url_for('settings') }}" class="nav-icon-btn" aria-label="Einstellungen" title="Einstellungen">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83a2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33a1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2a2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0a2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2a2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83a2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2a2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0a2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2a2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </a>
+
+	        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menü öffnen">
+	            <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+	                <path d="M3 6h18M3 12h18M3 18h18"
+	                    stroke="currentColor"
+	                    stroke-width="2"
+	                    stroke-linecap="round"/>
+	            </svg>
+            </button>
+
+        </div>
+
+    </header>
+
+    <!-- ========================= -->
+    <!--   CONTENT + CHAT AREA    -->
+    <!-- ========================= -->
+    <div class="main-area desktop-main shared-sidebar-main">
+
+        <main class="main-content">
+            <div class="app-page-shell desktop-main-inner">
+                {% if test_mode %}
+                <div class="test-mode-banner" data-testid="test-mode-banner">TESTMODUS · Read-only · keine echten Schreibaktionen</div>
+                <div id="test-mode-dry-run-message" class="test-mode-dry-run" aria-live="polite" data-testid="dry-run-message" hidden></div>
+                {% endif %}
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+        <div class="chat-body">
+            <a class="chat-open-gpt"
+                href="https://chatgpt.com/g/g-694f06e7ff008191a2fd1fd19823767e-raspberry-pi"
+                target="_blank" rel="noopener">
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ONE global overlay only (window instances are created by terminal.js) -->
+<div id="thCmdOverlay" class="th-cmd-overlay" aria-hidden="true"></div>
+
+<!-- JS -->
+<script defer src="{{ url_for('static', filename='js/sidebar.js') }}?v=20260731_mobile_nav_order_3"></script>
+<script defer src="{{ url_for('static', filename='js/app.js') }}?v=20260730_shared_sidebar_1"></script>
+<script defer src="{{ url_for('static', filename='js/live.js') }}?v=20260608_live_polling_stability_1"></script>
+{% if test_mode %}
+<script>
+  window.TEST_UI_CONFIG = {
+    active: true
+  };
+</script>
+<script defer src="{{ url_for('static', filename='js/test_mode.js') }}"></script>
+{% endif %}
+
+{% block scripts %}{% endblock %}
+
+<script>
+  // Navbar ABOUT button -> opens terminal ABOUT window
+  (function () {
+    const btn = document.getElementById("about-toggle");
+    if (!btn) return;
+
+    let terminalLoader = null;
+
+    function ensureTerminalLoaded() {
+      if (typeof window.openLIVACmdAbout === "function") {
+        return Promise.resolve();
+      }
+      if (terminalLoader) return terminalLoader;
+      terminalLoader = new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "{{ url_for('static', filename='js/terminal.js') }}?v=20260510_perf_fix_1";
+        script.defer = true;
+        script.onload = () => resolve();
+        script.onerror = reject;
+        document.body.appendChild(script);
+      });
+      return terminalLoader;
+    }
+
+    btn.addEventListener("click", async () => {
+      try {
+        await ensureTerminalLoaded();
+        if (typeof window.openLIVACmdAbout === "function") {
+          window.openLIVACmdAbout();
+        }
+      } catch (_) {
+        // keep navbar responsive even if terminal bundle fails
+      }
+    });
+  })();
+</script>
+
+<script>
+  // Hidden CORE opener: type C O R E quickly (non-input fields only).
+  (function () {
+    const buffer = [];
+    let lastTs = 0;
+    window.addEventListener("keydown", function (ev) {
+      const target = ev.target;
+      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
+      const now = Date.now();
+      if (now - lastTs > 800) buffer.length = 0;
+      lastTs = now;
+      const key = String(ev.key || "").toLowerCase();
+      if (!/^[a-z]$/.test(key)) return;
+      buffer.push(key);
+      if (buffer.length > 4) buffer.shift();
+    });
+  })();
+</script>
+
+</body>
+</html>

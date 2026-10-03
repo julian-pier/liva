@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Ernährung – Import{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <section class="card-row">
+        <article class="wide-card">
+            <div class="card-header">
+                <h2>CSV importieren</h2>
+            </div>
+
+            {% if success %}
+                <div class="success-banner">
+                    CSV wurde erfolgreich importiert.
+                </div>
+            {% endif %}
+
+            <form action="{{ url_for('upload_csv') }}" method="post" enctype="multipart/form-data" class="form-vertical">
+                <label class="form-label">
+                    CSV-Datei wählen
+                    <input type="file" name="csv" accept=".csv" required class="file-input">
+                </label>
+                <button type="submit" class="primary-button">Import starten</button>
+            </form>
+
+            <p class="helper-text">
+                Erwartet Spalten wie Datum, Gewicht, Kcal, Protein, Carbs, Fat, Sugar.  
+            </p>
+        </article>
+    </section>
+</div>
+{% endblock %}

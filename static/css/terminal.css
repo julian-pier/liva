@@ -1,0 +1,279 @@
+/* ==============================
+   LIVA ABOUT CMD Window
+   (matches your exact markup)
+============================== */
+
+html.dark #thCmdOverlay{
+  --th-overlay-bg: rgba(0,0,0,0.55);
+  --th-win-bg: #0c0c0c;
+  --th-win-border: #2a2a2a;
+  --th-win-text: #c0c0c0;
+  --th-title-bg: #1c1c1c;
+  --th-ctrl-hover: #2a2a2a;
+  --th-ctrl-active: #3a3a3a;
+  --th-scroll-track: #101010;
+  --th-scroll-thumb: #2b2b2b;
+  --th-scroll-thumb-hover: #3a3a3a;
+  --th-window-shadow: 0 18px 60px rgba(0,0,0,0.72);
+}
+
+html:not(.dark) #thCmdOverlay{
+  --th-overlay-bg: rgba(15,23,42,0.35);
+  --th-win-bg: #f3f6fa;
+  --th-win-border: #c8d2df;
+  --th-win-text: #1f2937;
+  --th-title-bg: #e5ebf2;
+  --th-ctrl-hover: #d6e0ea;
+  --th-ctrl-active: #c5d1de;
+  --th-scroll-track: #dbe4ee;
+  --th-scroll-thumb: #9fb0c3;
+  --th-scroll-thumb-hover: #8599af;
+  --th-window-shadow: 0 18px 48px rgba(15,23,42,0.28);
+}
+
+/* HIDE/SHOW via aria-hidden (no extra classes needed) */
+#thCmdOverlay[aria-hidden="true"]{
+  display: none !important;
+}
+#thCmdOverlay[aria-hidden="false"]{
+  display: block !important;
+}
+
+@media (max-width: 600px) {
+  #thCmdOverlay {
+    display: none !important;
+  }
+}
+
+/* Overlay backdrop */
+#thCmdOverlay.th-cmd-overlay{
+  position: fixed !important;
+  inset: 0 !important;
+  background: var(--th-overlay-bg) !important;
+  z-index: 9999 !important;
+  overflow: hidden !important;
+}
+
+/* Window */
+#thCmdOverlay .th-cmd-window{
+  position: absolute !important;
+
+  /* start centered (until first drag) */
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+
+  width: min(860px, 96vw) !important;
+  height: min(560px, 78vh) !important;
+
+  background: var(--th-win-bg) !important;
+  border: 1px solid var(--th-win-border) !important;
+  border-radius: 0 !important;
+  box-shadow: var(--th-window-shadow) !important;
+
+  font-family: Consolas, "Lucida Console", "Cascadia Mono", monospace !important;
+  color: var(--th-win-text) !important;
+
+  resize: both !important;
+  overflow: hidden !important;
+}
+
+/* once JS sets left/top px -> remove centering translate */
+#thCmdOverlay .th-cmd-window.is-positioned{
+  transform: none !important;
+}
+
+/* Titlebar (drag handle) */
+#thCmdOverlay .th-cmd-titlebar{
+  height: 30px !important;
+  background: var(--th-title-bg) !important;
+  border-bottom: 1px solid var(--th-win-border) !important;
+  display: flex !important;
+  align-items: center !important;
+
+  user-select: none !important;
+  -webkit-user-select: none !important;
+
+  cursor: move !important;
+}
+
+/* Icon + title */
+#thCmdOverlay .th-cmd-title{
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding-left: 10px !important;
+  font-size: 12.5px !important;
+  line-height: 1 !important;
+  opacity: 0.92 !important;
+  white-space: nowrap !important;
+}
+
+/* CMD Icon (top-left) */
+#thCmdOverlay .th-cmd-icon{
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+
+  /* crisp like Windows */
+  image-rendering: pixelated;
+
+  /* classic cmd icon */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+
+  /* inline SVG (no external file needed) */
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%2716%27%20height%3D%2716%27%20viewBox%3D%270%200%2016%2016%27%3E%3Crect%20x%3D%270%27%20y%3D%270%27%20width%3D%2716%27%20height%3D%2716%27%20rx%3D%271%27%20fill%3D%27%23000000%27/%3E%3Crect%20x%3D%270.5%27%20y%3D%270.5%27%20width%3D%2715%27%20height%3D%2715%27%20rx%3D%271%27%20fill%3D%27none%27%20stroke%3D%27%232b2b2b%27/%3E%3Ctext%20x%3D%272%27%20y%3D%2711.2%27%20font-family%3D%27Consolas%2C%20Courier%20New%2C%20monospace%27%20font-size%3D%277.3%27%20fill%3D%27%23ffffff%27%3EC%3A%5C_%3C/text%3E%3C/svg%3E");
+}
+
+
+/* Window controls */
+#thCmdOverlay .th-cmd-controls{
+  margin-left: auto !important;
+  display: flex !important;
+  height: 100% !important;
+}
+
+#thCmdOverlay .th-cmd-ctrl{
+  width: 46px !important;
+  height: 100% !important;
+  display: grid !important;
+  place-items: center !important;
+  font-size: 12px !important;
+  color: var(--th-win-text) !important;
+  cursor: default !important;
+  user-select: none !important;
+}
+
+#thCmdOverlay .th-cmd-ctrl:hover{ background: var(--th-ctrl-hover) !important; }
+#thCmdOverlay .th-cmd-ctrl:active{ background: var(--th-ctrl-active) !important; }
+
+#thCmdOverlay .th-cmd-ctrl.close:hover{ background: #c42b1c !important; color: #fff !important; }
+#thCmdOverlay .th-cmd-ctrl.close:active{ background: #a51f14 !important; color: #fff !important; }
+
+/* Body */
+#thCmdOverlay .th-cmd-body{
+  height: calc(100% - 30px) !important;
+  padding: 10px 10px !important;
+  overflow: auto !important;
+
+  font-size: 14px !important;
+  line-height: 1.25 !important;
+
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+
+  caret-color: transparent !important;
+}
+
+/* Interactive prompt */
+#thCmdOverlay .th-cmd-output{
+  white-space: pre-wrap !important;
+}
+
+#thCmdOverlay .th-cmd-inputline{
+  display: flex !important;
+  align-items: baseline !important;
+  gap: 8px !important;
+}
+
+#thCmdOverlay .th-cmd-body:focus{
+  outline: none !important;
+}
+
+#thCmdOverlay .th-cmd-cursor{
+  display: inline-block;
+  width: 0.7ch;
+  animation: thCmdBlink 1.05s steps(1, end) infinite;
+}
+
+@keyframes thCmdBlink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* Selection */
+#thCmdOverlay .th-cmd-body::selection{
+  background: rgba(192,192,192,0.25) !important;
+  color: var(--th-win-text) !important;
+}
+
+/* Scrollbars */
+#thCmdOverlay .th-cmd-body::-webkit-scrollbar{ width: 12px; height: 12px; }
+#thCmdOverlay .th-cmd-body::-webkit-scrollbar-track{ background: var(--th-scroll-track); }
+#thCmdOverlay .th-cmd-body::-webkit-scrollbar-thumb{
+  background: var(--th-scroll-thumb);
+  border: 3px solid var(--th-scroll-track);
+}
+#thCmdOverlay .th-cmd-body::-webkit-scrollbar-thumb:hover{ background: var(--th-scroll-thumb-hover); }
+#thCmdOverlay .th-cmd-body::-webkit-scrollbar-corner{ background: var(--th-scroll-track); }
+
+#thCmdOverlay .th-cmd-body{
+  scrollbar-width: thin;
+  scrollbar-color: var(--th-scroll-thumb) var(--th-scroll-track);
+}
+
+/* prevent selection while dragging (JS toggles this on overlay) */
+#thCmdOverlay.is-dragging,
+#thCmdOverlay.is-dragging *{
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  cursor: move !important;
+}
+
+/* ---- ensure resize works reliably ---- */
+#thCmdOverlay .th-cmd-window{
+  min-width: 420px !important;
+  min-height: 220px !important;
+
+  /* keep CSS resize as fallback */
+  resize: both !important;
+  overflow: hidden !important;
+}
+
+/* ---- invisible resize handles (more Windows-like than CSS resize) ---- */
+#thCmdOverlay .th-cmd-handle{
+  position: absolute;
+  z-index: 10;
+  background: transparent;
+}
+
+/* edges */
+#thCmdOverlay .th-cmd-handle.n{ top:-6px; left:10px; right:10px; height:12px; cursor: ns-resize; }
+#thCmdOverlay .th-cmd-handle.s{ bottom:-6px; left:10px; right:10px; height:12px; cursor: ns-resize; }
+#thCmdOverlay .th-cmd-handle.e{ right:-6px; top:10px; bottom:10px; width:12px; cursor: ew-resize; }
+#thCmdOverlay .th-cmd-handle.w{ left:-6px; top:10px; bottom:10px; width:12px; cursor: ew-resize; }
+
+/* corners */
+#thCmdOverlay .th-cmd-handle.ne{ right:-6px; top:-6px; width:16px; height:16px; cursor: nesw-resize; }
+#thCmdOverlay .th-cmd-handle.nw{ left:-6px; top:-6px; width:16px; height:16px; cursor: nwse-resize; }
+#thCmdOverlay .th-cmd-handle.se{ right:-6px; bottom:-6px; width:18px; height:18px; cursor: nwse-resize; }
+#thCmdOverlay .th-cmd-handle.sw{ left:-6px; bottom:-6px; width:18px; height:18px; cursor: nesw-resize; }
+
+/* when maximized, disable resize affordance */
+#thCmdOverlay .th-cmd-window.is-maximized{
+  resize: none !important;
+}
+#thCmdOverlay .th-cmd-window.is-maximized::after{
+  display: none !important;
+}
+
+#thCmdOverlay .th-cmd-titlebar{
+  touch-action: none !important;
+}
+#thCmdOverlay .th-cmd-handle{
+  touch-action: none !important;
+}
+
+/* Win11-ish rounding + acrylic-ish titlebar */
+#thCmdOverlay .th-cmd-window{
+  border-radius: 10px !important;
+  overflow: hidden !important;
+}
+
+#thCmdOverlay .th-cmd-titlebar{
+  height: 34px !important;
+  background: var(--th-title-bg) !important;
+  border-bottom-color: var(--th-win-border) !important;
+}

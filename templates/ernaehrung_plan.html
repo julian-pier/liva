@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Ernährungsplanung{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ernaehrung_plan.css') }}?v=20260806-day-groups">
+{% endblock %}
+
+{% block content %}
+<div class="liva-subpage-shell">
+<header class="liva-subpage-hero">
+    <div class="liva-subpage-hero-copy">
+        <p class="liva-subpage-kicker">Ernaehrungsplanung</p>
+        <h1 class="liva-subpage-title">Wochenplan</h1>
+        <p class="liva-subpage-subtitle">Baue deine Woche aus festen Slots, wiederverwendbaren Meals und klaren Exporten fuer den Alltag.</p>
+    </div>
+    <div class="liva-subpage-chip-row">
+        <span class="liva-subpage-chip">Slots</span>
+        <span class="liva-subpage-chip">Meals</span>
+        <span class="liva-subpage-chip">Exports</span>
+    </div>
+</header>
+<div class="nutrition-plan-shell" data-nutrition-plan>
+    <div class="nutrition-plan-column nutrition-plan-column-left">
+        <section class="panel card slot-library">
+            <div class="panel-head">
+                <div>
+                    <p class="eyebrow">Slots</p>
+                    <h3>Slot Library</h3>
+                </div>
+            </div>
+            <div id="slot-template-list" class="slot-library-list"></div>
+            <form id="slot-template-form" class="slot-form">
+                <input name="title" type="text" placeholder="Slot Titel" required>
+                <input name="default_time" type="time" placeholder="Zeit">
+                <input name="context_tag" type="text" placeholder="Kontext (school, preworkout)">
+                <input name="macro_intent" type="text" placeholder="Macro Intent (z.B. Protein hoch)">
+                <button type="submit" class="primary">Slot speichern</button>
+            </form>
+        </section>
+
+        <section class="panel card meal-library">
+            <div class="panel-head">
+                <div>
+                    <p class="eyebrow">Meal Templates</p>
+                    <h3>Mahlzeiten</h3>
+                </div>
+                <input id="meal-search" type="search" placeholder="Meal suchen">
+            </div>
+            <div id="meal-template-list" class="meal-library-list"></div>
+            <details class="meal-builder" open>
+                <summary>Mahlzeit Builder</summary>
+                <form id="meal-builder-form">
+                    <div class="form-row">
+                        <input name="title" type="text" placeholder="Titel" required>
+                        <input name="default_servings" type="number" step="0.1" min="0.1" placeholder="Servings" value="1.0">
+                    </div>
+                    <div class="form-row">
+                        <input name="tags" type="text" placeholder="Tags (comma)">
+                        <input name="mfp_alias" type="text" placeholder="MFP Alias">
+                    </div>
+                    <div class="form-row">
+                        <textarea name="notes" rows="2" placeholder="Notizen"></textarea>
+                    </div>
+                    <div id="ingredient-tray" class="ingredient-tray"></div>
+                    <button type="button" id="add-ingredient-btn" class="ghost">+ Ingredient hinzufügen</button>
+                    <button type="submit" class="primary">Mahlzeit speichern</button>
+                </form>
+            </details>
+        </section>
+
+        <section class="panel card food-library">
+            <div class="panel-head">
+                <div>
+                    <p class="eyebrow">Foods</p>
+                    <h3>Food-Sammlung</h3>
+                </div>
+                <input id="food-search" type="search" placeholder="Food suchen">
+            </div>
+            <div id="food-list" class="food-library-list"></div>
+            <form id="food-form" class="food-form">
+                <div class="form-row">
+                    <input name="name" type="text" placeholder="Name" required>
+                    <input name="brand" type="text" placeholder="Brand">
+                </div>
+                <div class="form-row">
+                    <input name="unit_default" type="text" placeholder="Einheit" value="g">
+                    <input name="kcal_per_100" type="number" step="0.1" placeholder="kcal" required>
+                </div>
+                <div class="form-row">
+                    <input name="p_per_100" type="number" step="0.1" placeholder="Protein" required>
+                    <input name="c_per_100" type="number" step="0.1" placeholder="Carbs" required>
+                </div>
+                <div class="form-row">
+                    <input name="sugar_per_100" type="number" step="0.1" placeholder="Sugar" required>
+                    <input name="f_per_100" type="number" step="0.1" placeholder="Fett" required>
+                </div>
+                <div class="form-row">
+                    <input name="mfp_search_hint" type="text" placeholder="MFP Hint">
+                    <input name="category" type="text" placeholder="Kategorie">
+                </div>
+                <button type="submit" class="primary">Food speichern</button>
+            </form>
+        </section>
+    </div>
+
+    <div class="nutrition-plan-column nutrition-plan-column-center">
+        <header class="plan-header">
+            <div>
+                <p class="eyebrow">Planung</p>
+                <h2>Wochenplan</h2>
+                <p class="plan-subtitle">Template: Standardwoche</p>
+            </div>
+            <div class="plan-actions">
+                <button id="apply-week-btn" class="ghost">Diese Woche anwenden</button>
+                <button id="generate-shopping-btn" class="ghost">Einkaufsliste erstellen</button>
+                <button id="export-checklist-btn" class="ghost">MFP-Checklist export</button>
+            </div>
+        </header>
+        <section class="day-link-workbench" aria-labelledby="day-link-title">
+            <div class="day-link-heading">
+                <div>
+                    <p class="eyebrow">Wochenrhythmus</p>
+                    <h3 id="day-link-title">Tage verbinden</h3>
+                    <p>Über die Leiste ziehen, dann gemeinsam verwalten.</p>
+                </div>
+                <div id="day-link-selection" class="day-link-selection" aria-live="polite"></div>
+            </div>
+            <div id="weekday-ribbon" class="weekday-ribbon" role="group" aria-label="Wochentage auswählen"></div>
+            <div id="day-group-actions" class="day-group-actions" hidden>
+                <button type="button" id="link-selected-days" class="primary">Als Tagesmuster verbinden</button>
+                <button type="button" id="clear-day-selection" class="ghost">Auswahl aufheben</button>
+            </div>
+            <div id="day-group-focus" class="day-group-focus" aria-live="polite"></div>
+        </section>
+        <div id="nutrition-plan-grid" class="plan-grid"></div>
+    </div>
+
+    <div class="nutrition-plan-column nutrition-plan-column-right">
+        <section class="panel card summary-panel">
+            <div class="panel-head">
+                <div>
+                    <p class="eyebrow">Targets & Gap-Filler</p>
+                    <h3>Makro-Übersicht</h3>
+                </div>
+            </div>
+            <div id="week-summary" class="summary-list"></div>
+            <div id="gap-notes" class="gap-notes"></div>
+        </section>
+        <section class="panel card exports-panel">
+            <div class="panel-head">
+                <div>
+                    <p class="eyebrow">Export</p>
+                    <h3>MFP Bridge</h3>
+                </div>
+            </div>
+            <div class="export-block">
+                <div class="export-actions">
+                    <button id="copy-shopping-btn" class="ghost">Copy Einkaufsliste</button>
+                </div>
+                <pre id="shopping-output" class="export-output" aria-live="polite"></pre>
+            </div>
+            <div class="export-block">
+                <div class="export-actions">
+                    <button id="copy-checklist-btn" class="ghost">Copy MFP Checklist</button>
+                </div>
+                <pre id="checklist-output" class="export-output" aria-live="polite"></pre>
+            </div>
+        </section>
+    </div>
+</div>
+</div>
+
+<script src="{{ url_for('static', filename='js/ernaehrung_plan.js') }}"></script>
+
+{% endblock %}

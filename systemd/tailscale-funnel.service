@@ -1,0 +1,33 @@
+[Unit]
+Description=Tailscale Funnel Service for LIVA
+After=network-online.target tailscaled.service liva.service
+Wants=network-online.target
+Requires=tailscaled.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStartPre=/bin/sh -c 'for i in $(seq 1 30); do /usr/bin/tailscale status --json 2>/dev/null | /usr/bin/jq -r .BackendState | /bin/grep -qx Running && exit 0; sleep 2; done; exit 1'
+ExecStart=/usr/bin/tailscale funnel --bg --https=443 http://127.0.0.1:5000
+# Memos has absolute asset/API paths; serve it on its own Tailnet HTTPS port.
+# Keep this alongside the Funnel routes so service restarts do not drop it.
+ExecStartPost=/usr/bin/tailscale serve --bg --https=5233 http://127.0.0.1:5230
+ExecStartPost=/usr/bin/tailscale funnel --bg --https=443 --set-path=/mcp http://127.0.0.1:8765/mcp
+ExecStartPost=/usr/bin/tailscale funnel --bg --https=443 --set-path=/healthz http://127.0.0.1:8765/healthz
+ExecStartPost=/usr/bin/tailscale funnel --bg --https=443 --set-path=/.well-known/oauth-protected-resource http://127.0.0.1:8765/.well-known/oauth-protected-resource
+ExecStartPost=/usr/bin/tailscale funnel --bg --https=443 --set-path=/.well-known/oauth-protected-resource/mcp http://127.0.0.1:8765/.well-known/oauth-protected-resource/mcp
+ExecStartPost=/usr/bin/tailscale funnel --bg --https=443 --set-path=/.well-known/oauth-authorization-server http://127.0.0.1:8765/.well-known/oauth-authorization-server
+ExecStartPost=/usr/bin/tailscale funnel --bg --https=443 --set-path=/oauth/authorize http://127.0.0.1:8765/oauth/authorize
+ExecStartPost=/usr/bin/tailscale funnel --bg --https=443 --set-path=/oauth/token http://127.0.0.1:8765/oauth/token
+ExecStartPost=/usr/bin/tailscale funnel --bg --https=443 --set-path=/oauth/revoke http://127.0.0.1:8765/oauth/revoke
+ExecStartPost=/usr/bin/tailscale funnel --bg --https=443 --set-path=/oauth/register http://127.0.0.1:8765/oauth/register
+ExecStartPost=/usr/bin/tailscale funnel --bg --https=443 --set-path=/oauth/login http://127.0.0.1:8765/oauth/login
+# During boot, tailscaled can briefly report Running before it has finished
+# restoring its persisted Serve/Funnel configuration. Verify after that window;
+# Restart=on-failure will reapply every route if the restored root handler won.
+ExecStartPost=/bin/sh -c 'sleep 5; status=$(/usr/bin/tailscale funnel status); case "$status" in *":5233"*) ;; *) exit 1;; esac; case "$status" in *"/mcp"*) ;; *) exit 1;; esac; case "$status" in *"/oauth/authorize"*) ;; *) exit 1;; esac; case "$status" in *"/.well-known/oauth-authorization-server"*) ;; *) exit 1;; esac'
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

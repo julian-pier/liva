@@ -1,0 +1,11 @@
+[Unit]
+Description=LIVA SQLite database backup timer
+
+[Timer]
+OnCalendar=*-*-* 04:20:00
+Persistent=true
+RandomizedDelaySec=5min
+Unit=liva-db-backup.service
+
+[Install]
+WantedBy=timers.target

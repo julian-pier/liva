@@ -1,0 +1,11 @@
+[Unit]
+Description=LIVA Kienzl weekly analyse refresh (Sunday night)
+
+[Timer]
+OnCalendar=Sun 23:35:00
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target
+

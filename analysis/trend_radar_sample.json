@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "end_date": "2026-02-11",
+    "days": 28,
+    "baseline_days": 28,
+    "trend_days": 7,
+    "timezone": "Europe/Berlin",
+    "data_freshness": {
+      "weight_last": "2026-02-10",
+      "hrv_last": "2026-02-11",
+      "training_last": "2026-02-06",
+      "nutrition_last": "2026-02-10",
+      "cardio_last": "2026-01-27"
+    }
+  },
+  "status": {
+    "level": "yellow",
+    "headline": "Stress-Signal: RHR ↑, RMSSD ↓",
+    "reasons": [
+      "rmssd_down",
+      "rhr_up"
+    ]
+  },
+  "chips": [
+    {
+      "key": "weight",
+      "label": "Gewicht",
+      "unit": "kg",
+      "value_7d": 72.3,
+      "value_baseline": 72.8,
+      "delta_pct": -0.0069,
+      "direction": "flat",
+      "note": "7d vs 28d",
+      "missing": false
+    }
+  ],
+  "series": {
+    "dates": [
+      "2026-01-15",
+      "2026-01-16"
+    ],
+    "metrics": {
+      "weight": {
+        "raw": [72.9, 72.8],
+        "index": [100.2, 100.0],
+        "band": {
+          "low": 95.0,
+          "high": 105.0
+        }
+      }
+    }
+  },
+  "flags": []
+}

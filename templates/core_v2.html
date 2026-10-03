@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% block title %}CORE{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/core_board.css') }}?v=20260514_core_app_rebuild_1">
+{% endblock %}
+{% block content %}
+<div class="core-v2-page layout-shell" data-core-key="{{ core_key or '' }}">
+  <div class="core-app-shell">
+    <header class="core-app-header">
+      <div class="core-app-header-copy">
+        <p class="core-app-kicker">CORE</p>
+        <h1>Heutige Trainingsentscheidung</h1>
+        <p>Tagesentscheidung, Recovery-Signale und Trainingssteuerung.</p>
+      </div>
+      <div class="core-app-header-actions">
+        <div class="core-app-status-block">
+          <span class="core-app-status-label">Stand</span>
+          <strong id="core-v2-generated">-</strong>
+          <span class="core-app-status-line" id="core-board-status-line">-</span>
+        </div>
+        <div class="core-app-action-row">
+          <button type="button" id="core-v2-recompute" class="core-btn">Neu bewerten</button>
+          <a href="/training" class="core-btn core-btn-primary">Training öffnen</a>
+        </div>
+      </div>
+    </header>
+
+    <section class="core-card core-decision-card" aria-label="Tagesentscheidung" data-testid="core-decision-card">
+      <div class="core-decision-head">
+        <div>
+          <p class="core-section-kicker">Entscheidung</p>
+          <h2 id="core-board-headline">-</h2>
+          <p id="core-board-summary" class="core-decision-summary">-</p>
+        </div>
+        <div class="core-decision-meta">
+          <span id="core-board-mode-badge" class="core-badge core-badge-neutral">Offen</span>
+          <span id="core-board-confidence" class="core-badge core-badge-soft">-- %</span>
+        </div>
+      </div>
+      <div id="core-board-consistency-hint" class="core-inline-note" hidden></div>
+      <div id="core-board-key-reasons" class="core-badge-row"></div>
+      <div class="core-decision-info-grid">
+        <div class="core-info-item">
+          <span>Empfehlung</span>
+          <strong id="core-decision-recommendation">-</strong>
+        </div>
+        <div class="core-info-item">
+          <span>Datenqualität</span>
+          <strong id="core-decision-data-quality">-</strong>
+        </div>
+        <div class="core-info-item">
+          <span>Entscheidungsbasis</span>
+          <strong id="core-decision-updated">-</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="core-metrics-grid" aria-label="Kennzahlen">
+      <article class="core-card core-metric-card">
+        <div class="core-metric-head">
+          <span>Recovery</span>
+          <span id="metric-recovery-badge" class="core-badge core-badge-soft">-</span>
+        </div>
+        <strong id="metric-recovery-value" class="core-metric-value">-</strong>
+        <p id="metric-recovery-description" class="core-metric-description">-</p>
+        <span id="metric-recovery-meta" class="core-metric-meta">-</span>
+      </article>
+
+      <article class="core-card core-metric-card">
+        <div class="core-metric-head">
+          <span>Schlaf</span>
+          <span id="metric-sleep-badge" class="core-badge core-badge-soft">-</span>
+        </div>
+        <strong id="metric-sleep-value" class="core-metric-value">-</strong>
+        <p id="metric-sleep-description" class="core-metric-description">-</p>
+        <span id="metric-sleep-meta" class="core-metric-meta">-</span>
+      </article>
+
+      <article class="core-card core-metric-card">
+        <div class="core-metric-head">
+          <span>ANS / HRV</span>
+          <span id="metric-ans-badge" class="core-badge core-badge-soft">-</span>
+        </div>
+        <strong id="metric-ans-value" class="core-metric-value">-</strong>
+        <p id="metric-ans-description" class="core-metric-description">-</p>
+        <span id="metric-ans-meta" class="core-metric-meta">-</span>
+      </article>
+
+      <article class="core-card core-metric-card">
+        <div class="core-metric-head">
+          <span>Puls</span>
+          <span id="metric-pulse-badge" class="core-badge core-badge-soft">-</span>
+        </div>
+        <strong id="metric-pulse-value" class="core-metric-value">-</strong>
+        <p id="metric-pulse-description" class="core-metric-description">-</p>
+        <span id="metric-pulse-meta" class="core-metric-meta">-</span>
+      </article>
+
+      <article class="core-card core-metric-card">
+        <div class="core-metric-head">
+          <span>Flags</span>
+          <span id="metric-flags-badge" class="core-badge core-badge-soft">-</span>
+        </div>
+        <strong id="metric-flags-value" class="core-metric-value">-</strong>
+        <p id="metric-flags-description" class="core-metric-description">-</p>
+        <span id="metric-flags-meta" class="core-metric-meta">-</span>
+      </article>
+    </section>
+
+    <section class="core-card core-tabs-card">
+      <div class="core-tabs-head">
+        <div>
+          <p class="core-section-kicker">Details</p>
+          <h3 id="core-details-title">Heute im Überblick</h3>
+          <p id="core-details-subline" class="core-tabs-subline">-</p>
+        </div>
+        <div class="core-tabs-list" role="tablist" aria-label="CORE Details">
+          <button type="button" class="core-tab is-active" data-tab="overview" role="tab" aria-selected="true">Überblick</button>
+          <button type="button" class="core-tab" data-tab="signals" role="tab" aria-selected="false">Signale</button>
+          <button type="button" class="core-tab" data-tab="data" role="tab" aria-selected="false">Datenlage</button>
+          <button type="button" class="core-tab" data-tab="history" role="tab" aria-selected="false">Verlauf</button>
+        </div>
+      </div>
+
+      <div class="core-tab-panel is-active" data-panel="overview">
+        <div class="core-overview-grid">
+          <article class="core-subcard">
+            <p class="core-section-kicker">Was bedeutet das?</p>
+            <h4 id="core-overview-headline">-</h4>
+            <div id="core-overview-summary" class="core-copy-stack"></div>
+          </article>
+          <article class="core-subcard">
+            <p class="core-section-kicker">Worauf achten?</p>
+            <div id="core-overview-watchouts" class="core-list-stack"></div>
+          </article>
+          <article class="core-subcard" id="core-overview-missing-wrap" hidden>
+            <p class="core-section-kicker">Was fehlt noch?</p>
+            <div id="core-overview-missing" class="core-list-stack"></div>
+          </article>
+        </div>
+      </div>
+
+      <div class="core-tab-panel" data-panel="signals" hidden>
+        <div class="core-signals-toolbar">
+          <div class="core-filter-row" id="core-board-filter-row">
+            <button type="button" class="core-filter-chip is-active" data-filter="all">Alle</button>
+            <button type="button" class="core-filter-chip" data-filter="limits">Bremst</button>
+            <button type="button" class="core-filter-chip" data-filter="supports">Trägt</button>
+            <button type="button" class="core-filter-chip" data-filter="missing">Fehlt</button>
+            <button type="button" class="core-filter-chip" data-filter="stale">Alt</button>
+          </div>
+        </div>
+        <div class="core-signals-summary">
+          <strong id="core-board-signals-count">Signale</strong>
+          <p id="core-board-signals-line">-</p>
+        </div>
+        <div id="core-board-signals-list" class="core-signal-list"></div>
+        <div id="core-board-signal-detail" class="core-signal-detail" hidden></div>
+      </div>
+
+      <div class="core-tab-panel" data-panel="data" hidden>
+        <div class="core-data-grid">
+          <article class="core-subcard">
+            <p class="core-section-kicker">Körperdaten</p>
+            <h4>Körperdaten</h4>
+            <div id="core-data-body" class="core-data-stack"></div>
+          </article>
+          <article class="core-subcard">
+            <p class="core-section-kicker">Schlaf</p>
+            <h4>Schlaf</h4>
+            <div id="core-data-sleep" class="core-data-stack"></div>
+          </article>
+          <article class="core-subcard">
+            <p class="core-section-kicker">Training</p>
+            <h4>Training</h4>
+            <div id="core-data-training" class="core-data-stack"></div>
+          </article>
+          <article class="core-subcard">
+            <p class="core-section-kicker">Check-in</p>
+            <h4>Check-in</h4>
+            <div id="core-data-checkin" class="core-data-stack"></div>
+          </article>
+          <article class="core-subcard">
+            <p class="core-section-kicker">Kalender</p>
+            <h4>Kalender</h4>
+            <div id="core-data-calendar" class="core-data-stack"></div>
+          </article>
+          <article class="core-subcard">
+            <p class="core-section-kicker">Nutrition</p>
+            <h4>Nutrition</h4>
+            <div id="core-data-nutrition" class="core-data-stack"></div>
+          </article>
+        </div>
+      </div>
+
+      <div class="core-tab-panel" data-panel="history" hidden>
+        <article class="core-subcard">
+          <div class="core-history-head">
+            <div>
+              <p class="core-section-kicker">Letzte Tage</p>
+              <h4>Recovery- und CORE-Verlauf</h4>
+            </div>
+            <span id="core-history-caption" class="core-history-caption">-</span>
+          </div>
+          <div id="core-history-chart" class="core-history-chart"></div>
+          <div id="core-history-empty" class="core-empty-state" hidden>
+            <strong>Noch nicht genug Verlauf für eine saubere Darstellung.</strong>
+            <p>Zeige Verlauf, sobald genug CORE-Tage verfügbar sind.</p>
+          </div>
+          <div id="core-history-list" class="core-history-list"></div>
+        </article>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script id="core-board-bootstrap" type="application/json">{{ core_board_bootstrap|tojson }}</script>
+<script defer src="{{ url_for('static', filename='js/core_board.js') }}?v=20260514_core_app_rebuild_1"></script>
+{% endblock %}

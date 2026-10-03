@@ -1,0 +1,15 @@
+{% for r in rows %}
+<tr data-id="{{ r[0] }}">
+
+  <td>{{ r[1] }}</td>
+  <td class="makros-weight-cell">{{ "%.1f"|format(r[2]) if r[2] is not none else "" }}</td>
+  <td>{{ "%.0f"|format(r[3]) if r[3] is not none else "" }}</td>
+  <td>{{ "%.0f"|format(r[4]) if r[4] is not none else "" }}</td>
+  <td>{{ "%.0f"|format(r[5]) if r[5] is not none else "" }}</td>
+  <td>{{ "%.0f"|format(r[6]) if r[6] is not none else "" }}</td>
+  <td>{{ "%.0f"|format(r[7]) if r[7] is not none else "" }}</td>
+
+  {% if not auth_is_key %}<td class="actions-col"></td>{% endif %}
+
+</tr>
+{% endfor %}

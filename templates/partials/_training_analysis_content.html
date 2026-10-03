@@ -1,0 +1,1512 @@
+<div class="page-container training-analysis-page">
+  <section class="card analysis-module supercomp-card">
+    <div class="card-header analysis-card-head">
+      <div class="analysis-card-heading">
+        <div class="training-section-kicker">Belastung · Messung · Trend</div>
+        <h2>Belastung &amp; Leistungsreaktion</h2>
+        <p class="analysis-card-subline">Trainingsbelastung, echte Leistungsmessungen und geglättete Leistungsentwicklung im zeitlichen Verlauf.</p>
+      </div>
+      <div id="responseScopeSwitch" class="response-scope-switch" role="tablist" aria-label="Analysebereich">
+        <button type="button" class="response-scope-btn is-active" data-scope="overall" role="tab" aria-selected="true">Gesamt</button>
+        <button type="button" class="response-scope-btn" data-scope="chest" role="tab" aria-selected="false">Brust</button>
+        <button type="button" class="response-scope-btn" data-scope="back" role="tab" aria-selected="false">Rücken</button>
+        <button type="button" class="response-scope-btn" data-scope="legs" role="tab" aria-selected="false">Beine</button>
+        <button type="button" class="response-scope-btn" data-scope="shoulders" role="tab" aria-selected="false">Schulter</button>
+        <button type="button" class="response-scope-btn" data-scope="biceps" role="tab" aria-selected="false">Bizeps</button>
+        <button type="button" class="response-scope-btn" data-scope="triceps" role="tab" aria-selected="false">Trizeps</button>
+      </div>
+    </div>
+    <div class="response-model-strip" aria-live="polite">
+      <div class="response-model-copy">
+        <span class="response-data-key response-data-key--load">Balken · gemessene Belastung</span>
+        <span class="response-data-key response-data-key--measured">Punkte · gemessene Leistung</span>
+        <span class="response-data-key response-data-key--trend">Linie · Leistungstrend aus echten Messungen</span>
+      </div>
+      <div class="response-model-status">
+        <span id="responseTrendMethod" class="response-observation">Robust geglättet aus den letzten 5 Messungen</span>
+      </div>
+    </div>
+    <div class="chart-container supk-chart-container analysis-chart-container">
+      <canvas id="supkChart"></canvas>
+      <div id="responseChartState" class="analysis-chart-state hidden">Für diesen Bereich liegen noch keine auswertbaren Daten vor.</div>
+    </div>
+  </section>
+
+  <section class="card analysis-card analysis-module">
+    <div class="analysis-head">
+      <div class="analysis-head-left">
+        <div class="analysis-card-heading">
+          <div class="training-section-kicker">Fortschritt</div>
+          <h2>Fortschritt</h2>
+          <div id="analysisSubtitle" class="muted analysis-card-subline">
+            Letzte 7 Tage vs. die 7 Tage davor · Top Sets
+          </div>
+        </div>
+
+        <div id="analysisHelp" class="microcopy analysis-help">
+          <div id="defaultHelpText">
+            <div id="defaultExcludedRow" class="muted hidden analysis-inline-note">
+              <span id="defaultExcludedNote"></span>
+              <button id="defaultExcludedToggle" class="link-btn" type="button">Anzeigen</button>
+            </div>
+          </div>
+          <div id="detailHelpText" class="hidden analysis-inline-note">
+            Top-Set = schwerstes Set pro Einheit (Gewicht -> Reps). Status = letzte Einheit vs. davor. Trend = letzte 4 Einheiten.
+          </div>
+        </div>
+
+        <button id="btnShowOverall" class="link-btn hidden analysis-back-link" type="button">
+          Overall anzeigen
+        </button>
+      </div>
+
+      <div class="analysis-head-right">
+        <div class="analysis-toolbar analysis-toolbar-compact">
+          <div class="analysis-control-group">
+            <span class="analysis-control-label">Übung</span>
+            <select id="exerciseSelect" class="analysis-select select">
+              <option value="">Übung auswählen</option>
+              {% for ex in exercises %}
+                <option value="{{ ex }}">{{ ex }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="analysis-control-group">
+            <span class="analysis-control-label">Gerät</span>
+            <select id="deviceSelect" class="analysis-select select" disabled>
+              <option value="">Gerät auswählen</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="overallPanel" class="panel analysis-panel">
+      <div class="panel-top analysis-panel-top">
+        <div class="analysis-panel-summary">
+          <div class="panel-label">OVERALL · PROGRESS (SETS)</div>
+
+          <div class="metric-line analysis-metric-line">
+            <div id="overallProgressValue" class="panel-big">—</div>
+            <div class="panel-inline">Progress (Sets)</div>
+          </div>
+
+          <div class="analysis-meta-grid">
+            <div id="overallBreakdown" class="reason-label analysis-meta-row">
+              Improved: — · Same: — · Worse: — · New: —
+            </div>
+            <div id="overallCoverage" class="reason-label analysis-meta-row">
+              Compared: —/— sets
+            </div>
+            <div id="overallPlanChange" class="reason-label analysis-meta-row hidden">
+              Viele neue Übungen -> Vergleich eingeschränkt
+            </div>
+            <div id="overallNoData" class="reason-label analysis-meta-row hidden">
+              Keine Vergleichsdaten (neue Übungen/Planwechsel)
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-container chart-overall analysis-chart-container">
+        <canvas id="overallChart"></canvas>
+        <div id="overallChartState" class="reason-label hidden analysis-chart-state">
+          Keine Vergleichsdaten im Zeitraum (viele neue Übungen/Planwechsel)
+        </div>
+      </div>
+    </div>
+
+    <div id="detailPanel" class="panel analysis-panel hidden" aria-hidden="true">
+      <div class="panel-top analysis-panel-top">
+        <div class="analysis-panel-summary">
+          <div id="detailLabel" class="panel-label">DETAIL · —</div>
+
+          <div class="metric-line analysis-metric-line">
+            <div id="detailScore" class="panel-big">—</div>
+            <div id="detailInline" class="panel-inline">Ø Sätze bis Steigerung</div>
+          </div>
+        </div>
+
+        <div class="panel-right analysis-panel-aside">
+          <div class="meta-inline analysis-status-grid">
+            <div class="meta-block">
+              <div class="meta-k">STATUS · LETZTE EINHEIT</div>
+              <div id="statusValue" class="meta-v meta-neutral">—</div>
+            </div>
+
+            <div class="meta-block">
+              <div class="meta-k">TREND · LETZTE 4</div>
+              <div id="trendLabel" class="meta-v meta-neutral">—</div>
+            </div>
+          </div>
+
+          <div id="reasonLabel" class="reason-label analysis-detail-reason"></div>
+        </div>
+      </div>
+
+      <div class="chart-container chart-detail analysis-chart-container">
+        <canvas id="detailChart"></canvas>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* =========================================================
+   COLORS (SuperK-Vibe)
+========================================================= */
+const C_REPS   = "#4e8cff";
+const C_WEIGHT = "#8fc4ff";
+const C_IMPROVED_SUM = "#2f6ee5";
+const C_TREND_DARK  = "rgba(229,231,235,0.50)";
+const C_TREND_LIGHT = "#475569";
+const GRID_DARK = "rgba(255,255,255,0.08)";
+const GRID_LIGHT = "rgba(100,116,139,0.24)";
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+const subtitleEl = document.getElementById("analysisSubtitle");
+
+const exSel   = document.getElementById("exerciseSelect");
+const devSel  = document.getElementById("deviceSelect");
+const btnShowOverall = document.getElementById("btnShowOverall");
+
+const overallPanel = document.getElementById("overallPanel");
+const detailPanel  = document.getElementById("detailPanel");
+
+const detailLabel = document.getElementById("detailLabel");
+const detailScore = document.getElementById("detailScore");
+const detailInline = document.getElementById("detailInline");
+const overallProgressValue = document.getElementById("overallProgressValue");
+const overallBreakdown = document.getElementById("overallBreakdown");
+const overallCoverage = document.getElementById("overallCoverage");
+const overallPlanChange = document.getElementById("overallPlanChange");
+const overallNoData = document.getElementById("overallNoData");
+const overallChartState = document.getElementById("overallChartState");
+const defaultHelpText = document.getElementById("defaultHelpText");
+const detailHelpText = document.getElementById("detailHelpText");
+const defaultExcludedRow = document.getElementById("defaultExcludedRow");
+const defaultExcludedNote = document.getElementById("defaultExcludedNote");
+const defaultExcludedToggle = document.getElementById("defaultExcludedToggle");
+
+/* =========================================================
+   CHART INSTANCES
+========================================================= */
+let overallChart = null;
+let detailChart  = null;
+let supkChart    = null;
+let overallDefaultMeta = { mode: "session", trend_window_sessions: 6 };
+let overallDefaultPoints = [];
+let showLowComparableSessions = false;
+let panelTransitionTimer = null;
+let lastExerciseForDeviceSelection = "";
+
+function currentTrainingInterval(){
+  const value = window.LivaEvaluationControls?.getInterval?.("training");
+  if(value?.start && value?.end) return value;
+  const end = new Date();
+  const start = new Date(end);
+  start.setDate(start.getDate() - 179);
+  return { start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10) };
+}
+
+function trainingRangeParams(){
+  return new URLSearchParams(currentTrainingInterval());
+}
+
+/* =========================================================
+   THEME HELPERS
+========================================================= */
+function fmtDate(iso){
+  if(!iso) return "";
+  const p = String(iso).split("-");
+  if(p.length !== 3) return String(iso);
+  return `${p[2]}.${p[1]}.${p[0].slice(2)}`;
+}
+function isDark(){ return document.documentElement.classList.contains("dark"); }
+function gridColor(){ return isDark() ? GRID_DARK : GRID_LIGHT; }
+function legendColor(){ return isDark() ? "rgba(229,231,235,0.68)" : "#334155"; }
+function trendStrokeColor(){ return isDark() ? C_TREND_DARK : C_TREND_LIGHT; }
+function destroy(ch){ if(ch){ ch.destroy(); } return null; }
+
+function hexToRgba(hex, a){
+  const h = hex.replace("#","");
+  const n = parseInt(h, 16);
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  return `rgba(${r},${g},${b},${a})`;
+}
+function buildGradient(ctx, colorHex){
+  const g = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
+  g.addColorStop(0, hexToRgba(colorHex, 0.18));
+  g.addColorStop(1, hexToRgba(colorHex, 0.02));
+  return g;
+}
+
+/* =========================================================
+   STATUS + TREND UI (Apple-like labels, no pill)
+   Requires HTML ids: statusValue, trendLabel, reasonLabel
+========================================================= */
+function setStatusText(status, reason=null){
+  const el = document.getElementById("statusValue");
+  const rel = document.getElementById("reasonLabel");
+  if(!el) return;
+
+  const key = String(status || "neutral").toLowerCase();
+
+  el.classList.remove("meta-up","meta-flat","meta-down","meta-neutral");
+
+  if(reason === "not_enough_data"){
+    el.textContent = "—";
+    el.classList.add("meta-neutral");
+    if(rel) rel.textContent = "ℹ️ Zu wenig Daten für Status";
+    return;
+  }
+
+  if(rel) rel.textContent = "";
+
+  const map = {
+    progress: { text: "↑ Progress", cls: "meta-up" },
+    stable:   { text: "→ Stable",   cls: "meta-flat" },
+    regress:  { text: "↓ Regress",  cls: "meta-down" },
+    neutral:  { text: "—",          cls: "meta-neutral" }
+  };
+
+  const m = map[key] || map.neutral;
+  el.textContent = m.text;
+  el.classList.add(m.cls);
+}
+
+function setTrend(trend, reason=null){
+  const el = document.getElementById("trendLabel");
+  const rel = document.getElementById("reasonLabel");
+  if(!el) return;
+
+  const key = String(trend || "neutral").toLowerCase();
+
+  el.classList.remove("meta-up","meta-flat","meta-down","meta-neutral");
+
+  if(reason === "not_enough_data"){
+    el.textContent = "—";
+    el.classList.add("meta-neutral");
+    if(rel && !rel.textContent) rel.textContent = "ℹ️ Zu wenig Daten für Trend (mind. 2–4 Einheiten nötig)";
+    return;
+  }
+
+  const map = {
+    up:      { text: "↑ steigend", cls: "meta-up" },
+    flat:    { text: "→ stabil",   cls: "meta-flat" },
+    down:    { text: "↓ fallend",  cls: "meta-down" },
+    neutral: { text: "—",          cls: "meta-neutral" }
+  };
+
+  const m = map[key] || map.neutral;
+  el.textContent = m.text;
+  el.classList.add(m.cls);
+}
+
+/* =========================================================
+   VIEW MODES
+========================================================= */
+function clearPanelFadeClasses(panel){
+  if(!panel) return;
+  panel.classList.remove("panel-fade-enter","panel-fade-enter-active","panel-fade-exit","panel-fade-exit-active");
+}
+
+function swapAnalysisPanels(panelToShow, panelToHide){
+  const showVisible = panelToShow && !panelToShow.classList.contains("hidden");
+  const hideHidden = !panelToHide || panelToHide.classList.contains("hidden");
+  if(showVisible && hideHidden){
+    if(panelToShow){
+      panelToShow.style.display = "block";
+      panelToShow.removeAttribute("aria-hidden");
+    }
+    if(panelToHide){
+      panelToHide.style.display = "none";
+      panelToHide.setAttribute("aria-hidden", "true");
+    }
+    return;
+  }
+
+  if(panelTransitionTimer){
+    clearTimeout(panelTransitionTimer);
+    panelTransitionTimer = null;
+  }
+
+  [panelToShow, panelToHide].forEach((panel) => {
+    if(!panel) return;
+    clearPanelFadeClasses(panel);
+    panel.classList.add("panel-fade");
+  });
+
+  if(panelToShow){
+    panelToShow.classList.remove("hidden");
+    panelToShow.style.display = "block";
+    panelToShow.removeAttribute("aria-hidden");
+    panelToShow.classList.add("panel-fade-enter");
+  }
+
+  if(panelToHide){
+    panelToHide.classList.remove("hidden");
+    panelToHide.style.display = "block";
+    panelToHide.removeAttribute("aria-hidden");
+    panelToHide.classList.add("panel-fade-exit");
+  }
+
+  requestAnimationFrame(() => {
+    if(panelToShow) panelToShow.classList.add("panel-fade-enter-active");
+    if(panelToHide) panelToHide.classList.add("panel-fade-exit-active");
+  });
+
+  panelTransitionTimer = setTimeout(() => {
+    if(panelToShow){
+      clearPanelFadeClasses(panelToShow);
+      panelToShow.style.display = "block";
+      panelToShow.removeAttribute("aria-hidden");
+    }
+    if(panelToHide){
+      clearPanelFadeClasses(panelToHide);
+      panelToHide.classList.add("hidden");
+      panelToHide.style.display = "none";
+      panelToHide.setAttribute("aria-hidden","true");
+    }
+    panelTransitionTimer = null;
+  }, 210);
+}
+
+function showOverallMode(){
+  swapAnalysisPanels(overallPanel, detailPanel);
+  if (btnShowOverall) btnShowOverall.classList.add("hidden");
+  if (subtitleEl) subtitleEl.textContent = "Ungefiltert · Set-Progress pro Einheit (Rohwert + Trend)";
+  if (defaultHelpText) defaultHelpText.classList.remove("hidden");
+  if (detailHelpText) detailHelpText.classList.add("hidden");
+  if (defaultExcludedRow && defaultExcludedNote && String(defaultExcludedNote.textContent || "").trim()){
+    defaultExcludedRow.classList.remove("hidden");
+  }
+}
+
+function showDetailMode(){
+  swapAnalysisPanels(detailPanel, overallPanel);
+  if (btnShowOverall) btnShowOverall.classList.remove("hidden");
+  if (subtitleEl) subtitleEl.textContent = "Übungs-Detail · Top Sets · Status (Event) + Trend (4 Einheiten)";
+  if (defaultHelpText) defaultHelpText.classList.add("hidden");
+  if (detailHelpText) detailHelpText.classList.remove("hidden");
+  if (defaultExcludedRow) defaultExcludedRow.classList.add("hidden");
+}
+
+
+
+/* =========================================================
+   CHART STYLE
+========================================================= */
+function baseOptions(){
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: "nearest", intersect: false },
+    plugins: {
+      legend: {
+        display: true,
+        position: "top",
+        align: "center",
+        labels: {
+          color: legendColor(),
+          boxWidth: isDark() ? 20 : 28,
+          boxHeight: 8,
+          padding: isDark() ? 10 : 14,
+          font: {
+            size: isDark() ? 12 : 14,
+            weight: isDark() ? "500" : "600",
+            family: "'Inter', sans-serif"
+          }
+        }
+      }
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { color: gridColor() } }
+    }
+  };
+}
+
+/* =========================================================
+   PERFORMANCE HELPERS (für Chart / Anzeige)
+========================================================= */
+function repsToReps10(reps, rpe){
+  const R = Number(reps ?? 0);
+  const P = (rpe === null || rpe === undefined) ? 10 : Number(rpe);
+  const adj = (10 - P);
+  return Math.max(0, Math.round((R + adj) * 10) / 10);
+}
+
+// Steigerung-Regel (Session -> Session)
+function isImprovement(prev, cur){
+  const pw = Number(prev?.weight ?? 0);
+  const pr = Number(prev?.reps ?? 0);
+  const cw = Number(cur?.weight ?? 0);
+  const cr = Number(cur?.reps ?? 0);
+
+  if(cw > pw + 1e-9) return true;
+  if(Math.abs(cw - pw) <= 1e-9 && cr > pr) return true;
+  return false;
+}
+
+// Ø Sätze bis Steigerung (Sätze pro Einheit -> Intervall)
+function computeAvgSetsPerImprovementFromSessions(rows){
+  if(!rows || rows.length < 2) return { text: "—", hadImp: false };
+
+  const sets = rows.map(r => Number(r.sets_count ?? 0));
+  const imps = [];
+  let boundary = 0;
+
+  for(let i=1; i<rows.length; i++){
+    if(isImprovement(rows[i-1], rows[i])){
+      const intervalSets = sets.slice(boundary, i+1).reduce((a,b)=>a+b,0);
+      imps.push(intervalSets);
+      boundary = i + 1;
+    }
+  }
+
+  const tail = sets.slice(boundary).reduce((a,b)=>a+b,0);
+
+  if(imps.length === 0){
+    return { text: `${tail}+`, hadImp: false };
+  }
+
+  const sum = imps.reduce((a,b)=>a+b,0) + (tail > 0 ? tail : 0);
+  const denom = imps.length + (tail > 0 ? 1 : 0);
+  const mean = sum / denom;
+  const rounded = Math.round(mean * 10) / 10;
+
+  const plus = tail > 0 ? "+" : "";
+  return { text: String(rounded).replace(".", ",") + plus, hadImp: true };
+}
+
+/* =========================================================
+   OVERALL CHART
+========================================================= */
+function pct(v){
+  return (v === null || v === undefined || Number.isNaN(Number(v))) ? "—" : `${Math.round(Number(v))}%`;
+}
+
+function toYPercent(v){
+  if(v === null || v === undefined) return null;
+  const n = Number(v);
+  if(!Number.isFinite(n)) return null;
+  return n * 100;
+}
+
+function fmt2(n){
+  const v = Number(n);
+  return Number.isFinite(v) ? String(v) : "0";
+}
+
+function formatTooltipTitle(ts){
+  if(ts === null || ts === undefined) return "";
+  const ms = Number(ts);
+  if(!Number.isFinite(ms)) return String(ts);
+  const d = new Date(ms);
+  if(Number.isNaN(d.getTime())) return String(ts);
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = String(d.getFullYear());
+  return `${dd}.${mm}.${yyyy}`;
+}
+
+function shouldShowOverallRawPoint(r){
+  if(r.progress_rate !== null && r.progress_rate !== undefined) return true;
+  return !!(showLowComparableSessions && r.low_comparable && Number(r.comparable || 0) > 0);
+}
+
+function buildCumulativeImprovedData(rows){
+  let cumulative = 0;
+  const data = (Array.isArray(rows) ? rows : [])
+    .filter((r) => Number.isFinite(Number(r.t)))
+    .sort((a, b) => Number(a.t) - Number(b.t))
+    .filter((r) => shouldShowOverallRawPoint(r))
+    .map((r) => {
+      cumulative += Math.max(0, Number(r.improved || 0));
+      return {
+        x: Number(r.t),
+        y: cumulative,
+        session_name: r.session_name || null,
+        improved: Number(r.improved || 0),
+        cumulative_improved: cumulative,
+        _r: r
+      };
+    });
+  if(data.length > 0){
+    data.unshift({
+      x: Number(data[0].x) - 86400000,
+      y: 0,
+      session_name: "Start",
+      improved: 0,
+      cumulative_improved: 0
+    });
+  }
+  return data;
+}
+
+function renderOverallChart(points){
+  if(typeof Chart === "undefined") return;
+  const canvas = document.getElementById("overallChart");
+  if(!canvas) return;
+
+  const rows = Array.isArray(points) ? points : [];
+  const rawData = rows
+    .filter((r) => shouldShowOverallRawPoint(r))
+    .map((r) => ({
+      x: r.t,
+      y: toYPercent(
+        (r.progress_rate !== null && r.progress_rate !== undefined)
+          ? r.progress_rate
+          : (Number(r.comparable || 0) > 0 ? (Number(r.improved || 0) / Number(r.comparable || 1)) : null)
+      ),
+      session_name: r.session_name || null,
+      improved: Number(r.improved || 0),
+      same: Number(r.same || 0),
+      worse: Number(r.worse || 0),
+      new: Number(r.new || 0),
+      comparable: Number(r.comparable || 0),
+      total: Number(r.total || 0),
+      no_baseline: !!r.no_baseline,
+      low_comparable: !!r.low_comparable,
+      _r: r
+    }));
+  const trendData = rows
+    .filter((r) => r.trend !== null && r.trend !== undefined)
+    .map((r) => ({
+    x: r.t,
+    y: toYPercent(r.trend),
+    session_name: r.session_name || null,
+    improved: Number(r.improved || 0),
+    same: Number(r.same || 0),
+    worse: Number(r.worse || 0),
+    new: Number(r.new || 0),
+    comparable: Number(r.comparable || 0),
+    total: Number(r.total || 0),
+    no_baseline: !!r.no_baseline,
+    low_comparable: !!r.low_comparable,
+    _r: r
+  }));
+  const cumulativeImprovedData = buildCumulativeImprovedData(rows);
+  if(overallChartState){
+    overallChartState.classList.toggle("hidden", !(rows.length > 0 && rawData.length === 0));
+  }
+  const xVals = rows
+    .map((r) => Number(r.t))
+    .concat(cumulativeImprovedData.map((r) => Number(r.x)))
+    .filter((v) => Number.isFinite(v))
+    .sort((a, b) => a - b);
+  const minX = xVals.length ? xVals[0] : null;
+  const maxX = xVals.length ? xVals[xVals.length - 1] : null;
+
+  overallChart = destroy(overallChart);
+
+  const ctx = canvas.getContext("2d");
+
+  overallChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      datasets: [
+        {
+          label: "Rohwert",
+          data: rawData,
+          hidden: false,
+          showLine: true,
+          borderColor: hexToRgba(C_WEIGHT, 0.32),
+          borderWidth: 1,
+          tension: 0,
+          pointRadius: 0,
+          pointHitRadius: 10,
+          pointHoverRadius: 3,
+          spanGaps: false
+        },
+        {
+          label: "Trend",
+          data: trendData,
+          showLine: true,
+          borderColor: C_REPS,
+          borderWidth: 3,
+          tension: 0,
+          pointRadius: 0,
+          pointHitRadius: 8,
+          pointHoverRadius: 3,
+          spanGaps: true,
+          borderDash: []
+        },
+        {
+          label: "Summe gesteigerte Sets",
+          data: cumulativeImprovedData,
+          hidden: true,
+          yAxisID: "yImproved",
+          showLine: true,
+          borderColor: C_IMPROVED_SUM,
+          backgroundColor: C_IMPROVED_SUM,
+          borderWidth: 2,
+          tension: 0,
+          pointRadius: 0,
+          pointHitRadius: 10,
+          pointHoverRadius: 3,
+          spanGaps: false,
+          stepped: "before"
+        }
+      ]
+    },
+    options: {
+      ...baseOptions(),
+      parsing: false,
+      normalized: true,
+      animation: false,
+      plugins: {
+        ...baseOptions().plugins,
+        legend: {
+          ...(baseOptions().plugins.legend || {})
+        },
+        tooltip: {
+          displayColors: false,
+          padding: 11,
+          cornerRadius: 10,
+          backgroundColor: isDark() ? "rgba(2, 6, 23, 0.92)" : "rgba(15, 23, 42, 0.92)",
+          titleFont: { size: 13, weight: "600" },
+          bodyFont: { size: 12, weight: "500" },
+          callbacks: {
+            title: (items) => {
+              const item = items?.[0];
+              const x = item?.raw?.x ?? item?.parsed?.x ?? null;
+              const dLabel = formatTooltipTitle(x);
+              const sName = item?.raw?.session_name || item?.raw?._r?.session_name;
+              return sName ? `${dLabel} · ${sName}` : dLabel;
+            },
+            label: (ctx) => {
+              const r = ctx?.raw || {};
+              if(ctx?.dataset?.yAxisID === "yImproved"){
+                const improved = Number(r.improved || 0);
+                const cumulative = Number(r.cumulative_improved || r.y || 0);
+                return [
+                  `Summe gesteigerte Sets: ${cumulative}`,
+                  `+${improved} in dieser Einheit`
+                ];
+              }
+              const comparable = Number(r.comparable || 0);
+              const improved = Number(r.improved || 0);
+              const same = Number(r.same || 0);
+              const worse = Number(r.worse || 0);
+              const newer = Number(r.new || 0);
+              const total = Number(r.total || 0);
+              if(r.no_baseline || comparable === 0){
+                return [
+                  "Keine Baseline (nur neue Sets)",
+                  `New: ${newer} • Total: ${total}`
+                ];
+              }
+              const p = Math.round((improved / Math.max(1, comparable)) * 100);
+              const lines = [
+                `Progress: ${p}%  (${improved}/${comparable})`,
+                `✅ ${improved}  ➖ ${same}  ❌ ${worse}  ✳ ${newer}`,
+                `Verglichen: ${comparable}/${total} Sets`
+              ];
+              if(r.low_comparable){
+                lines.push("Hinweis: wenig Vergleichs-Sets → Aussage unsicher");
+              }
+              return lines;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          min: 0,
+          max: 100,
+          grid: { color: gridColor() },
+          ticks: {
+            callback: (v) => `${v}%`
+          }
+        },
+        x: {
+          type: "time",
+          offset: false,
+          bounds: "data",
+          min: Number.isFinite(minX) ? minX : undefined,
+          max: Number.isFinite(maxX) ? maxX : undefined,
+          grid: { display: false },
+          ticks: {
+            autoSkip: true,
+            maxTicksLimit: window.matchMedia("(max-width: 720px)").matches ? 4 : 8,
+            maxRotation: 0,
+            minRotation: 0,
+            callback: (val) => {
+              let ms = Number(val);
+              if(!Number.isFinite(ms)){
+                ms = Number.parseInt(String(val), 10);
+              }
+              if(!Number.isFinite(ms)) return "";
+              const d = new Date(ms);
+              if(Number.isNaN(d.getTime())) return "";
+              const mm = String(d.getMonth() + 1).padStart(2, "0");
+              const yy = String(d.getFullYear()).slice(2);
+              return `${mm}.${yy}`;
+            }
+          },
+          afterBuildTicks: (axis) => {
+            const monthTicks = [];
+            if(Number.isFinite(minX) && Number.isFinite(maxX)){
+              const end = new Date(maxX);
+              const cur = new Date(minX);
+              cur.setHours(0, 0, 0, 0);
+              cur.setDate(1);
+              while(cur.getTime() <= end.getTime()){
+                monthTicks.push({ value: cur.getTime() });
+                cur.setMonth(cur.getMonth() + 1, 1);
+                cur.setHours(0, 0, 0, 0);
+              }
+            }
+            while(monthTicks.length > 1 && Number(monthTicks[0]?.value) < minX){
+              monthTicks.shift();
+            }
+            if(monthTicks.length > 0){
+              const limit = window.matchMedia("(max-width: 720px)").matches ? 4 : 8;
+              if(monthTicks.length > limit){
+                const sampled = [];
+                for(let i = 0; i < limit; i += 1){
+                  const index = Math.round((monthTicks.length - 1) * (i / Math.max(1, limit - 1)));
+                  sampled.push(monthTicks[index]);
+                }
+                axis.ticks = sampled.filter((tick, index, list) => index === 0 || tick.value !== list[index - 1].value);
+              }else{
+                axis.ticks = monthTicks;
+              }
+              return axis.ticks;
+            }
+            const all = Array.isArray(axis.ticks) ? axis.ticks : [];
+            if(all.length >= 2){
+              axis.ticks = [all[0], all[all.length - 1]];
+            }
+            return axis.ticks;
+          },
+          time: {
+            tooltipFormat: "dd.MM.yyyy"
+          }
+        },
+        yImproved: {
+          position: "right",
+          min: 0,
+          grid: { drawOnChartArea: false },
+          title: { display: false },
+          ticks: {
+            precision: 0,
+            callback: (v) => fmt2(v)
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderOverallSummary(points, meta){
+  const rows = Array.isArray(points) ? points : [];
+  const totals = rows.reduce((acc, r) => {
+    acc.improved += Number(r.improved || 0);
+    acc.same += Number(r.same || 0);
+    acc.worse += Number(r.worse || 0);
+    acc.new += Number(r.new || 0);
+    acc.comparable += Number(r.comparable || 0);
+    acc.total += Number(r.total || 0);
+    return acc;
+  }, { improved: 0, same: 0, worse: 0, new: 0, comparable: 0, total: 0 });
+
+  const progress = totals.comparable > 0 ? (totals.improved / totals.comparable) * 100 : null;
+  if(overallProgressValue) overallProgressValue.textContent = pct(progress);
+  if(overallBreakdown){
+    overallBreakdown.textContent = `Improved: ${fmt2(totals.improved)} · Same: ${fmt2(totals.same)} · Worse: ${fmt2(totals.worse)} · New: ${fmt2(totals.new)}`;
+  }
+  if(overallCoverage){
+    overallCoverage.textContent = `Compared: ${fmt2(totals.comparable)}/${fmt2(totals.total)} sets`;
+  }
+  if(overallNoData){
+    overallNoData.classList.toggle("hidden", totals.comparable > 0);
+  }
+  if(overallPlanChange){
+    overallPlanChange.classList.toggle("hidden", !(meta?.plan_change_flag));
+  }
+  syncExcludedSessionsUI(meta);
+}
+
+function syncExcludedSessionsUI(meta){
+  if(defaultExcludedNote){
+    const lowN = Number(meta?.low_comparable_sessions_count || 0);
+    if(lowN > 0){
+      defaultExcludedNote.textContent = `${lowN} Einheiten mit niedriger Vergleichssicherheit; alle Ergebnisse bleiben sichtbar.`;
+      if(defaultExcludedRow) defaultExcludedRow.classList.remove("hidden");
+      if(defaultExcludedToggle){
+        defaultExcludedToggle.classList.add("hidden");
+        defaultExcludedToggle.setAttribute("aria-pressed", "true");
+      }
+    }else{
+      defaultExcludedNote.textContent = "";
+      if(defaultExcludedRow) defaultExcludedRow.classList.add("hidden");
+      if(defaultExcludedToggle){
+        defaultExcludedToggle.classList.add("hidden");
+        defaultExcludedToggle.setAttribute("aria-pressed", "false");
+      }
+    }
+  }
+}
+
+window.addEventListener("themechange", () => {
+  if(!overallChart) return;
+  if(overallChart.options?.plugins?.legend?.labels){
+    overallChart.options.plugins.legend.labels.color = legendColor();
+  }
+  if(overallChart.options?.scales?.y?.grid){
+    overallChart.options.scales.y.grid.color = gridColor();
+  }
+  if(overallChart.data?.datasets?.[1]){
+    overallChart.data.datasets[1].borderColor = C_REPS;
+  }
+  overallChart.update();
+});
+
+async function loadOverallDefaultProgress(){
+  try{
+    const qp = new URLSearchParams(window.location.search || "");
+    const dbg = qp.get("debug");
+    const params = new URLSearchParams();
+    if(dbg === "1" || dbg === "true") params.set("debug", "1");
+    const interval = currentTrainingInterval();
+    params.set("start", interval.start);
+    params.set("end", interval.end);
+    const url = `/api/analyse/default_progress?${params.toString()}`;
+    const r = await fetch(url, { cache: "no-store" });
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    const payload = await r.json();
+    const points = Array.isArray(payload?.points) ? payload.points : [];
+    overallDefaultPoints = points;
+    showLowComparableSessions = false;
+    overallDefaultMeta = payload?.meta || { mode: "session", trend_window_sessions: 6 };
+    if(dbg === "1" || dbg === "true"){
+      console.log("default_progress", overallDefaultMeta, points.slice(0,3));
+    }
+    if(subtitleEl){
+      const tw = Number(overallDefaultMeta?.trend_window_sessions || 6);
+      subtitleEl.textContent = `Ungefiltert · Set-Progress pro Einheit (Rohwert + Trend, rolling ${tw} Einheiten)`;
+    }
+    renderOverallChart(points);
+    renderOverallSummary(points, overallDefaultMeta);
+  }catch(err){
+    console.error("default progress load failed", err);
+    renderOverallChart([]);
+    renderOverallSummary([], { plan_change_flag: false });
+    if(overallNoData) overallNoData.classList.remove("hidden");
+  }
+}
+
+defaultExcludedToggle?.addEventListener("click", () => {
+  showLowComparableSessions = !showLowComparableSessions;
+  syncExcludedSessionsUI(overallDefaultMeta);
+  renderOverallChart(overallDefaultPoints);
+  renderOverallSummary(overallDefaultPoints, overallDefaultMeta);
+});
+
+/* =========================================================
+   ÜBUNGSDROPDOWN nach Häufigkeit (letzte 30 Tage)
+========================================================= */
+async function fetchExerciseFrequency30d(){
+  const rangeParams = trainingRangeParams().toString();
+  const candidates = [
+    `/api/analysis/exercise_frequency?${rangeParams}`,
+    `/api/analysis/exercises?${rangeParams}`
+  ];
+
+  for(const url of candidates){
+    try{
+      const r = await fetch(url);
+      if(!r.ok) continue;
+      const data = await r.json();
+      return data;
+    }catch(e){}
+  }
+  return null;
+}
+
+function normalizeFreqData(data){
+  const map = new Map();
+  if(!data) return map;
+
+  if(Array.isArray(data)){
+    for(const it of data){
+      const ex = it.exercise ?? it.name ?? it.ex ?? null;
+      const c  = it.count ?? it.sessions_30d ?? it.n ?? it.freq ?? it.times ?? null;
+      if(ex && typeof c === "number") map.set(String(ex), c);
+    }
+    return map;
+  }
+
+  if(typeof data === "object"){
+    for(const k of Object.keys(data)){
+      const v = data[k];
+      if(typeof v === "number") map.set(String(k), v);
+    }
+  }
+  return map;
+}
+
+function sortExerciseSelectByFreq(freqMap){
+  if(!freqMap || freqMap.size === 0) return;
+
+  const current = exSel.value;
+
+  const opts = Array.from(exSel.querySelectorAll("option"))
+    .filter(o => o.value);
+
+  opts.sort((a,b) => (freqMap.get(b.value) ?? 0) - (freqMap.get(a.value) ?? 0));
+
+  const placeholder = exSel.querySelector("option[value='']");
+  exSel.innerHTML = "";
+  if(placeholder) exSel.appendChild(placeholder);
+
+  for(const o of opts){
+    exSel.appendChild(o);
+  }
+
+  if(current){
+    exSel.value = current;
+  }
+}
+
+/* =========================================================
+   DEVICES + HISTORY
+========================================================= */
+async function loadDevices(exercise){
+  const prevDevice = (devSel.value || "").trim();
+  devSel.innerHTML = "<option value=''>Gerät auswählen</option>";
+  devSel.disabled = true;
+
+  if(!exercise) return;
+
+  const params = trainingRangeParams();
+  params.set("exercise", exercise);
+  const resp = await fetch(`/api/analysis/exercise_variants?${params.toString()}`);
+  if(!resp.ok) return;
+
+  const variants = await resp.json();
+  const devs = [...new Set((variants || []).map(v => v?.device).filter(Boolean))];
+
+  devs.forEach(d => {
+    const o = document.createElement("option");
+    o.value = d;
+    o.textContent = d;
+    devSel.appendChild(o);
+  });
+
+  devSel.disabled = devs.length === 0;
+  if(devs.length === 0){
+    showOverallMode();
+    lastExerciseForDeviceSelection = "";
+    return;
+  }
+
+  // Only keep previous device when refreshing the same exercise.
+  // On exercise switch, always pick latest variant from backend.
+  if(lastExerciseForDeviceSelection === exercise && prevDevice && devs.includes(prevDevice)){
+    devSel.value = prevDevice;
+  }else{
+    // API is sorted by last usage desc; first option is the latest variant.
+    devSel.value = devs[0];
+  }
+  lastExerciseForDeviceSelection = exercise;
+  await loadHistory(exercise, devSel.value);
+}
+
+async function loadHistory(exercise, device){
+  if(!exercise || !device) return;
+
+  // 1) Timeseries für Chart
+  const params = trainingRangeParams();
+  params.set("exercise", exercise);
+  params.set("device", device);
+  const resp = await fetch(`/api/analysis/exercise_history?${params.toString()}`);
+  if(!resp.ok) return;
+  const rows = await resp.json();
+
+  // 2) Status + Trend vom Backend (Event vs Trend)
+  try{
+    const r = await fetch(`/api/analysis/exercise_progress?${params.toString()}`);
+    if(r.ok){
+      const meta = await r.json();
+      setStatusText(meta.status || "neutral", meta.reason || null);
+      setTrend(meta.trend || "neutral", meta.reason || null);
+    }else{
+      setStatusText("neutral");
+      setTrend("neutral");
+    }
+  }catch(e){
+    console.warn("Status/Trend API failed", e);
+    setStatusText("neutral");
+    setTrend("neutral");
+  }
+
+  if(!rows || rows.length === 0){
+    showDetailMode();
+    detailLabel.textContent = `DETAIL · ${exercise} · ${device}`;
+    detailScore.textContent = "—";
+    detailInline.textContent = "Ø Sätze bis Steigerung";
+    detailChart = destroy(detailChart);
+    return;
+  }
+
+  showDetailMode();
+  detailLabel.textContent = `DETAIL · ${exercise} · ${device}`;
+
+  const avgObj = computeAvgSetsPerImprovementFromSessions(rows);
+  detailScore.textContent = avgObj.text;
+  detailInline.textContent = "Ø Sätze bis Steigerung";
+
+  // Chart series
+  const labels = rows.map(r => fmtDate(r.date || r.date_iso));
+  const reps10 = rows.map(r => repsToReps10(r.reps, r.rpe));
+  const weight = rows.map(r => Number(r.weight ?? 0));
+
+  const rMin = Math.floor((Math.min(...reps10) - 1) * 10) / 10;
+  const rMax = Math.ceil((Math.max(...reps10) + 1) * 10) / 10;
+  const wMin = Math.floor(Math.min(...weight) - 2);
+  const wMax = Math.ceil(Math.max(...weight) + 2);
+
+  detailChart = destroy(detailChart);
+
+  const canvas = document.getElementById("detailChart");
+  const ctx = canvas.getContext("2d");
+  const repsFill = buildGradient(ctx, C_REPS);
+
+  detailChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Reps @10",
+          data: reps10,
+          yAxisID: "reps",
+          borderColor: C_REPS,
+          backgroundColor: repsFill,
+          fill: true,
+          borderWidth: 2,
+          tension: 0.35,
+          pointRadius: 2
+        },
+        {
+          label: "Gewicht",
+          data: weight,
+          yAxisID: "weight",
+          borderColor: C_WEIGHT,
+          backgroundColor: "transparent",
+          fill: false,
+          borderWidth: 2,
+          tension: 0.35,
+          pointRadius: 2
+        }
+      ]
+    },
+    options: {
+      ...baseOptions(),
+      scales: {
+        x: { grid: { display: false } },
+        reps: {
+          position: "left",
+          min: rMin,
+          max: rMax,
+          grid: { color: gridColor() },
+          ticks: { color: legendColor() }
+        },
+        weight: {
+          position: "right",
+          min: wMin,
+          max: wMax,
+          grid: { drawOnChartArea: false },
+          ticks: { color: legendColor() }
+        }
+      }
+    }
+  });
+}
+
+/* =========================================================
+   SUPERK CHART
+========================================================= */
+let trainingResponsePayload = null;
+let activeResponseScope = "overall";
+
+function responsePerformanceBounds(scope){
+  const values = [...(scope?.performance || []), ...(scope?.performance_trend || [])].filter(Number.isFinite);
+  const minValue = values.length ? Math.min(...values) : 100;
+  const maxValue = values.length ? Math.max(...values) : 100;
+  return {
+    min: Math.floor(Math.min(90, minValue - 2) / 5) * 5,
+    max: Math.ceil(Math.max(110, maxValue + 2) / 5) * 5,
+  };
+}
+
+function responseDecimal(value){
+  return Number(value).toFixed(1).replace(".", ",");
+}
+
+function responseTooltipLines(context){
+  const value = Number(context.raw);
+  const metric = context.dataset?.metric;
+  if(metric === "load") return `Belastung: ${responseDecimal(value)} gewichtete Sätze`;
+  if(metric === "measured") return `Gemessen: ${responseDecimal(value)}`;
+  if(metric === "trend") return `Leistungstrend: ${responseDecimal(value)}`;
+  return "";
+}
+
+function setResponseScope(scopeKey){
+  if(!trainingResponsePayload?.scopes?.[scopeKey] || !supkChart) return;
+  activeResponseScope = scopeKey;
+  const scope = trainingResponsePayload.scopes[scopeKey];
+  const labels = trainingResponsePayload.dates || [];
+  const bounds = responsePerformanceBounds(scope);
+  const hasData = (scope.load || []).some(value => Number(value) > 0) || (scope.performance || []).some(Number.isFinite);
+
+  document.querySelectorAll(".response-scope-btn").forEach(button => {
+    const active = button.dataset.scope === scopeKey;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-selected", active ? "true" : "false");
+  });
+  const trendMethod = document.getElementById("responseTrendMethod");
+  const state = document.getElementById("responseChartState");
+  if(trendMethod){
+    const measuredCount = (scope.performance || []).filter(Number.isFinite).length;
+    trendMethod.textContent = `${measuredCount} Messpunkte · robuster, geglätteter Trend`;
+  }
+  state?.classList.toggle("hidden", hasData);
+
+  supkChart.data.labels = labels;
+  supkChart.data.datasets[0].data = scope.load || [];
+  supkChart.data.datasets[0].label = `${scope.label} · Belastung`;
+  supkChart.data.datasets[1].data = scope.performance || [];
+  supkChart.data.datasets[2].data = scope.performance_trend || [];
+  supkChart.options.scales.yPerformance.min = bounds.min;
+  supkChart.options.scales.yPerformance.max = bounds.max;
+  supkChart.update();
+}
+
+async function initSupkChart(){
+  const cv = document.getElementById("supkChart");
+  if(!cv) return;
+  try{
+    const response = await fetch(`/api/training/response?${trainingRangeParams().toString()}`);
+    if(!response.ok) throw new Error(`Training response ${response.status}`);
+    trainingResponsePayload = await response.json();
+  }catch(error){
+    console.error("❌ Belastungs-/Leistungsanalyse konnte nicht geladen werden:", error);
+    document.getElementById("responseChartState")?.classList.remove("hidden");
+    return;
+  }
+
+  const ctx = cv.getContext("2d");
+  supkChart = destroy(supkChart);
+  supkChart = new Chart(ctx, {
+    data: {
+      labels: trainingResponsePayload?.dates || [],
+      datasets: [
+        {
+          type: "bar",
+          metric: "load",
+          label: "Belastung",
+          data: [],
+          yAxisID: "yLoad",
+          backgroundColor: "rgba(93, 148, 255, 0.28)",
+          borderColor: "rgba(93, 148, 255, 0.68)",
+          borderWidth: 1,
+          borderRadius: 2,
+          barPercentage: 0.86,
+          categoryPercentage: 1.0,
+          order: 4,
+        },
+        {
+          type: "line",
+          metric: "measured",
+          label: "Gemessene Leistung",
+          data: [],
+          yAxisID: "yPerformance",
+          borderColor: "rgba(143, 196, 255, 0.42)",
+          backgroundColor: "rgba(143, 196, 255, 0.52)",
+          borderWidth: 1,
+          pointRadius: 2,
+          pointHoverRadius: 4,
+          pointBorderWidth: 1,
+          pointBorderColor: "rgba(143, 196, 255, 0.62)",
+          pointBackgroundColor: "rgba(15, 23, 42, 0.58)",
+          tension: 0.22,
+          spanGaps: true,
+          order: 3,
+        },
+        {
+          type: "line",
+          metric: "trend",
+          label: "Leistungstrend",
+          data: [],
+          yAxisID: "yPerformance",
+          borderColor: "#2f6ee5",
+          backgroundColor: "#2f6ee5",
+          borderWidth: 4,
+          pointRadius: 0,
+          tension: 0.48,
+          cubicInterpolationMode: "monotone",
+          borderJoinStyle: "round",
+          spanGaps: true,
+          order: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: {
+          display: true,
+          position: "top",
+          align: "center",
+          labels: { color: legendColor(), usePointStyle: true, boxWidth: 9, boxHeight: 9 },
+        },
+        tooltip: {
+          callbacks: {
+            title: items => items?.[0]?.label ? fmtDate(items[0].label) : "",
+            label: responseTooltipLines,
+          },
+        },
+      },
+      scales: {
+        yLoad: {
+          position: "left",
+          beginAtZero: true,
+          title: { display: true, text: "gewichtete Arbeitssätze", color: legendColor() },
+          grid: { color: gridColor() },
+          ticks: { color: legendColor(), precision: 0 },
+        },
+        yPerformance: {
+          position: "right",
+          min: 90,
+          max: 110,
+          title: { display: true, text: "Leistungsindex", color: legendColor() },
+          grid: { drawOnChartArea: false },
+          ticks: { color: legendColor() },
+        },
+        x: {
+          grid: { display: false },
+          ticks: {
+            color: legendColor(),
+            autoSkip: true,
+            maxTicksLimit: window.matchMedia("(max-width: 720px)").matches ? 4 : 8,
+            maxRotation: 0,
+            minRotation: 0,
+            callback: value => fmtDate(trainingResponsePayload?.dates?.[Number(value)] || ""),
+          },
+        },
+      },
+    },
+  });
+
+  document.querySelectorAll(".response-scope-btn").forEach(button => {
+    button.addEventListener("click", () => setResponseScope(button.dataset.scope || "overall"));
+  });
+  setResponseScope("overall");
+
+  window.addEventListener("themechange", () => {
+    if(!supkChart) return;
+    supkChart.options.plugins.legend.labels.color = legendColor();
+    for(const scaleName of ["yLoad", "yPerformance"]){
+      supkChart.options.scales[scaleName].ticks.color = legendColor();
+      supkChart.options.scales[scaleName].title.color = legendColor();
+    }
+    supkChart.options.scales.yLoad.grid.color = gridColor();
+    supkChart.update();
+  });
+}
+
+/* =========================================================
+   EVENTS
+========================================================= */
+exSel.addEventListener("change", async () => {
+  const exercise = (exSel.value || "").trim();
+  if(!exercise){
+    devSel.innerHTML = "<option value=''>Gerät auswählen</option>";
+    devSel.disabled = true;
+    showOverallMode();
+    return;
+  }
+  await loadDevices(exercise);
+});
+
+devSel.addEventListener("change", async () => {
+  const exercise = (exSel.value || "").trim();
+  const device = (devSel.value || "").trim();
+  if(!exercise || !device){
+    showOverallMode();
+    return;
+  }
+  await loadHistory(exercise, device);
+});
+
+document.getElementById("btnShowOverall")?.addEventListener("click", () => {
+  showOverallMode();
+});
+
+
+/* =========================================================
+   INIT
+========================================================= */
+let trainingAnalysisInitialized = false;
+
+async function initTrainingAnalysis() {
+  if (trainingAnalysisInitialized) return;
+  trainingAnalysisInitialized = true;
+  if(typeof Chart !== "undefined"){
+    await initSupkChart();
+    await loadOverallDefaultProgress();
+  }
+
+  const freqData = await fetchExerciseFrequency30d();
+  const freqMap = normalizeFreqData(freqData);
+  sortExerciseSelectByFreq(freqMap);
+
+  showOverallMode();
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  const workspace = document.getElementById("evaluation-workspace");
+  if (!workspace || workspace.dataset.area === "training") initTrainingAnalysis();
+});
+
+window.addEventListener("liva:analysis-area-change", (event) => {
+  if (event?.detail?.area === "training") initTrainingAnalysis();
+});
+
+window.addEventListener("liva:analysis-range-change", async (event) => {
+  if(event?.detail?.area !== "training" || typeof Chart === "undefined") return;
+  await initSupkChart();
+  await loadOverallDefaultProgress();
+  const freqData = await fetchExerciseFrequency30d();
+  sortExerciseSelectByFreq(normalizeFreqData(freqData));
+  const exercise = (exSel.value || "").trim();
+  if(exercise){
+    await loadDevices(exercise);
+  }else{
+    showOverallMode();
+  }
+});
+</script>
+
+<script>
+  // KIENZL weekly analyse (cached; refreshed Sunday night)
+  (function () {
+    const metaEl = document.getElementById("kienzlWeeklyMeta");
+    const textEl = document.getElementById("kienzlWeeklyText");
+    if (!metaEl || !textEl) return;
+
+    function fmtTs(ts) {
+      if (!ts) return "–";
+      const d = new Date(ts);
+      if (Number.isNaN(d.getTime())) return String(ts);
+      return d.toLocaleDateString("de-DE") + " – " + d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function splitKienzlSentences(text) {
+      return String(text || "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .split(/(?<=[.!?])\s+(?=[A-ZÄÖÜ])/)
+        .map((part) => part.trim())
+        .filter(Boolean);
+    }
+
+    function renderKienzlText(textEl, rawText) {
+      const clean = String(rawText || "").replace(/\s+/g, " ").trim();
+      if (!clean) {
+        textEl.textContent = "—";
+        return;
+      }
+
+      const sentences = splitKienzlSentences(clean);
+      if (sentences.length <= 1) {
+        textEl.textContent = clean;
+        return;
+      }
+
+      const closingHints = ["jetzt", "fazit", "damit", "ziel", "nächste", "naechste"];
+      let closingIndex = -1;
+      for (let i = sentences.length - 1; i >= 0; i -= 1) {
+        const lowered = sentences[i].toLowerCase();
+        if (closingHints.some((hint) => lowered.startsWith(hint))) {
+          closingIndex = i;
+          break;
+        }
+      }
+
+      const intro = sentences.slice(0, Math.min(2, sentences.length));
+      const middleStart = intro.length;
+      const middleEnd = closingIndex > middleStart ? closingIndex : sentences.length;
+      const middle = sentences.slice(middleStart, middleEnd);
+      const closing = closingIndex >= middleStart ? sentences.slice(closingIndex) : [];
+
+      const chunks = [];
+      if (intro.length) {
+        chunks.push(`<p class="kienzl-copy-lead">${intro.map(escapeHtml).join(" ")}</p>`);
+      }
+      for (let i = 0; i < middle.length; i += 2) {
+        chunks.push(`<p>${middle.slice(i, i + 2).map(escapeHtml).join(" ")}</p>`);
+      }
+      if (closing.length) {
+        chunks.push(`<p class="kienzl-copy-focus">${closing.map(escapeHtml).join(" ")}</p>`);
+      }
+
+      textEl.innerHTML = chunks.join("");
+    }
+
+    let loaded = false;
+    function loadKienzlWeekly() {
+      if (loaded) return;
+      loaded = true;
+      fetch("/api/analysis/kienzl_weekly", { cache: "no-store" })
+        .then((r) => r.json())
+        .then((d) => {
+          if (!d || !d.ok) {
+            textEl.textContent = "Kienzl nicht verfügbar.";
+            metaEl.textContent = "–";
+            return;
+          }
+          if (!d.exists) {
+            textEl.textContent = "Noch keine Analyse. Läuft Sonntag Nacht.";
+            metaEl.textContent = "–";
+            return;
+          }
+          const range = (d.range_start && d.range_end) ? `${d.range_start} -> ${d.range_end}` : "–";
+          metaEl.textContent = `${fmtTs(d.created_at)} · ${range}`;
+          renderKienzlText(textEl, d.text || "");
+        })
+        .catch(() => {
+          textEl.textContent = "Kienzl nicht verfügbar.";
+          metaEl.textContent = "–";
+        });
+    }
+
+    const workspace = document.getElementById("evaluation-workspace");
+    if (!workspace || workspace.dataset.area === "training") loadKienzlWeekly();
+    window.addEventListener("liva:analysis-area-change", (event) => {
+      if (event?.detail?.area === "training") loadKienzlWeekly();
+    });
+  })();
+</script>

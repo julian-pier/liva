@@ -1,0 +1,9 @@
+[Unit]
+Description=LIVA Telegram Inbox Processor
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/liva
+ExecStart=/opt/liva/venv/bin/python -m jobs.telegram_inbox
+

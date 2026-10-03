@@ -1,0 +1,1128 @@
+.physique-page {
+  width: min(1180px, calc(100% - 32px));
+  margin: 28px auto 48px;
+  display: grid;
+  gap: 20px;
+  position: relative;
+  z-index: 21010;
+}
+
+.physique-hero,
+.physique-upload-card,
+.physique-feed-card {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02)),
+    radial-gradient(circle at top right, rgba(88, 180, 120, 0.16), transparent 34%);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
+}
+
+.physique-hero {
+  padding: 28px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.physique-kicker {
+  margin: 0 0 8px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #7fd39b;
+}
+
+.physique-hero h1 {
+  margin: 0;
+  font-size: clamp(30px, 5vw, 48px);
+  line-height: 0.95;
+}
+
+.physique-subtitle {
+  margin: 12px 0 0;
+  max-width: 780px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.physique-subtitle code {
+  font-size: 0.92em;
+  color: #a7f0bc;
+}
+
+.physique-backlink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  text-decoration: none;
+}
+
+.physique-upload-card,
+.physique-feed-card {
+  padding: 24px;
+}
+
+.physique-upload-collapsed {
+  padding: 0;
+}
+
+.physique-upload-collapsed > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 16px 24px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.physique-upload-collapsed > summary::-webkit-details-marker {
+  display: none;
+}
+
+.physique-upload-collapsed > summary span {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 13px;
+}
+
+.physique-upload-collapsed[open] > form {
+  padding: 0 24px 24px;
+}
+
+.physique-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.physique-card-head h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.physique-card-head span {
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.physique-upload-form {
+  display: grid;
+  gap: 18px;
+}
+
+.physique-dropzone {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  padding: 26px;
+  border: 1px dashed rgba(127, 211, 155, 0.5);
+  border-radius: 18px;
+  background: rgba(127, 211, 155, 0.08);
+  cursor: pointer;
+}
+
+.physique-dropzone input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.physique-drop-title {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.physique-drop-copy {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.physique-form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.physique-form-grid label,
+.physique-note-field {
+  display: grid;
+  gap: 8px;
+}
+
+.physique-form-grid span,
+.physique-note-field span {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.physique-form-grid input,
+.physique-form-grid select,
+.physique-note-field textarea {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(10, 14, 20, 0.75);
+  color: #fff;
+  padding: 12px 14px;
+}
+
+.physique-note-field textarea {
+  resize: vertical;
+  min-height: 92px;
+}
+
+.physique-upload-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.physique-upload-status {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.physique-feed {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.physique-toolbar {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.physique-toolbar-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.physique-toolbar-sort {
+  display: grid;
+  gap: 6px;
+  min-width: 290px;
+}
+
+.physique-toolbar-view {
+  display: grid;
+  gap: 6px;
+  min-width: 220px;
+}
+
+.physique-toolbar-sort > span,
+.physique-toolbar-view > span {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.64);
+  font-weight: 700;
+}
+
+.physique-toolbar-sort select,
+.physique-toolbar-view select {
+  min-height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(14, 18, 26, 0.92);
+  color: #fff;
+  padding: 0 12px;
+}
+
+.physique-entry {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  background: rgba(8, 10, 16, 0.62);
+  overflow: hidden;
+  display: grid;
+  align-content: start;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 420px;
+}
+
+.physique-entry-head {
+  display: grid;
+  gap: 8px;
+  padding: 14px 14px 10px;
+}
+
+.physique-entry-date {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.physique-entry-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.physique-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(127, 211, 155, 0.3);
+  background: rgba(127, 211, 155, 0.14);
+  color: #c5f6d3;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 120ms ease, transform 120ms ease;
+}
+
+.physique-chip:hover {
+  background: rgba(127, 211, 155, 0.24);
+  transform: translateY(-1px);
+}
+
+.physique-chip.is-empty {
+  color: rgba(255, 255, 255, 0.74);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.physique-entry-note {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 13px;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.physique-entry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  padding: 0 14px 14px;
+}
+
+.physique-thumb {
+  display: block;
+  width: 100%;
+  border: none;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #090b0f;
+  position: relative;
+  cursor: pointer;
+  pointer-events: auto !important;
+}
+
+.physique-thumb-wrap {
+  position: relative;
+}
+
+.physique-like-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-2px);
+  transition: opacity 120ms ease, transform 120ms ease, background 120ms ease, border-color 120ms ease;
+}
+
+.physique-delete-btn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 157, 157, 0.45);
+  background: rgba(34, 8, 8, 0.72);
+  color: #ffd8d8;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-2px);
+  transition: opacity 120ms ease, transform 120ms ease, background 120ms ease, border-color 120ms ease;
+}
+
+.physique-thumb-wrap:hover .physique-like-btn,
+.physique-thumb-wrap:focus-within .physique-like-btn {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.physique-thumb-wrap:hover .physique-delete-btn,
+.physique-thumb-wrap:focus-within .physique-delete-btn {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.physique-delete-btn:hover {
+  background: rgba(57, 13, 13, 0.9);
+  border-color: rgba(255, 180, 180, 0.72);
+}
+
+.physique-like-btn.is-liked {
+  color: #ff6b81;
+  border-color: rgba(255, 107, 129, 0.7);
+  background: rgba(35, 10, 16, 0.82);
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.physique-feed,
+.physique-entry,
+.physique-entry-grid,
+.physique-entry-grid img {
+  pointer-events: auto !important;
+}
+
+.physique-entry-grid img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: contain;
+  background: #090b0f;
+  transition: transform 180ms ease;
+}
+
+.physique-thumb:hover img {
+  transform: scale(1.03);
+}
+
+.physique-entry-grid.is-single {
+  grid-template-columns: 1fr;
+}
+
+.physique-entry-grid.is-single img {
+  aspect-ratio: 4 / 5;
+  max-height: 280px;
+}
+
+.physique-empty {
+  padding: 28px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.72);
+}
+
+body.physique-no-scroll {
+  overflow: hidden;
+}
+
+.physique-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 20050;
+}
+
+.physique-viewer-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+}
+
+.physique-viewer-shell {
+  position: relative;
+  z-index: 2;
+  width: min(1600px, calc(100% - 30px));
+  height: calc(100% - 30px);
+  margin: 15px auto;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 10px;
+}
+
+.physique-viewer-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 3;
+}
+
+.physique-viewer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  min-height: 0;
+}
+
+.physique-viewer.is-split .physique-viewer-grid {
+  grid-template-columns: 1fr 1fr;
+}
+
+.physique-viewer-pane {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  background: rgba(5, 6, 10, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.physique-viewer-pane.is-hidden {
+  display: none;
+}
+
+.physique-viewer-pane.is-active {
+  border-color: rgba(127, 211, 155, 0.82);
+  box-shadow: inset 0 0 0 1px rgba(127, 211, 155, 0.42);
+}
+
+.physique-viewer-pane img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(100vh - 120px);
+  object-fit: contain;
+  background: #0a0b10;
+}
+
+.physique-viewer-meta {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.62);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 12px;
+}
+
+.physique-viewer-hint {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@media (max-width: 760px) {
+  .physique-page {
+    width: min(100% - 20px, 100%);
+    margin-top: 16px;
+  }
+
+  .physique-hero {
+    padding: 22px;
+    flex-direction: column;
+  }
+
+  .physique-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .physique-feed {
+    grid-template-columns: 1fr;
+  }
+
+  .physique-toolbar {
+    gap: 8px;
+  }
+
+  .physique-toolbar-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .physique-toolbar-sort {
+    min-width: 0;
+  }
+  .physique-toolbar-view {
+    min-width: 0;
+  }
+
+  .physique-viewer.is-split .physique-viewer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .physique-viewer-shell {
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    margin: 8px auto;
+  }
+}
+
+/* Gallery selection, strict overlay state and independent comparison zoom. */
+.physique-compare-select {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid rgba(127, 211, 155, 0.34);
+  border-radius: 999px;
+  background: rgba(127, 211, 155, 0.1);
+  color: #d8ffe3;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.physique-compare-select.is-active {
+  background: rgba(127, 211, 155, 0.22);
+  border-color: rgba(127, 211, 155, 0.72);
+}
+
+.physique-selection-bar {
+  position: sticky;
+  top: 72px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(127, 211, 155, 0.35);
+  border-radius: 14px;
+  background: rgba(10, 16, 20, 0.94);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(14px);
+}
+
+.physique-selection-bar[hidden] {
+  display: none !important;
+}
+
+.physique-selection-bar > div {
+  display: flex;
+  gap: 7px;
+}
+
+.physique-selection-bar button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.physique-selection-bar button:disabled {
+  opacity: 0.4;
+}
+
+.physique-photo-selected {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  background: #34c759;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 900;
+  opacity: 0;
+  transform: scale(0.78);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.physique-photo.is-selected {
+  box-shadow: inset 0 0 0 3px #34c759;
+}
+
+.physique-photo.is-selected .physique-photo-selected {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.physique-viewer,
+.physique-viewer[hidden] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.physique-viewer.is-open {
+  display: block !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.physique-viewer-pane.is-zoomed {
+  cursor: grab;
+}
+
+.physique-viewer-pane.is-zoomed img {
+  will-change: transform;
+}
+
+@media (max-width: 760px) {
+  .physique-toolbar-row .physique-compare-select {
+    width: 100%;
+  }
+
+  .physique-selection-bar {
+    top: 68px;
+    margin: 0 8px 8px;
+    padding: 9px 10px;
+    font-size: 12px;
+  }
+
+  .physique-selection-bar > div {
+    flex-shrink: 0;
+  }
+
+  .physique-selection-bar button {
+    min-height: 34px;
+    padding-inline: 10px;
+    font-size: 11px;
+  }
+
+  .physique-viewer.is-split .physique-viewer-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   Photo gallery v30: one asset per tile, Apple-like on mobile
+   ========================================================= */
+.physique-feed-card {
+  overflow: hidden;
+}
+
+.physique-feed {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.physique-photo {
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #090b0f;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 240px;
+}
+
+.physique-photo .physique-thumb {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: #090b0f;
+}
+
+.physique-photo .physique-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #090b0f;
+  transition: transform 220ms ease, filter 220ms ease;
+}
+
+.physique-photo-gradient {
+  position: absolute;
+  inset: auto 0 0;
+  height: 42%;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.76));
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.physique-photo-date,
+.physique-photo-meta {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  z-index: 1;
+  color: #fff;
+  text-align: left;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: opacity 180ms ease, transform 180ms ease;
+  pointer-events: none;
+}
+
+.physique-photo-date {
+  bottom: 28px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.physique-photo-meta {
+  bottom: 10px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.74);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.physique-photo-actions {
+  position: absolute;
+  inset: 8px 8px auto;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.physique-photo-actions .physique-delete-btn,
+.physique-photo-actions .physique-like-btn {
+  position: static;
+}
+
+.physique-photo:hover .physique-photo-gradient,
+.physique-photo:focus-within .physique-photo-gradient,
+.physique-photo:hover .physique-photo-date,
+.physique-photo:hover .physique-photo-meta,
+.physique-photo:focus-within .physique-photo-date,
+.physique-photo:focus-within .physique-photo-meta {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.physique-photo:hover .physique-thumb img,
+.physique-photo:focus-within .physique-thumb img {
+  transform: scale(1.025);
+}
+
+.physique-photo:hover .physique-photo-actions .physique-delete-btn,
+.physique-photo:hover .physique-photo-actions .physique-like-btn,
+.physique-photo:focus-within .physique-photo-actions .physique-delete-btn,
+.physique-photo:focus-within .physique-photo-actions .physique-like-btn,
+.physique-photo-actions .physique-like-btn.is-liked {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+
+.physique-viewer {
+  background: #000;
+  color: #fff;
+  overscroll-behavior: contain;
+}
+
+.physique-viewer-shell {
+  width: min(1600px, calc(100% - 28px));
+  height: calc(100% - 28px);
+  margin: 14px auto;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: 10px;
+}
+
+.physique-viewer-topbar {
+  min-height: 46px;
+  display: grid;
+  grid-template-columns: 46px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 4;
+}
+
+.physique-viewer-round-btn,
+.physique-viewer-control {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.physique-viewer-round-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  font-size: 25px;
+  line-height: 1;
+}
+
+.physique-viewer-counter {
+  justify-self: center;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.physique-action-icon {
+  display: block;
+  width: 17px;
+  height: 17px;
+  pointer-events: none;
+}
+
+.physique-viewer-actions {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.physique-viewer-actions[hidden] {
+  display: none !important;
+}
+
+.physique-viewer-action.physique-delete-btn,
+.physique-viewer-action.physique-like-btn {
+  position: static;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.physique-viewer-swipe-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.physique-viewer-grid {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.physique-viewer.is-split .physique-viewer-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.physique-viewer-pane img {
+  max-height: 100%;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.physique-viewer-controls {
+  display: grid;
+  grid-template-columns: 48px minmax(140px, 220px) 48px;
+  justify-content: center;
+  gap: 10px;
+}
+
+.physique-viewer-control {
+  min-height: 44px;
+  border-radius: 999px;
+  font-size: 22px;
+  font-weight: 650;
+}
+
+.physique-viewer-compare {
+  padding: 0 20px;
+  font-size: 13px;
+}
+
+.physique-viewer-compare.is-active {
+  color: #d6ffe1;
+  border-color: rgba(127, 211, 155, 0.72);
+  background: rgba(127, 211, 155, 0.2);
+}
+
+@media (max-width: 760px) {
+  .physique-page {
+    width: 100%;
+    margin: 8px 0 28px;
+    gap: 12px;
+  }
+
+  .physique-hero,
+  .physique-upload-card {
+    margin-inline: 10px;
+  }
+
+  .physique-feed-card {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .physique-card-head,
+  .physique-toolbar {
+    margin-inline: 12px;
+  }
+
+  .physique-card-head {
+    margin-bottom: 12px;
+  }
+
+  .physique-feed {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2px;
+  }
+
+  .physique-photo {
+    aspect-ratio: 1;
+    border-radius: 0;
+    contain-intrinsic-size: auto 130px;
+  }
+
+  .physique-photo .physique-thumb img {
+    object-fit: cover;
+  }
+
+  .physique-photo-gradient,
+  .physique-photo-date,
+  .physique-photo-meta,
+  .physique-photo-actions .physique-delete-btn,
+  .physique-photo-actions .physique-like-btn:not(.is-liked) {
+    display: none;
+  }
+
+  .physique-photo-actions {
+    inset: 5px 5px auto;
+    justify-content: flex-end;
+  }
+
+  .physique-photo-actions .physique-like-btn.is-liked {
+    display: grid;
+    width: 25px;
+    height: 25px;
+    font-size: 14px;
+    border: 0;
+    background: rgba(0, 0, 0, 0.44);
+  }
+
+  .physique-viewer-shell {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: max(8px, env(safe-area-inset-top)) 0 max(8px, env(safe-area-inset-bottom));
+    gap: 8px;
+  }
+
+  .physique-viewer-topbar {
+    padding-inline: 10px;
+  }
+
+  .physique-viewer-swipe-label {
+    display: none;
+  }
+
+  .physique-viewer-topbar {
+    grid-template-columns: 46px 1fr 46px;
+  }
+
+  .physique-viewer-grid,
+  .physique-viewer.is-split .physique-viewer-grid {
+    gap: 2px;
+  }
+
+  .physique-viewer-pane {
+    border-radius: 0;
+    border-color: transparent;
+  }
+
+  .physique-viewer-pane.is-active {
+    border-color: #7fd39b;
+    box-shadow: inset 0 0 0 2px #7fd39b;
+  }
+
+  .physique-viewer-pane img {
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    object-fit: contain;
+  }
+
+  .physique-viewer-meta {
+    left: 6px;
+    right: 6px;
+    bottom: 7px;
+    border-radius: 8px;
+    font-size: 10px;
+    text-align: left;
+  }
+
+  .physique-viewer-controls {
+    padding-inline: 12px;
+  }
+
+  .physique-viewer-hint {
+    padding-inline: 14px;
+    font-size: 10px;
+  }
+}
+
+/* Final state invariants: these intentionally follow every legacy rule. */
+.physique-viewer,
+.physique-viewer[hidden]:not(.is-open) {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.physique-viewer.is-open {
+  display: block !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+@media (max-width: 760px) {
+  .physique-viewer.is-split .physique-viewer-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  /* Raster stays image-only on touch devices; actions live in the single-image viewer. */
+  .physique-photo-actions {
+    display: none !important;
+    pointer-events: none !important;
+  }
+
+  .physique-viewer-topbar {
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+  }
+
+  .physique-viewer-action.physique-delete-btn,
+  .physique-viewer-action.physique-like-btn {
+    width: 38px !important;
+    height: 38px !important;
+  }
+}

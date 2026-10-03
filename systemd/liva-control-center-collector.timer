@@ -1,0 +1,12 @@
+[Unit]
+Description=Collect LIVA Control Center technical events
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+Persistent=true
+RandomizedDelaySec=20
+Unit=liva-control-center-collector.service
+
+[Install]
+WantedBy=timers.target

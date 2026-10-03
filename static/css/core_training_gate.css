@@ -1,0 +1,134 @@
+.core-training-gate {
+  --ctg-panel-a: color-mix(in srgb, var(--bg-card, #131a29) 94%, #0a0f18 6%);
+  --ctg-panel-b: color-mix(in srgb, var(--bg-card-soft, #1a2234) 92%, #0a0f16 8%);
+  --ctg-line: var(--border-soft, rgba(255, 255, 255, 0.1));
+  --ctg-text: var(--text-main, #e9edf5);
+  --ctg-soft: color-mix(in srgb, var(--text-main, #e9edf5) 82%, transparent);
+  --ctg-muted: color-mix(in srgb, var(--text-muted, #a0abbd) 90%, transparent);
+  --ctg-mint: #7bc8b4;
+  --ctg-amber: #cfaa73;
+  min-height: calc(100vh - 108px);
+  display: grid;
+  place-items: center;
+  padding: 24px 14px;
+  position: relative;
+  isolation: isolate;
+}
+
+.core-training-gate::before,
+.core-training-gate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.core-training-gate::before {
+  background:
+    radial-gradient(560px 260px at 14% -6%, rgba(123, 200, 180, 0.16), transparent 70%),
+    radial-gradient(620px 300px at 86% -8%, rgba(207, 170, 115, 0.16), transparent 74%),
+    radial-gradient(760px 320px at 50% 100%, rgba(79, 121, 163, 0.1), transparent 78%);
+}
+
+.core-training-gate::after {
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.012), rgba(255, 255, 255, 0.012) 1px, transparent 1px, transparent 84px);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.56), transparent 60%);
+  opacity: 0.3;
+}
+
+.core-training-gate-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 10, 15, 0.45);
+}
+
+.core-training-gate-modal {
+  width: min(760px, calc(100% - 24px));
+  position: relative;
+  border-radius: 24px;
+  border: 1px solid var(--ctg-line);
+  background: linear-gradient(155deg, color-mix(in srgb, var(--ctg-panel-a) 95%, white 3%), color-mix(in srgb, var(--ctg-panel-b) 96%, black 4%));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 36px 72px rgba(0, 0, 0, 0.42);
+  padding: clamp(20px, 3.4vw, 30px);
+}
+
+.core-training-gate-modal::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 23px;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  pointer-events: none;
+}
+
+.core-training-gate-kicker {
+  margin: 0;
+  font-size: 0.73rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ctg-muted);
+  font-family: "JetBrains Mono", "IBM Plex Mono", monospace;
+}
+
+.core-training-gate-modal h1 {
+  margin: 10px 0 8px;
+  font-size: clamp(1.5rem, 3vw, 2.35rem);
+  letter-spacing: -0.028em;
+  line-height: 1.06;
+  color: var(--ctg-text);
+}
+
+.core-training-gate-sub {
+  margin: 0;
+  color: var(--ctg-soft);
+  line-height: 1.48;
+}
+
+.core-training-gate-actions {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.core-training-gate-btn {
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--ctg-line) 90%, transparent);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--ctg-text);
+  text-decoration: none;
+  padding: 14px 14px 12px;
+  display: grid;
+  gap: 4px;
+  transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.core-training-gate-btn span {
+  font-size: 1.02rem;
+  font-weight: 670;
+  letter-spacing: -0.01em;
+}
+
+.core-training-gate-btn small {
+  color: var(--ctg-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.core-training-gate-btn.is-primary {
+  border-color: color-mix(in srgb, var(--ctg-mint) 52%, var(--ctg-line));
+  background: linear-gradient(180deg, rgba(123, 200, 180, 0.2), rgba(123, 200, 180, 0.11));
+}
+
+.core-training-gate-btn:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--ctg-amber) 45%, white 18%);
+}
+
+@media (max-width: 720px) {
+  .core-training-gate-actions {
+    grid-template-columns: 1fr;
+  }
+}

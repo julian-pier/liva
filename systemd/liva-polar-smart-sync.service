@@ -1,0 +1,15 @@
+[Unit]
+Description=LIVA Polar smart sync
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=liva
+WorkingDirectory=/opt/liva
+EnvironmentFile=-/opt/liva/.env
+ExecStart=/opt/liva/venv/bin/python /opt/liva/scripts/polar_smart_sync.py
+Nice=10
+
+[Install]
+WantedBy=multi-user.target

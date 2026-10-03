@@ -1,0 +1,11 @@
+[Unit]
+Description=Schedule LIVA encrypted full recovery backup
+
+[Timer]
+OnCalendar=*-*-* 05:30:00
+RandomizedDelaySec=5min
+Persistent=true
+Unit=liva-full-recovery.service
+
+[Install]
+WantedBy=timers.target

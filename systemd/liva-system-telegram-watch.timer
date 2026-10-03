@@ -1,0 +1,10 @@
+[Unit]
+Description=Run LIVA System Telegram Watch every 5 minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+Unit=liva-system-telegram-watch.service
+
+[Install]
+WantedBy=timers.target

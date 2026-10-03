@@ -1,0 +1,52 @@
+<div class="page-container overall-analysis" id="overall-analysis">
+  <header class="overall-analysis__head">
+    <h2>Verlauf</h2>
+    <div class="overall-analysis__status" id="overall-analysis-status" aria-live="polite">Lade …</div>
+  </header>
+
+  <section class="overall-analysis__canvas" aria-label="Interaktive Gesamtanalyse">
+    <details class="overall-analysis__series-picker" id="overall-analysis-series-picker" open>
+      <summary>Spuren <span id="overall-analysis-series-count">1</span></summary>
+      <div class="overall-analysis__toolbar" aria-label="Datenreihen einblenden">
+      <div class="overall-analysis__series-group" role="group" aria-label="Körper und Ernährung">
+        <span>Körper &amp; Intake</span>
+        <button class="overall-analysis__toggle is-active" type="button" data-series="weight" aria-pressed="true"><i></i>Gewicht</button>
+        <button class="overall-analysis__toggle" type="button" data-series="kcal" aria-pressed="false"><i></i>Kalorien</button>
+        <button class="overall-analysis__toggle" type="button" data-series="protein" aria-pressed="false"><i></i>Protein</button>
+        <button class="overall-analysis__toggle" type="button" data-series="carbs" aria-pressed="false"><i></i>Carbs</button>
+        <button class="overall-analysis__toggle" type="button" data-series="fat" aria-pressed="false"><i></i>Fett</button>
+      </div>
+      <div class="overall-analysis__series-group" role="group" aria-label="Training">
+        <span>Training</span>
+        <button class="overall-analysis__toggle" type="button" data-series="training" aria-pressed="false"><i></i>Last</button>
+        <button class="overall-analysis__toggle" type="button" data-series="progression" aria-pressed="false"><i></i>Progression</button>
+      </div>
+      <div class="overall-analysis__series-group" role="group" aria-label="Recovery und Kontext">
+        <span>Recovery &amp; Kontext</span>
+        <button class="overall-analysis__toggle" type="button" data-series="hrv" aria-pressed="false"><i></i>HRV</button>
+        <button class="overall-analysis__toggle" type="button" data-series="nightPulse" aria-pressed="false"><i></i>Nachtpuls</button>
+        <button class="overall-analysis__toggle" type="button" data-series="sleep" aria-pressed="false"><i></i>Schlaf</button>
+        <button class="overall-analysis__toggle" type="button" data-series="calendar" aria-pressed="false"><i></i>Belegte Zeit</button>
+        <button class="overall-analysis__toggle" type="button" data-series="flags" aria-pressed="false"><i></i>Ereignisse</button>
+      </div>
+      </div>
+    </details>
+    <div class="overall-analysis__chart-wrap">
+      <div class="overall-analysis__scale" id="overall-analysis-scale">Gewicht · kg</div>
+      <canvas id="overall-analysis-chart" aria-label="Gemeinsamer Verlauf von Gewicht, Ernährung, Training, Progression und Recovery" role="img"></canvas>
+      <div class="overall-analysis__empty" id="overall-analysis-empty" hidden>Keine Daten im Zeitraum.</div>
+    </div>
+    <div class="overall-analysis__readouts" id="overall-analysis-readouts" aria-label="Wertebereiche der sichtbaren Datenreihen"></div>
+  </section>
+
+  <section class="overall-analysis__phase" id="overall-analysis-phase" aria-labelledby="overall-analysis-phase-title">
+    <div class="overall-analysis__phase-current">
+      <h3 id="overall-analysis-phase-title">Freier Zeitraum</h3>
+      <p id="overall-analysis-phase-summary">Zielkontext lädt …</p>
+      <div class="overall-analysis__phase-meta" id="overall-analysis-phase-meta"></div>
+    </div>
+    <div class="overall-analysis__phase-suggestions">
+      <div class="overall-analysis__phase-list" id="overall-analysis-phase-list" aria-label="Vorgeschlagene Analysephasen"></div>
+    </div>
+  </section>
+</div>

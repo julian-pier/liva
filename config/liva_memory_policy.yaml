@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "origins": {"gpt": "#gpt", "liva": "#liva"},
+  "domains": ["privat", "training", "recovery", "ernaehrung", "schule", "system", "kreativ", "texte"],
+  "memory_types": ["ereignis", "person", "emotion", "erkenntnis", "praeferenz", "entscheidung", "status", "technik"],
+  "temporal_scopes": ["historical", "until_changed", "temporary"],
+  "operations": ["create", "supersede", "append_edit"]
+}

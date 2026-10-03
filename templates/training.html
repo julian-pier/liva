@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Training{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/training.css') }}?v=20260809_mobile_workspace_v35_6">
+{% endblock %}
+
+{% block content %}
+<div id="training-workspace" class="training-workspace liva-subpage-shell" data-view="session_new" data-selected-session-id="">
+  <header class="training-left-header liva-subpage-hero">
+    <div class="liva-subpage-hero-copy">
+      <p class="liva-subpage-kicker">Logging</p>
+      <h1 id="training-title" class="liva-subpage-title">Training</h1>
+      <p class="liva-subpage-subtitle training-subtitle-desktop">Sessions erfassen, vergangene Einheiten öffnen und dein Training vollständig dokumentieren.</p>
+      <p class="liva-subpage-subtitle training-subtitle-mobile">Schnell loggen. Klar vergleichen.</p>
+    </div>
+  </header>
+
+  <nav class="training-mobile-modes" role="tablist" aria-label="Trainingsbereich">
+    <button class="training-mobile-mode is-active" type="button" role="tab" aria-selected="true" data-training-mobile-mode="session">
+      <span class="training-mobile-mode-label">Einheit</span>
+      <span class="training-mobile-mode-meta">Loggen</span>
+    </button>
+    <button class="training-mobile-mode" type="button" role="tab" aria-selected="false" data-training-mobile-mode="parser">
+      <span class="training-mobile-mode-label">Freitext</span>
+      <span class="training-mobile-mode-meta">Import</span>
+    </button>
+    <button class="training-mobile-mode" type="button" role="tab" aria-selected="false" data-training-mobile-mode="history">
+      <span class="training-mobile-mode-label">Verlauf</span>
+      <span class="training-mobile-mode-meta">Einheiten</span>
+    </button>
+  </nav>
+
+  <div class="training-workspace-body">
+    <section class="training-left-pane">
+      <section id="training-view-logging" class="training-view training-view-logging is-active" data-view="logging">
+        {% include "partials/_training_logging_content.html" %}
+      </section>
+    </section>
+
+    {% include "partials/_training_history_rail.html" %}
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.exerciseNameSuggestions = {{ exercise_suggestions|tojson }};
+</script>
+<script defer src="{{ url_for('static', filename='js/training_vnext.js') }}?v=20260809_mobile_workspace_v24_3_parser_empty_v1"></script>
+{% endblock %}

@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+{% block title %}Einstellungen{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/settings.css') }}?v=20260922_sheet_settings_v3">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/settings_core.css') }}?v=20260301_core_v31">
+{% endblock %}
+
+{% block content %}
+
+<div class="settings-page liva-subpage-shell" data-auth-level="{{ auth_level }}" data-csrf-token="{{ csrf_token }}">
+
+    <header class="settings-header liva-subpage-hero">
+        <div class="settings-header-main liva-subpage-hero-copy">
+            <p class="liva-subpage-kicker">System</p>
+            <h1 class="liva-subpage-title">Einstellungen</h1>
+            <p class="settings-subtitle liva-subpage-subtitle">
+                Darstellung, Systemstatus und Datensicherung
+            </p>
+        </div>
+        <div class="settings-header-auth liva-subpage-actions">
+            <div class="settings-header-auth-column">
+                <span class="settings-hint">Role: {{ role_label }}</span>
+                <span class="settings-hint" id="master-panel-btn" style="cursor: pointer; display: block; margin-top: 4px;">Master-Panel</span>
+            </div>
+            {% if auth_can_logout %}
+            <button id="logout-btn" class="primary-btn" type="button">Logout</button>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="settings-grid">
+        <nav class="settings-rail" aria-label="Einstellungsbereiche">
+            <a href="#system-section">System</a>
+            {% if auth_is_master or auth_is_key %}<a href="#operations-section">Betrieb</a>{% endif %}
+            <a href="#backup-section">Sicherung</a>
+            <a href="#appearance-section">Darstellung</a>
+            <a href="#notifications-section">Benachrichtigungen</a>
+            {% if auth_is_master or auth_is_key %}<a href="#access-keys-card">Zugänge &amp; Daten</a>{% endif %}
+        </nav>
+
+        <div class="settings-col settings-content">
+            <section class="settings-card settings-section" id="system-section">
+                <div class="settings-card-header">
+                    <h2>System</h2>
+                    <span class="settings-hint">Raspberry Pi</span>
+                </div>
+
+                <ul class="pi-stats">
+                    <li><span>Host</span><span id="pi-host">-</span></li>
+                    <li><span>OS</span><span id="pi-os">-</span></li>
+                    <li><span>CPU</span><span id="pi-cpu">-</span></li>
+                    <li><span>RAM</span><span id="pi-ram">-</span></li>
+                    <li><span>Disk</span><span id="pi-disk">-</span></li>
+                    <li><span>Load</span><span id="pi-load">-</span></li>
+                    <li><span>Uptime</span><span id="pi-uptime">-</span></li>
+                </ul>
+            </section>
+
+            {% if auth_is_master or auth_is_key %}
+            <section class="settings-card settings-section" id="operations-section">
+                <div class="settings-card-header">
+                    <h2>Betrieb</h2>
+                    <span class="settings-hint">System Health</span>
+                </div>
+
+                <div class="control-center" data-control-center>
+                    <div class="control-center-toolbar">
+                        <div>
+                            <strong id="control-center-status">Wird geladen …</strong>
+                            <p class="settings-text" id="control-center-summary">Technischer Read-only Status der angebundenen Komponenten.</p>
+                        </div>
+                        <button id="control-center-refresh" class="primary-btn" type="button">Aktualisieren</button>
+                    </div>
+                    <p class="control-center-meta" id="control-center-updated"></p>
+                    <div class="control-center-list" id="control-center-checks" aria-live="polite"></div>
+                    <h3 class="control-center-heading">Jobs &amp; Automations</h3>
+                    <div class="control-center-list" id="control-center-jobs"></div>
+                    <h3 class="control-center-heading">Bounded Self-Healing</h3>
+                    <div class="control-center-list" id="self-healing-panel"></div>
+                    <h3 class="control-center-heading">Technical Config</h3>
+                    <div class="control-center-list" id="technical-config-panel"></div>
+                    <h3 class="control-center-heading">Notifications</h3>
+                    <div class="control-center-list" id="notification-panel"></div>
+                    <h3 class="control-center-heading">Releases</h3>
+                    <div class="control-center-list" id="release-panel"></div>
+                    <h3 class="control-center-heading">Full Recovery</h3>
+                    <p class="settings-text">Reine Statusanzeige: Backup Engine, Verschlüsselung und Recovery Coverage werden getrennt ausgewiesen. Es gibt in 006B keine Wiederherstellungs- oder Startaktion.</p>
+                    <div class="control-center-list" id="full-recovery-panel" aria-live="polite"></div>
+                    <h3 class="control-center-heading">Vorfälle</h3>
+                    <div class="control-center-list" id="control-center-incidents" aria-live="polite"></div>
+                    <div class="control-center-detail" id="control-center-incident-detail" hidden></div>
+                    <h3 class="control-center-heading">Technische Logs</h3>
+                    <form class="control-center-log-filter" id="control-center-log-filter">
+                        <label><span>Komponente</span><select id="control-center-log-component"><option value="">Alle erlaubten Quellen</option><option value="liva">LIVA</option><option value="liva-mcp-remote">LIVA MCP</option><option value="control-center-collector">Collector</option><option value="endurance-intervals">Endurance</option><option value="daily-sqlite-backup">Backup</option><option value="full-recovery">Full Recovery</option></select></label>
+                        <label><span>Suche</span><input id="control-center-log-search" type="search" maxlength="120" placeholder="Bereits geladene Logs filtern"></label>
+                        <button class="ghost-btn" type="submit">Logs laden</button>
+                    </form>
+                    <div class="control-center-list" id="control-center-logs"></div>
+                </div>
+            </section>
+            {% endif %}
+
+            {% if auth_is_tailscale or auth_is_key %}
+            <section class="settings-card settings-section" id="physique-section">
+                <div class="settings-card-header">
+                    <h2>Physique</h2>
+                    <span class="settings-hint">Tailscale only</span>
+                </div>
+
+                <p class="settings-text">
+                    Private Galerie für Form-Updates. Upload über Website oder direkt per Telegram-Foto im Training-Chat.
+                </p>
+
+                <div class="backup-actions">
+                    <a class="primary-btn" href="{{ url_for('physique_gallery_page') }}">Galerie öffnen</a>
+                </div>
+            </section>
+            {% endif %}
+
+            {% if auth_is_master or auth_is_key %}
+            <section class="settings-card settings-section" id="export-card"
+                     data-default-start="{{ export_defaults.start_date }}"
+                     data-default-end="{{ export_defaults.end_date }}">
+                <div class="settings-card-header">
+                    <h2>Datenexport</h2>
+                    <span class="settings-hint">AI Export</span>
+                </div>
+
+                <p class="settings-text">
+                    Kurzer, gut lesbarer JSON-Export.
+                </p>
+
+                <div class="export-actions">
+                    <button id="export-toggle-btn" class="primary-btn" type="button">
+                        Export öffnen
+                    </button>
+                </div>
+
+                <div id="export-panel" class="export-panel is-hidden">
+                    <div class="export-subcard">
+                        <div class="export-section-title">Datentypen</div>
+                        <div class="export-types">
+                            <label class="export-check"><input type="checkbox" class="export-type" value="hrv_daily" checked><span>HRV (RMSSD/SDNN/RHR)</span></label>
+                            <label class="export-check"><input type="checkbox" class="export-type" value="run" checked><span>Runs</span></label>
+                            <label class="export-check"><input type="checkbox" class="export-type" value="gym_session" checked><span>Gym Sessions Summary</span></label>
+                            <label class="export-check"><input type="checkbox" class="export-type" value="gym_set"><span>Gym Raw Sets</span></label>
+                            <label class="export-check"><input type="checkbox" class="export-type" value="weight" checked><span>Weight</span></label>
+                            <label class="export-check"><input type="checkbox" class="export-type" value="nutrition_day" checked><span>Nutrition (Day)</span></label>
+                        </div>
+
+                        <div class="export-section-title">Zeitraum</div>
+                        <div class="export-grid">
+                            <label class="export-field"><span>Start</span><input type="date" id="export-start-date"></label>
+                            <label class="export-field"><span>Ende</span><input type="date" id="export-end-date"></label>
+                            <label class="export-field"><span>Limit Records</span><input type="number" id="export-limit" min="1" max="20000" step="1" value="3000"></label>
+                        </div>
+
+                        <div id="export-error" class="export-error" role="alert"></div>
+
+                        <div class="export-actions-row">
+                            <button id="export-generate-btn" class="primary-btn" type="button">Generate Export</button>
+                            <button id="export-copy-btn" class="primary-btn export-copy-btn" type="button" disabled>Copy</button>
+                        </div>
+
+                        <textarea id="export-output" class="export-output" rows="14" readonly
+                                  placeholder="Hier erscheint der kompakte Export..."></textarea>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {% if auth_is_master or auth_is_key %}
+            <section class="settings-card settings-section" id="backup-section">
+                <div class="settings-card-header">
+                    <h2>Backups</h2>
+                    <span class="settings-hint">Datensicherheit</span>
+                </div>
+
+                <p class="settings-text">
+                    Täglich um <b>03:00 Uhr</b>: Projektstand nach <b>GitHub (privat)</b>; Hauptdatenbanken nach <code>dropbox:Apps/Datenbanken</code> und auf alle erkannten USB-Laufwerke.
+                </p>
+
+                <div class="backup-actions">
+                    <button id="run-backup-btn" class="primary-btn" {% if auth_is_key %}disabled aria-disabled="true"{% endif %}>
+                        Backup jetzt ausführen
+                    </button>
+                </div>
+
+                <div class="backup-info">
+                    <div class="backup-meta-group">
+                        <span class="backup-label">Letzter Lauf</span>
+                        <span class="backup-last-full" id="backup-last">-</span>
+                    </div>
+                    <div class="backup-meta-group backup-meta-group-status">
+                        <span class="backup-label">Status</span>
+                        <span class="backup-status-icon is-idle" id="backup-status" aria-label="Status unbekannt"></span>
+                    </div>
+                </div>
+
+                <div class="backup-live-panel is-hidden" id="backup-live-panel" aria-hidden="true">
+                    <div class="backup-live-row is-idle" id="backup-target-github">
+                        <div class="backup-live-copy">
+                            <span class="backup-target-name">GitHub</span>
+                            <span class="backup-target-detail" id="backup-target-github-detail">Privates Repo aktuell</span>
+                        </div>
+                        <span class="backup-target-spinner" aria-hidden="true"></span>
+                    </div>
+                    <div class="backup-live-row is-idle" id="backup-target-dropbox">
+                        <div class="backup-live-copy">
+                            <span class="backup-target-name">Dropbox</span>
+                            <span class="backup-target-detail" id="backup-target-dropbox-detail">Apps/Datenbanken aktuell</span>
+                        </div>
+                        <span class="backup-target-spinner" aria-hidden="true"></span>
+                    </div>
+                    <div class="backup-live-row is-idle" id="backup-target-usb">
+                        <div class="backup-live-copy">
+                            <span class="backup-target-name">USB</span>
+                            <span class="backup-target-detail" id="backup-target-usb-detail">1 Ziel aktuell</span>
+                        </div>
+                        <span class="backup-target-spinner" aria-hidden="true"></span>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <section class="settings-card settings-section" id="appearance-section">
+                <div class="settings-card-header">
+                    <h2>Darstellung</h2>
+                    <span class="settings-hint">Oberfläche</span>
+                </div>
+
+                <label class="settings-toggle">
+                    <span>Dark Mode</span>
+                    <input type="checkbox" id="darkmode-toggle">
+                </label>
+                <label class="settings-toggle">
+                    <span>Compact</span>
+                    <input type="checkbox" id="layoutmode-toggle">
+                </label>
+            </section>
+
+            <section class="settings-card settings-section" id="notifications-section">
+                <div class="settings-card-header">
+                    <h2>Benachrichtigungen</h2>
+                    <span class="settings-hint">Telegram</span>
+                </div>
+
+                <p class="settings-text">
+                    Telegram-Nachrichten für Meal-Reminders und Updates.
+                </p>
+
+                <div class="telegram-actions">
+                    <button id="telegram-primary-btn" class="primary-btn" type="button" {% if auth_is_key %}disabled{% endif %}>
+                        Pausieren
+                    </button>
+                    <button id="telegram-change-duration-btn" class="telegram-link-btn is-hidden" type="button" {% if auth_is_key %}disabled{% endif %}>
+                        Dauer ändern
+                    </button>
+                </div>
+
+                <div id="telegram-duration-panel" class="telegram-panel is-hidden">
+                    <div class="telegram-segmented">
+                            <button class="telegram-segment-btn telegram-duration-btn" data-telegram-duration-slot="today" type="button" {% if auth_is_key %}disabled{% endif %}>
+                                Bis 23:59
+                            </button>
+                            <button class="telegram-segment-btn telegram-duration-btn" data-telegram-duration-slot="7d" type="button" {% if auth_is_key %}disabled{% endif %}>
+                                7 Tage
+                            </button>
+                            <button class="telegram-segment-btn telegram-duration-btn" data-telegram-duration-slot="forever" type="button" {% if auth_is_key %}disabled{% endif %}>
+                                Dauerhaft
+                            </button>
+                    </div>
+                </div>
+
+                <div class="telegram-push-info">
+                    <div class="telegram-push-toprow">
+                        <span class="settings-hint">Status</span>
+                        <span id="telegram-push-status">Aktiv</span>
+                    </div>
+                </div>
+                <p id="telegram-paused-hint" class="settings-text telegram-paused-note is-hidden">
+                    Du bekommst in dieser Zeit keine Telegram-Nachrichten.
+                </p>
+
+            </section>
+
+            {% if auth_is_master or auth_is_key %}
+            <section class="settings-card settings-section" id="access-keys-card">
+                <div class="settings-card-header">
+                    <h2>Key-Zugänge</h2>
+                    <span class="settings-hint">Gastzugänge</span>
+                </div>
+
+                <div class="access-keys-card-body">
+                    {% if auth_is_master %}<div class="access-keys-actions">
+                        <label class="access-keys-field">
+                            <span>Label</span>
+                            <input type="text" id="access-key-label" placeholder="z.B. Arne">
+                        </label>
+                        <label class="access-keys-field">
+                            <span>Ablauf</span>
+                            <input type="datetime-local" id="access-key-expires-at">
+                        </label>
+                        <button id="create-access-key-btn" class="primary-btn" type="button">Key erstellen</button>
+                    </div>{% endif %}
+                    <div id="access-keys-error" class="access-key-error" role="status" aria-live="polite" style="display:none;"></div>
+                    <div id="access-key-plain" class="access-key-plain" aria-live="polite" style="display:none;">
+                        <span>Neuer Key: <code id="access-key-plain-text"></code></span>
+                        <button id="access-key-copy-btn" class="ghost-btn" type="button">Copy</button>
+                    </div>
+                    <div class="access-keys-list" id="access-keys-list">
+                        <p class="settings-text" id="access-keys-empty">Keine Keys vorhanden.</p>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script defer src="{{ url_for('static', filename='js/settings.js') }}?v=20260911_guest_readonly_v1"></script>
+{% endblock %}

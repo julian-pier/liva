@@ -1,0 +1,16 @@
+[Unit]
+Description=LIVA Kienzl weekly analyse refresh
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=liva
+WorkingDirectory=/opt/liva
+EnvironmentFile=-/opt/liva/.env
+ExecStart=/opt/liva/venv/bin/python -m jobs.kienzl_analyse_weekly
+Nice=10
+
+[Install]
+WantedBy=multi-user.target
+

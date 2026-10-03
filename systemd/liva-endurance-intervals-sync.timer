@@ -1,0 +1,12 @@
+[Unit]
+Description=Reconcile LIVA Endurance workouts with Intervals.icu
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=15min
+Persistent=true
+RandomizedDelaySec=30
+Unit=liva-endurance-intervals-sync.service
+
+[Install]
+WantedBy=timers.target

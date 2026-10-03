@@ -1,0 +1,10 @@
+[Unit]
+Description=Check LIVA public availability every minute
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=1min
+Unit=liva-availability-watchdog.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,24 @@
+services:
+  liva:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      LIVA_DATABASE_DIR: /var/lib/liva/database
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - liva_database:/var/lib/liva/database
+      - liva_data:/app/data
+      - liva_uploads:/app/uploads
+      - liva_var:/app/var
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+volumes:
+  liva_database:
+  liva_data:
+  liva_uploads:
+  liva_var:

@@ -1,0 +1,9 @@
+[Unit]
+Description=LIVA bounded self-healing executor
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=liva
+WorkingDirectory=/opt/liva
+ExecStart=/opt/liva/.venv/bin/python -m control_center.self_healing

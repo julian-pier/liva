@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}CORE Training{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/core_training.css') }}?v=20260302_core_training_keys_v12">
+{% endblock %}
+{% block content %}
+<div class="core-training-page core-training" data-auth-level="{{ auth_level }}" data-csrf-token="{{ csrf_token }}">
+    <section class="core-deck-shell">
+        <header class="core-deck-header core-panel">
+            <div class="core-deck-heading">
+                <p class="core-deck-kicker">Calibration Deck</p>
+                <h1>CORE Training</h1>
+                <p class="core-deck-sub">Kurze Ja/Nein-Karten. CORE schärft daraus Prinzipien und Grenzfälle.</p>
+            </div>
+            <div class="core-deck-live-stats" id="core-training-live-stats">{{ (core_training_stats or {}).get('summary', '0 Antworten') }}</div>
+        </header>
+
+        <section class="core-prediction-card core-panel">
+            <div class="core-prediction-meta">
+                <span>CORE schätzt diese Frage</span>
+                <b id="core-prediction-label">Lade …</b>
+            </div>
+            <div class="core-prediction-bar" aria-hidden="true">
+                <div class="core-prediction-track"></div>
+                <div id="core-prediction-marker" class="core-prediction-marker"></div>
+            </div>
+        </section>
+
+        <section class="core-card-stage" aria-live="polite">
+            <div id="core-card-stack" class="core-card-stack">
+                <article class="core-card is-loading">
+                    <div class="core-card-pill">CORE</div>
+                    <h2>Lade Karte …</h2>
+                    <p>Calibration Deck wird aufgebaut.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="core-deck-controls">
+            <button type="button" id="core-answer-no" class="core-deck-btn is-no">NEIN</button>
+            <div class="core-deck-hint" id="core-deck-hint"></div>
+            <button type="button" id="core-answer-yes" class="core-deck-btn is-yes">JA</button>
+        </section>
+
+        <section id="core-deck-error" class="core-deck-error is-hidden" role="alert">
+            <div>Deck gerade nicht erreichbar.</div>
+            <button type="button" id="core-deck-retry" class="core-deck-inline-btn">Erneut laden</button>
+        </section>
+    </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/core_training.js') }}?v=20260310_core_training_question_scope_v16"></script>
+{% endblock %}

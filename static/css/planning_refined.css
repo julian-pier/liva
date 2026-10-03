@@ -1,0 +1,1376 @@
+/* =========================================================
+   Planning — canonical LIVA workspace
+   Uses the dashboard / training / HRV surface system:
+   page header -> one card level -> compact semantic controls.
+   ========================================================= */
+
+.planning-page {
+  --plan-page: #e7ecf2;
+  --plan-surface: #f3f7fb;
+  --plan-surface-soft: #e8eef5;
+  --plan-input: #edf3f8;
+  --plan-text: #18212f;
+  --plan-soft: #5c6a80;
+  --plan-muted: #6d7b90;
+  --plan-faint: #8b97aa;
+  --plan-border: rgba(24, 33, 47, 0.17);
+  --plan-border-strong: rgba(24, 33, 47, 0.27);
+  --plan-primary: #126a9b;
+  --plan-training: #217fab;
+  --plan-nutrition: #d79418;
+  --plan-good: #26c99a;
+  --plan-warn: #f2bb48;
+  --plan-bad: #e8676b;
+  --plan-radius: 12px;
+  color: var(--plan-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cardio on phones is a read-only race brief, not a compressed editor. The
+   route line is the signature: season phases form one course and the white
+   needle shows exactly where today sits. */
+@media (max-width: 900px) {
+  .planning-page {
+    --plan-cardio: #35c9b1;
+    --plan-cardio-blue: #59a8ff;
+    --plan-cardio-ink: #071a1a;
+  }
+
+  .planning-page .mpv4-title.is-cardio { color: var(--plan-cardio); }
+  .planning-page:has(.mpv4-title.is-cardio) .mpv4-switch-btn { color: var(--plan-cardio); }
+  .planning-page .mpv4-cardio-read { display: grid; gap: 14px; }
+
+  .planning-page .mpv4-cardio-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 15px 15px 16px;
+    border: 1px solid color-mix(in srgb, var(--plan-cardio) 34%, var(--plan-border));
+    border-radius: 16px;
+    background:
+      linear-gradient(118deg, color-mix(in srgb, var(--plan-cardio) 12%, transparent), transparent 52%),
+      var(--plan-surface);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, .14);
+  }
+
+  .planning-page .mpv4-cardio-hero-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--plan-cardio);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: .58rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+  }
+
+  .planning-page .mpv4-cardio-hero-head span:last-child {
+    padding: 4px 7px;
+    border: 1px solid color-mix(in srgb, var(--plan-cardio) 35%, transparent);
+    border-radius: 99px;
+    letter-spacing: .08em;
+  }
+
+  .planning-page .mpv4-cardio-target {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 16px;
+    margin-top: 18px;
+  }
+
+  .planning-page .mpv4-cardio-target > div:last-child {
+    padding-left: 14px;
+    border-left: 1px solid var(--plan-border);
+    text-align: right;
+  }
+
+  .planning-page .mpv4-cardio-target strong {
+    display: block;
+    color: var(--plan-text);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: clamp(1.65rem, 9vw, 2.25rem);
+    font-weight: 720;
+    line-height: .95;
+    letter-spacing: -.065em;
+  }
+
+  .planning-page .mpv4-cardio-target > div:last-child strong {
+    color: var(--plan-cardio);
+    font-size: 1.32rem;
+    letter-spacing: -.045em;
+  }
+
+  .planning-page .mpv4-cardio-target small {
+    display: block;
+    margin-top: 7px;
+    color: var(--plan-muted);
+    font-size: .64rem;
+    line-height: 1.3;
+  }
+
+  .planning-page .mpv4-cardio-route { margin-top: 20px; }
+  .planning-page .mpv4-cardio-route-track {
+    position: relative;
+    display: flex;
+    gap: 3px;
+    height: 8px;
+    margin: 0 3px 12px;
+  }
+
+  .planning-page .mpv4-cardio-route-track > span {
+    flex: var(--phase-grow) 1 0;
+    min-width: 4px;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--plan-cardio-blue) 75%, var(--plan-border));
+    opacity: .52;
+  }
+  .planning-page .mpv4-cardio-route-track > span[data-kind="threshold"] { background: #42c891; }
+  .planning-page .mpv4-cardio-route-track > span[data-kind="specific"] { background: #e5a84f; }
+  .planning-page .mpv4-cardio-route-track > span[data-kind="taper"],
+  .planning-page .mpv4-cardio-route-track > span[data-kind="peak"] { background: #ef7180; }
+  .planning-page .mpv4-cardio-route-track > i {
+    position: absolute;
+    z-index: 2;
+    top: -5px;
+    left: var(--route-progress);
+    width: 2px;
+    height: 18px;
+    border-radius: 2px;
+    background: var(--plan-text);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--plan-surface) 72%, transparent), 0 0 10px color-mix(in srgb, var(--plan-cardio) 52%, transparent);
+    transform: translateX(-1px);
+  }
+
+  .planning-page .mpv4-cardio-route > div:last-child {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--plan-faint);
+    font-size: .62rem;
+  }
+  .planning-page .mpv4-cardio-route b { color: var(--plan-text); font-size: .68rem; }
+
+  .planning-page .mpv4-cardio-week .mpv4-sheet-kicker,
+  .planning-page .mpv4-cardio-week .mpv4-mode-chip { color: var(--plan-cardio); }
+  .planning-page .mpv4-cardio-week .mpv4-mode-chip { border-color: color-mix(in srgb, var(--plan-cardio) 42%, var(--plan-border)); }
+
+  .planning-page .mpv4-cardio-week-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--plan-border);
+    border-bottom: 1px solid var(--plan-border);
+  }
+  .planning-page .mpv4-cardio-week-metrics span { padding: 11px 12px 10px; border-right: 1px solid var(--plan-border); }
+  .planning-page .mpv4-cardio-week-metrics span:last-child { border-right: 0; }
+  .planning-page .mpv4-cardio-week-metrics b { color: var(--plan-text); font-family: var(--font-mono, ui-monospace, monospace); font-size: .92rem; }
+  .planning-page .mpv4-cardio-week-metrics small { display: block; margin-top: 2px; color: var(--plan-faint); font-size: .58rem; text-transform: uppercase; }
+
+  .planning-page .mpv4-cardio-chart {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    align-items: end;
+    gap: 5px;
+    min-height: 88px;
+    padding: 13px 13px 9px;
+    border-bottom: 1px solid var(--plan-border);
+  }
+  .planning-page .mpv4-cardio-chart > span { position: relative; display: grid; grid-template-rows: 58px auto; align-items: end; gap: 5px; min-width: 0; text-align: center; }
+  .planning-page .mpv4-cardio-chart > span::before { content: attr(data-tip); position: absolute; z-index: 8; bottom: calc(100% + 6px); left: 50%; width: max-content; padding: 6px 8px; border: 1px solid color-mix(in srgb, var(--plan-cardio) 32%, var(--plan-border)); border-radius: 6px; background: var(--plan-surface-soft); color: var(--plan-text); box-shadow: 0 8px 20px rgba(0,0,0,.28); font-size: .56rem; white-space: nowrap; opacity: 0; pointer-events: none; transform: translate(-50%,4px); transition: opacity .12s ease,transform .12s ease; }
+  .planning-page .mpv4-cardio-chart > span:hover::before,
+  .planning-page .mpv4-cardio-chart > span:focus::before { opacity: 1; transform: translate(-50%,0); }
+  .planning-page .mpv4-cardio-chart > span.tip-left::before { left: 0; transform: translate(0,4px); }
+  .planning-page .mpv4-cardio-chart > span.tip-left:hover::before,
+  .planning-page .mpv4-cardio-chart > span.tip-left:focus::before { transform: translate(0,0); }
+  .planning-page .mpv4-cardio-chart > span.tip-right::before { right: 0; left: auto; transform: translate(0,4px); }
+  .planning-page .mpv4-cardio-chart > span.tip-right:hover::before,
+  .planning-page .mpv4-cardio-chart > span.tip-right:focus::before { transform: translate(0,0); }
+  .planning-page .mpv4-cardio-chart i { display: block; height: var(--bar-height); min-height: 5px; border-radius: 3px 3px 1px 1px; background: color-mix(in srgb, var(--plan-cardio-blue) 58%, var(--plan-border)); }
+  .planning-page .mpv4-cardio-chart .is-selected i { background: var(--plan-cardio); box-shadow: 0 0 12px color-mix(in srgb, var(--plan-cardio) 28%, transparent); }
+  .planning-page .mpv4-cardio-chart small { overflow: hidden; color: var(--plan-faint); font-family: var(--font-mono, ui-monospace, monospace); font-size: .48rem; white-space: nowrap; }
+  .planning-page .mpv4-cardio-chart .is-selected small { color: var(--plan-cardio); }
+
+  .planning-page .mpv4-cardio-session-list { display: grid; }
+  .planning-page .mpv4-cardio-session { position: relative; border-bottom: 1px solid var(--plan-border); }
+  .planning-page .mpv4-cardio-session:last-child { border-bottom: 0; }
+  .planning-page .mpv4-cardio-session::before { content: ""; position: absolute; inset: 12px auto 12px 0; width: 2px; background: var(--plan-cardio-blue); }
+  .planning-page .mpv4-cardio-session.type-easy::before,
+  .planning-page .mpv4-cardio-session.type-long::before { background: var(--plan-cardio); }
+  .planning-page .mpv4-cardio-session.type-threshold::before { background: #e5a84f; }
+
+  .planning-page .mpv4-cardio-session-head {
+    display: grid;
+    grid-template-columns: 43px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 70px;
+    padding: 11px 13px 11px 15px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+  }
+  .planning-page .mpv4-cardio-session-head:active { background: color-mix(in srgb, var(--plan-cardio) 8%, transparent); }
+  .planning-page .mpv4-cardio-date { display: grid; gap: 2px; }
+  .planning-page .mpv4-cardio-date b { color: var(--plan-cardio); font-family: var(--font-mono, ui-monospace, monospace); font-size: .72rem; text-transform: uppercase; }
+  .planning-page .mpv4-cardio-date small { color: var(--plan-faint); font-size: .56rem; }
+  .planning-page .mpv4-cardio-session-copy { min-width: 0; }
+  .planning-page .mpv4-cardio-session-copy b { display: block; overflow: hidden; color: var(--plan-text); font-size: .8rem; font-weight: 760; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+  .planning-page .mpv4-cardio-session-copy small { display: block; margin-top: 5px; color: var(--plan-muted); font-family: var(--font-mono, ui-monospace, monospace); font-size: .61rem; }
+  .planning-page .mpv4-cardio-session-numbers { min-width: 48px; text-align: right; }
+  .planning-page .mpv4-cardio-session-numbers > b { display: block; color: var(--plan-text); font-family: var(--font-mono, ui-monospace, monospace); font-size: .78rem; }
+  .planning-page .mpv4-cardio-session-numbers > b small { font-size: .52rem; font-weight: 500; }
+  .planning-page .mpv4-cardio-session-numbers > small { color: var(--plan-faint); font-size: .57rem; }
+
+  .planning-page .mpv4-cardio-session-detail { padding: 0 13px 14px 15px; }
+  .planning-page .mpv4-cardio-loadline { display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid var(--plan-border); color: var(--plan-faint); font-family: var(--font-mono, ui-monospace, monospace); font-size: .55rem; }
+  .planning-page .mpv4-cardio-loadline b { color: var(--plan-cardio); }
+  .planning-page .mpv4-cardio-workout-chart { margin: 3px 0 9px; padding: 9px 0 7px; border-block: 1px solid color-mix(in srgb, var(--plan-border) 62%, transparent); }
+  .planning-page .mpv4-cardio-workout-chart figcaption { display: flex; justify-content: space-between; margin-bottom: 4px; color: var(--plan-faint); font-size: .57rem; }
+  .planning-page .mpv4-cardio-workout-chart figcaption b { color: var(--plan-text); font-family: var(--font-mono, ui-monospace, monospace); font-weight: 650; }
+  .planning-page .mpv4-cardio-workout-canvas { position: relative; width: 100%; height: 178px; }
+  .planning-page .mpv4-cardio-session-detail ol { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+  .planning-page .mpv4-cardio-session-detail li { display: grid; grid-template-columns: 10px 1fr; gap: 7px; margin-left: calc(var(--step-depth) * 8px); padding: 7px 0; border-top: 1px solid color-mix(in srgb, var(--plan-border) 62%, transparent); }
+  .planning-page .mpv4-cardio-session-detail li > span { color: var(--plan-cardio-blue); font-size: .63rem; }
+  .planning-page .mpv4-cardio-session-detail li b { display: block; color: var(--plan-text); font-size: .65rem; text-transform: capitalize; }
+  .planning-page .mpv4-cardio-session-detail li b em { margin-left: 4px; color: var(--plan-faint); font: 500 .54rem var(--font-mono, ui-monospace, monospace); }
+  .planning-page .mpv4-cardio-session-detail li small { display: block; margin-top: 2px; color: var(--plan-muted); font-family: var(--font-mono, ui-monospace, monospace); font-size: .58rem; line-height: 1.35; }
+  .planning-page .mpv4-cardio-session-detail > p { margin-top: 9px; color: var(--plan-muted); font-size: .65rem; line-height: 1.5; }
+}
+
+@media (max-width: 380px) {
+  .planning-page .mpv4 { padding-inline: 10px; }
+  .planning-page .mpv4-cardio-target { gap: 10px; }
+  .planning-page .mpv4-cardio-target strong { font-size: 1.75rem; }
+  .planning-page .mpv4-cardio-session-head { grid-template-columns: 38px minmax(0, 1fr) auto; gap: 8px; }
+  .planning-page .mpv4-cardio-session-detail { padding-left: 12px; }
+}
+
+html.dark .planning-page {
+  --plan-page: #0e1013;
+  --plan-surface: #1a1d22;
+  --plan-surface-soft: #1f2329;
+  --plan-input: #16191e;
+  --plan-text: #e7e9ee;
+  --plan-soft: #a1a7b3;
+  --plan-muted: #8f98a8;
+  --plan-faint: #748094;
+  --plan-border: rgba(255, 255, 255, 0.08);
+  --plan-border-strong: rgba(255, 255, 255, 0.15);
+  --plan-primary: #80cdf7;
+  --plan-training: #76a9ff;
+  --plan-nutrition: #ffd25a;
+  --plan-good: #2ce4aa;
+  --plan-warn: #ffd25a;
+  --plan-bad: #ef7378;
+}
+
+body:has(#planning-page),
+body:has(#planning-page) .app-layout,
+body:has(#planning-page) .main-content {
+  background: var(--plan-page);
+}
+
+html.dark body:has(#planning-page),
+html.dark body:has(#planning-page) .app-layout,
+html.dark body:has(#planning-page) .main-content {
+  background: #0e1013;
+}
+
+html.dark body:has(#planning-page)::before,
+html.dark body:has(#planning-page)::after,
+.planning-page::before,
+.planning-page::after,
+.planning-page :is(.panel, .nutrition-card)::before {
+  display: none !important;
+}
+
+.planning-page,
+.planning-page *,
+.planning-page *::before,
+.planning-page *::after {
+  box-sizing: border-box;
+}
+
+.planning-page :is(h1, h2, h3, p) {
+  margin-block: 0;
+}
+
+.planning-page :is(.panel, .nutrition-card, .nutrition-slot-card) {
+  border-color: var(--plan-border);
+  border-radius: var(--plan-radius);
+  background: var(--plan-surface);
+  box-shadow: none;
+}
+
+/* Shared planning scope switch. */
+.planning-page .planning-header-switch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: fit-content;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--plan-border);
+  border-radius: 10px;
+  background: var(--plan-surface);
+}
+
+.planning-page .planning-desktop-switch-btn {
+  min-width: 88px;
+  min-height: 30px;
+  padding-inline: 12px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--plan-muted);
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.planning-page .planning-desktop-switch-btn:hover {
+  color: var(--plan-text);
+  background: color-mix(in srgb, var(--plan-surface-soft) 65%, transparent);
+}
+
+.planning-page .planning-desktop-switch-btn.is-active {
+  color: var(--plan-text);
+  border-color: var(--plan-border);
+  background: var(--plan-surface-soft);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--plan-border) 35%, transparent);
+}
+
+.planning-page .planning-nutrition .planning-desktop-switch-btn[data-planning-tab="nutrition"].is-active {
+  box-shadow: inset 0 -2px 0 var(--plan-nutrition);
+}
+
+.planning-page .gym-planning-shell .planning-desktop-switch-btn[data-planning-tab="gym"].is-active {
+  box-shadow: inset 0 -2px 0 var(--plan-training);
+}
+
+.planning-page .planning-desktop-switch-btn[disabled] {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+@media (min-width: 1200px) {
+  .planning-page.page-container {
+    width: 100%;
+    max-width: 90rem;
+    margin-inline: auto;
+    padding: clamp(20px, 2.2vw, 32px);
+    padding-bottom: 48px;
+  }
+
+  /* ---------- shared desktop masthead ---------- */
+  .planning-page :is(.planning-nutrition .nutrition-plan-header, .gym-plan-header-card) {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    min-width: 0;
+    padding: 0 0 20px;
+    border: 0;
+    border-bottom: 1px solid var(--plan-border);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .planning-page .planning-nutrition .nutrition-plan-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 18px 28px;
+  }
+
+  .planning-page .planning-nutrition .header-left {
+    display: grid;
+    gap: 6px;
+  }
+
+  .planning-page .planning-nutrition .nutrition-plan-header .eyebrow,
+  .planning-page .gym-plan-header-card .eyebrow {
+    color: var(--plan-nutrition);
+    font-size: 0.625rem;
+    font-weight: 750;
+    line-height: 1;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .planning-page .gym-plan-header-card .eyebrow {
+    color: var(--plan-training);
+  }
+
+  .planning-page .planning-nutrition .nutrition-week-title {
+    color: var(--plan-text);
+    font-size: clamp(1.875rem, 2.5vw, 2.25rem);
+    font-weight: 650;
+    line-height: 1;
+    letter-spacing: -0.045em;
+  }
+
+  .planning-page .planning-header-subtitle {
+    max-width: 64rem;
+    color: var(--plan-muted);
+    font-size: 0.875rem;
+    line-height: 1.45;
+  }
+
+  .planning-page :is(.planning-workspace-actions, .gym-header-actions) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-self: end;
+    gap: 8px;
+  }
+
+  .planning-page .planning-header-action-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .planning-page .planning-nutrition .version-pill {
+    min-height: 32px;
+    padding: 5px 10px;
+    border: 1px solid var(--plan-border);
+    border-radius: 9px;
+    background: var(--plan-input);
+    box-shadow: none;
+  }
+
+  .planning-page :is(.version-status-pill, .btn-ghost) {
+    box-shadow: none;
+  }
+
+  /* ---------- nutrition workspace ---------- */
+  .planning-page .planning-nutrition > .nutrition-planning-shell {
+    display: grid;
+    grid-template-columns: minmax(248px, 270px) minmax(560px, 1fr) minmax(270px, 300px);
+    grid-template-rows: auto 1fr;
+    align-items: start;
+    gap: 16px;
+    width: 100%;
+    padding: 0;
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-center {
+    display: contents;
+  }
+
+  /* One library card; its entries are rows, never cards. */
+  .planning-page .planning-nutrition .nutrition-column-left {
+    grid-column: 1;
+    grid-row: 2;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 0;
+    height: min(760px, calc(100vh - 230px));
+    min-height: 520px;
+    max-height: calc(100vh - 230px);
+    padding: 0 14px 14px;
+    overflow: hidden;
+    border: 1px solid var(--plan-border);
+    border-radius: var(--plan-radius);
+    background: var(--plan-surface);
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left > .nutrition-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+    padding: 14px 0 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left > .is-library-hidden {
+    display: none;
+  }
+
+  .planning-page .planning-library-tabs {
+    display: flex;
+    align-items: flex-end;
+    gap: 22px;
+    min-height: 42px;
+    border-bottom: 1px solid var(--plan-border);
+  }
+
+  .planning-page .planning-library-tab {
+    min-height: 42px;
+    padding: 0 2px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--plan-muted);
+    font-size: 0.6875rem;
+    font-weight: 750;
+  }
+
+  .planning-page .planning-library-tab:hover {
+    color: var(--plan-text);
+  }
+
+  .planning-page .planning-library-tab.is-active {
+    color: var(--plan-text);
+    box-shadow: inset 0 -2px 0 var(--plan-nutrition);
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left .panel-header {
+    padding: 0;
+    border: 0;
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left .panel-header .title {
+    color: var(--plan-text);
+    font-size: 0.9375rem;
+    font-weight: 650;
+    letter-spacing: -0.015em;
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left .eyebrow {
+    color: var(--plan-nutrition);
+    font-size: 0.5625rem;
+    letter-spacing: 0.15em;
+  }
+
+  .planning-page .planning-nutrition .nutrition-meals-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .planning-page .planning-nutrition .nutrition-meals-header-actions {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 32px 32px;
+    gap: 5px;
+    width: 100%;
+    margin-top: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--plan-border);
+  }
+
+  .planning-page .planning-nutrition .nutrition-food-search-row {
+    margin-top: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--plan-border);
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left :is(.nutrition-meals-header-actions, .nutrition-food-search-row) input {
+    width: 100%;
+    max-width: none;
+    padding-inline: 2px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left :is(.nutrition-meals-header-actions, .nutrition-foods-header-actions) .pill {
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left :is(.nutrition-meals-header-actions, .nutrition-foods-header-actions) .pill:hover {
+    color: var(--plan-nutrition);
+    background: color-mix(in srgb, var(--plan-nutrition) 8%, transparent);
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left .nutrition-scroll-list {
+    flex: 1 1 auto;
+    min-height: 96px;
+    max-height: none;
+    gap: 0;
+    margin-top: 8px;
+    padding-right: 5px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-color: color-mix(in srgb, var(--plan-nutrition) 40%, transparent) transparent;
+    scrollbar-width: thin;
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left .nutrition-list-card {
+    padding: 10px 6px 10px 10px;
+    border: 0;
+    border-bottom: 1px solid var(--plan-border);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    cursor: pointer;
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left .nutrition-list-card:hover,
+  .planning-page .planning-nutrition .nutrition-column-left .nutrition-list-card.is-selected {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--plan-nutrition) 8%, transparent), transparent 80%);
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left .nutrition-list-card.is-selected {
+    box-shadow: inset 2px 0 0 var(--plan-nutrition);
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left .nutrition-list-card .title {
+    color: var(--plan-text);
+    font-size: 0.75rem;
+    font-weight: 650;
+    line-height: 1.3;
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left .nutrition-list-card .nutrition-slot-meta {
+    margin-top: 2px;
+    color: var(--plan-faint);
+    font-size: 0.5625rem;
+    line-height: 1.35;
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left .nutrition-builder {
+    flex: 0 0 auto;
+    margin-top: 0;
+    border: 0;
+    border-bottom: 1px solid var(--plan-border);
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left .nutrition-builder > summary {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 42px;
+    padding-inline: 2px 6px;
+    color: var(--plan-text);
+    font-size: 0.6875rem;
+    font-weight: 750;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left .nutrition-builder > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left .nutrition-builder > summary > span {
+    color: var(--plan-nutrition);
+    font-size: 1rem;
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left .nutrition-builder[open] {
+    max-height: 62%;
+    overflow-y: auto;
+    border-top: 1px solid var(--plan-border);
+    background: color-mix(in srgb, var(--plan-surface-soft) 45%, transparent);
+    scrollbar-width: thin;
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left .nutrition-builder[open] > summary {
+    border-bottom: 1px solid var(--plan-border);
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left .nutrition-builder .nutrition-form {
+    padding: 10px 2px 12px;
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-left .nutrition-full {
+    flex: 0 0 auto;
+    min-height: 38px;
+    margin-top: 8px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--plan-primary);
+    color: #07121a;
+    box-shadow: none;
+  }
+
+  /* Week editor is the single center card. */
+  .planning-page .planning-nutrition .nutrition-week-board {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--plan-border);
+    border-radius: var(--plan-radius);
+    background: var(--plan-surface);
+  }
+
+  .planning-page .planning-nutrition .nutrition-day-tabs {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--plan-border);
+  }
+
+  .planning-page .planning-nutrition .nutrition-day-tabs .pill,
+  .planning-page .planning-nutrition .day-chip {
+    min-width: 0;
+    min-height: 50px;
+    padding: 7px 6px;
+    border: 0;
+    border-left: 1px solid var(--plan-border);
+    border-radius: 0;
+    background: transparent;
+    color: var(--plan-soft);
+    box-shadow: none;
+  }
+
+  .planning-page .planning-nutrition .nutrition-day-tabs .pill:first-child,
+  .planning-page .planning-nutrition .day-chip:first-child {
+    border-left: 0;
+  }
+
+  .planning-page .planning-nutrition .nutrition-day-tabs .pill.primary,
+  .planning-page .planning-nutrition .day-chip.active,
+  .planning-page .planning-nutrition .day-chip.active:hover {
+    color: var(--plan-text);
+    background: var(--plan-surface-soft);
+    box-shadow: inset 0 2px 0 var(--plan-nutrition);
+  }
+
+  .planning-page .planning-nutrition .nutrition-day-tabs :is(.chip-session, .day-kcal),
+  .planning-page .planning-nutrition .day-chip.active .chip-session {
+    color: var(--plan-muted);
+  }
+
+  .planning-page .planning-nutrition .nutrition-day-panel {
+    min-width: 0;
+    padding: 16px;
+  }
+
+  .planning-page .planning-nutrition .nutrition-slot-list {
+    gap: 8px;
+  }
+
+  .planning-page .planning-nutrition .nutrition-slot-card {
+    position: relative;
+    gap: 6px;
+    padding: 11px 86px 11px 12px;
+    border: 1px solid var(--plan-border);
+    border-radius: 10px;
+    background: var(--plan-input);
+  }
+
+  .planning-page .planning-nutrition .nutrition-slot-card.is-selected {
+    border-color: color-mix(in srgb, var(--plan-nutrition) 42%, var(--plan-border));
+    box-shadow: inset 2px 0 0 var(--plan-nutrition);
+  }
+
+  .planning-page .planning-nutrition .nutrition-slot-active {
+    gap: 2px;
+  }
+
+  .planning-page .planning-nutrition .nutrition-slot-actions {
+    position: absolute;
+    right: 12px;
+    bottom: 11px;
+    margin: 0;
+  }
+
+  .planning-page .planning-nutrition .nutrition-slot-actions .pill {
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--plan-faint);
+    font-size: 0.5625rem;
+    font-weight: 650;
+  }
+
+  .planning-page .planning-nutrition .nutrition-slot-actions .pill:hover {
+    color: var(--plan-bad);
+  }
+
+  /* Context cards use the same one-level surface treatment. */
+  .planning-page .planning-nutrition .nutrition-column-right {
+    grid-column: 3;
+    grid-row: 2;
+    gap: 14px;
+  }
+
+  .planning-page .planning-nutrition .nutrition-column-right > .nutrition-card {
+    padding: 16px;
+    border: 1px solid var(--plan-border);
+    border-radius: var(--plan-radius);
+    background: var(--plan-surface);
+  }
+
+  .planning-page .planning-nutrition :is(.macro-card-title, .nutrition-mfp-header .title) {
+    color: var(--plan-text);
+    font-size: 1rem;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+  }
+
+  .planning-page .planning-nutrition :is(.macro-card-subtitle, .nutrition-mfp-header .sub) {
+    color: var(--plan-muted);
+    font-size: 0.6875rem;
+  }
+
+  .planning-page .planning-nutrition :is(.macro-week-wrap, .macro-today-wrap, .nutrition-mfp-row) {
+    border-color: var(--plan-border);
+    border-radius: 10px;
+    background: var(--plan-input);
+  }
+
+  /* ---------- training planning workspace ---------- */
+  .planning-page .gym-planning-shell {
+    display: grid;
+    grid-template-columns: minmax(248px, 270px) minmax(560px, 1fr) minmax(286px, 312px);
+    grid-template-rows: auto auto auto 1fr;
+    align-items: start;
+    gap: 16px;
+    width: 100%;
+    padding: 0;
+  }
+
+  .planning-page .gym-planning-shell .nutrition-column-center {
+    display: contents;
+  }
+
+  .planning-page .gym-plan-header-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "main meta"
+      "description meta";
+    align-items: end;
+    gap: 6px 28px;
+    min-width: 0;
+  }
+
+  .planning-page .gym-plan-header-card .header-left {
+    grid-area: main;
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .planning-page .gym-plan-header-card .gym-title-input {
+    width: 100%;
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    padding: 0;
+    color: var(--plan-text);
+    font-size: clamp(1.875rem, 2.5vw, 2.25rem);
+    font-weight: 650;
+    line-height: 1;
+    letter-spacing: -0.045em;
+    overflow: hidden;
+  }
+
+  .planning-page .gym-plan-header-card .gym-header-description {
+    grid-area: description;
+    width: 100%;
+    height: 20px !important;
+    min-height: 20px !important;
+    max-height: 20px !important;
+    margin: 0;
+    padding: 0;
+    color: var(--plan-muted);
+    font-size: 0.875rem;
+    line-height: 1.45;
+    overflow: hidden;
+  }
+
+  .planning-page .gym-plan-header-card .gym-header-actions {
+    grid-area: meta;
+    align-self: end;
+  }
+
+  .planning-page .gym-rules-head,
+  .planning-page .gym-rule-row {
+    grid-template-columns: 30px 44px 44px 44px minmax(58px, 1fr);
+    gap: 5px;
+    padding-inline: 7px;
+  }
+
+  .planning-page .gym-rules-head {
+    padding-block: 5px;
+    border: 0;
+    border-bottom: 1px solid var(--plan-border);
+    border-radius: 0;
+    background: transparent;
+    color: var(--plan-faint);
+    font-size: 0.5625rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .planning-page .gym-rules-head > span {
+    overflow: hidden;
+    text-align: center;
+    text-overflow: ellipsis;
+  }
+
+  .planning-page .gym-rules-head > span:first-child {
+    text-align: left;
+  }
+
+  .planning-page .gym-rule-row {
+    border-color: var(--plan-border);
+    background: var(--plan-input);
+  }
+
+  .planning-page .gym-rule-row input {
+    min-height: 28px;
+    padding-inline: 4px;
+    text-align: center;
+  }
+
+  .planning-page .gym-rule-row button[data-f="phase"] {
+    width: 100%;
+    min-width: 0;
+    padding-inline: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .planning-page .gym-planning-shell .nutrition-column-left {
+    grid-column: 1;
+    grid-row: 2 / span 3;
+  }
+
+  .planning-page .gym-plan-mode-card {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .planning-page :is(.gym-day-grid, .gym-sequence-list) {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  .planning-page .gym-block-library-card {
+    grid-column: 2;
+    grid-row: 4;
+  }
+
+  .planning-page .gym-planning-shell .nutrition-column-right {
+    grid-column: 3;
+    grid-row: 2 / span 3;
+  }
+
+  .planning-page .gym-planning-shell :is(.panel, .nutrition-card) {
+    border: 1px solid var(--plan-border);
+    border-radius: var(--plan-radius);
+    background: var(--plan-surface);
+    box-shadow: none;
+  }
+}
+
+/* Mobile keeps the dedicated planning renderer and shared LIVA scale. */
+@media (max-width: 900px) {
+  .planning-page .mpv4 {
+    padding-inline: 0;
+  }
+
+  .planning-page .mpv4-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--plan-border);
+    border-radius: 10px;
+    background: var(--plan-surface);
+  }
+
+  .planning-page .mpv4-tab {
+    min-height: 36px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--plan-muted);
+    font-size: 0.6875rem;
+  }
+
+  .planning-page .mpv4-tab.is-active {
+    color: var(--plan-text);
+    background: var(--plan-surface-soft);
+    box-shadow: inset 0 0 0 1px var(--plan-border);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .planning-page :is(.planning-desktop-switch-btn, .mpv4-tab) {
+    transition: none;
+  }
+}
+
+/* Always-on meal contents: the meal card is a quick planning surface, not a
+   collapsed mystery box.  The editor remains progressive, while foods and
+   amounts stay visible at a glance. */
+.planning-page .planning-nutrition .nutrition-slot-card {
+  gap: 10px;
+  padding: 14px 16px 13px;
+  background: var(--plan-input);
+  border-color: var(--plan-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.018);
+}
+
+.planning-page .planning-nutrition .nutrition-slot-card.is-selected {
+  border-color: color-mix(in srgb, var(--plan-nutrition) 64%, var(--plan-border));
+  box-shadow: inset 3px 0 0 var(--plan-nutrition), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+.planning-page .planning-nutrition .nutrition-slot-active {
+  gap: 5px;
+  padding-bottom: 2px;
+}
+
+.planning-page .planning-nutrition .nutrition-slot-card.is-expanded {
+  border-color: var(--plan-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.018);
+}
+
+.planning-page .planning-nutrition .nutrition-meal-editor {
+  gap: 9px;
+  margin-top: 1px;
+  padding: 10px 0 0;
+  border-top: 1px solid var(--plan-border);
+}
+
+.planning-page .planning-nutrition .nutrition-meal-editor > .nutrition-slot-meta {
+  color: var(--plan-faint);
+  font-size: 0.5625rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.planning-page .planning-nutrition .nutrition-meal-editor .nutrition-ingredient-list {
+  display: grid;
+  gap: 5px;
+}
+
+.planning-page .planning-nutrition .nutrition-meal-editor .nutrition-ingredient-row {
+  padding: 3px 0;
+}
+
+/* Keep deletion in its own flow row; it must never overlap the add controls. */
+.planning-page .planning-nutrition .nutrition-slot-actions {
+  position: static;
+  width: 100%;
+  justify-content: flex-end;
+  margin: 0;
+  padding-top: 7px;
+  border-top: 1px solid color-mix(in srgb, var(--plan-border) 58%, transparent);
+}
+
+.planning-page .planning-nutrition .nutrition-slot-actions .pill {
+  flex: 0 0 auto;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--plan-faint);
+  font-size: 0.5625rem;
+  font-weight: 650;
+}
+
+.planning-page .planning-nutrition .slot-meal-title {
+  color: var(--plan-text);
+  font-size: 0.9375rem;
+  line-height: 1.25;
+}
+
+.nutrition-slot-ingredients-preview {
+  display: grid;
+  gap: 7px;
+  padding: 10px 11px 9px;
+  border: 1px solid color-mix(in srgb, var(--plan-border) 78%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--plan-surface) 68%, transparent);
+}
+
+.nutrition-slot-ingredients-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.nutrition-slot-ingredients-label {
+  color: var(--plan-faint);
+  font-size: 0.5625rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.nutrition-slot-edit-btn {
+  border: 0;
+  padding: 0;
+  color: var(--plan-nutrition);
+  background: transparent;
+  font: inherit;
+  font-size: 0.625rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.nutrition-slot-edit-btn:hover,
+.nutrition-slot-edit-btn:focus-visible {
+  color: var(--plan-text);
+  text-decoration: underline;
+}
+
+.nutrition-slot-ingredients-list {
+  display: grid;
+  gap: 5px;
+}
+
+.nutrition-slot-ingredient-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  padding-top: 5px;
+  border-top: 1px solid color-mix(in srgb, var(--plan-border) 52%, transparent);
+}
+
+.nutrition-slot-ingredient-row:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.nutrition-slot-ingredient-name {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--plan-text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nutrition-slot-ingredient-amount {
+  flex: 0 0 auto;
+  color: var(--plan-nutrition);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.nutrition-slot-ingredients-empty {
+  color: var(--plan-faint);
+  font-size: 0.6875rem;
+  font-style: italic;
+}
+
+@media (max-width: 700px) {
+  .planning-page .planning-nutrition .nutrition-slot-card {
+    padding: 12px;
+  }
+
+  .nutrition-slot-ingredients-preview {
+    padding-inline: 9px;
+  }
+}
+
+/* Mobile planning: a pocket cockpit, with one continuous working surface per
+   domain. The blue training and warm nutrition signals are intentionally kept
+   separate; nested card chrome from the legacy renderer is flattened here. */
+@media (max-width: 900px) {
+  .planning-page .mpv4 {
+    padding: 12px 14px calc(30px + env(safe-area-inset-bottom));
+  }
+
+  .planning-page .mpv4-top { margin: 2px 0 12px; padding: 0; }
+  .planning-page .mpv4-domain-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 13px;
+    margin: 0;
+    padding: 3px 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+  .planning-page .mpv4-title { color: var(--plan-training); font-size: 1.55rem; letter-spacing: -0.035em; }
+  .planning-page .mpv4-title.is-nutrition { color: var(--plan-nutrition); }
+  .planning-page .mpv4-domain-arrows {
+    display: grid;
+    grid-template-rows: 6px 6px;
+    width: 8px;
+    color: color-mix(in srgb, var(--plan-faint) 65%, transparent);
+    transition: color .16s ease;
+  }
+  .planning-page .mpv4-domain-arrows i { display: grid; place-items: center; height: 6px; font-style: normal; }
+  .planning-page .mpv4-domain-arrows i::after { content: ""; width: 4px; height: 4px; border-top: 1.5px solid currentColor; border-left: 1.5px solid currentColor; transform: rotate(45deg); }
+  .planning-page .mpv4-domain-arrows i:last-child::after { transform: rotate(225deg); }
+  .planning-page .mpv4-domain-toggle:focus-visible { outline: 2px solid var(--plan-training); outline-offset: 5px; border-radius: 4px; }
+  .planning-page .mpv4-domain-toggle:hover .mpv4-domain-arrows { color: var(--plan-faint); }
+
+  .planning-page .mpv4-switchbar {
+    grid-template-columns: 34px minmax(0, 1fr) 34px;
+    gap: 0;
+    margin: 0 0 14px;
+    border-bottom: 1px solid var(--plan-border);
+  }
+  .planning-page .mpv4-switch-btn,
+  .planning-page .mpv4-switch-label {
+    height: 34px;
+    min-height: 34px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+  .planning-page .mpv4-switch-btn { color: var(--plan-training); font-size: 1.5rem; }
+  .planning-page .mpv4-switch-label { font-size: .7rem; color: var(--plan-faint); }
+  .planning-page .mpv4-section { gap: 14px; }
+
+  .planning-page .mpv4-sheet {
+    overflow: hidden;
+    border: 1px solid var(--plan-border);
+    border-radius: 14px;
+    background: var(--plan-surface);
+    box-shadow: 0 12px 28px rgba(0,0,0,.12);
+  }
+  .planning-page .mpv4-sheet-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 14px 11px;
+  }
+  .planning-page .mpv4-sheet-kicker {
+    color: var(--plan-training);
+    font-size: .56rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+  }
+  .planning-page .mpv4-training-sheet > .mpv4-sheet-kicker { display: block; padding: 13px 14px 0; }
+  .planning-page .mpv4-sheet-head .mpv4-sheet-kicker { margin-bottom: 4px; }
+  .planning-page .mpv4-sheet-title { color: var(--plan-text); font-size: 1rem; font-weight: 780; line-height: 1.2; }
+  .planning-page .mpv4-sheet-sub { margin-top: 5px; color: var(--plan-muted); font-size: .7rem; line-height: 1.42; }
+  .planning-page .mpv4-mode-chip {
+    flex: 0 0 auto;
+    border: 1px solid color-mix(in srgb, var(--plan-training) 40%, var(--plan-border));
+    border-radius: 999px;
+    padding: 4px 7px;
+    color: var(--plan-training);
+    font-size: .61rem;
+    font-weight: 750;
+  }
+  .planning-page .mpv4-metric-rail,
+  .planning-page .mpv4-macro-rail {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    border-top: 1px solid var(--plan-border);
+    border-bottom: 1px solid var(--plan-border);
+    scrollbar-width: none;
+  }
+  .planning-page .mpv4-metric-rail span,
+  .planning-page .mpv4-macro-rail span {
+    flex: 0 0 auto;
+    padding: 8px 10px;
+    border-right: 1px solid var(--plan-border);
+    color: var(--plan-muted);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: .61rem;
+    white-space: nowrap;
+  }
+  .planning-page .mpv4-metric-rail span:first-child { color: var(--plan-training); }
+
+  .planning-page .mpv4-rotation-list { display: grid; }
+  .planning-page .mpv4-rotation-session {
+    display: grid;
+    grid-template-columns: 35px minmax(0,1fr);
+    gap: 0 10px;
+    padding: 13px 14px;
+    border-bottom: 1px solid var(--plan-border);
+  }
+  .planning-page .mpv4-rotation-session:last-child { border-bottom: 0; }
+  .planning-page .mpv4-session-marker {
+    width: 27px;
+    height: 27px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    color: var(--plan-training);
+    background: color-mix(in srgb, var(--plan-training) 13%, transparent);
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: .62rem;
+    font-weight: 800;
+  }
+  .planning-page .mpv4-session-title { color: var(--plan-text); font-size: .83rem; font-weight: 740; line-height: 1.25; }
+  .planning-page .mpv4-session-meta { margin-top: 3px; color: var(--plan-faint); font-size: .64rem; }
+  .planning-page .mpv4-exercise-lines {
+    grid-column: 2;
+    display: grid;
+    gap: 5px;
+    margin-top: 10px;
+    color: var(--plan-muted);
+    font-size: .68rem;
+    line-height: 1.35;
+  }
+  .planning-page .mpv4-exercise-lines div { padding-top: 5px; border-top: 1px solid color-mix(in srgb, var(--plan-border) 65%, transparent); }
+
+  .planning-page .mpv4-nutrition-sheet { border-color: var(--plan-border); }
+  .planning-page .mpv4-nutrition-sheet .mpv4-sheet-kicker,
+  .planning-page .mpv4-nutrition-sheet .mpv4-mode-chip { color: var(--plan-nutrition); }
+  .planning-page .mpv4-nutrition-sheet .mpv4-mode-chip { border-color: color-mix(in srgb, var(--plan-nutrition) 42%, var(--plan-border)); }
+  .planning-page .mpv4-day-rail {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    border-bottom: 1px solid var(--plan-border);
+  }
+  .planning-page .mpv4-day-rail-btn {
+    min-width: 0;
+    min-height: 70px;
+    padding: 12px 2px 10px;
+    border: 0;
+    border-right: 1px solid var(--plan-border);
+    background: transparent;
+    color: var(--plan-faint);
+  }
+  .planning-page .mpv4-day-rail-btn:last-child { border-right: 0; }
+  .planning-page .mpv4-day-rail-btn.is-linked::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    right: 7px;
+    left: 7px;
+    height: 3px;
+    border-radius: 99px;
+    background: var(--mpv4-group-color, var(--plan-nutrition));
+    box-shadow: 0 0 8px color-mix(in srgb, var(--mpv4-group-color, var(--plan-nutrition)) 28%, transparent);
+  }
+  .planning-page .mpv4-day-rail-btn { position: relative; }
+  .planning-page .mpv4-day-rail-btn span { display: block; font-size: .75rem; font-weight: 760; }
+  .planning-page .mpv4-day-rail-btn small { display: block; margin-top: 5px; font-size: .57rem; line-height: 1.1; }
+  .planning-page .mpv4-day-rail-btn.is-active { color: var(--plan-text); background: color-mix(in srgb, var(--plan-nutrition) 11%, transparent); box-shadow: inset 0 -2px 0 var(--plan-nutrition); }
+  .planning-page .mpv4-macro-rail span:first-child { color: var(--plan-nutrition); }
+  .planning-page .mpv4-macro-rail b { color: var(--plan-text); }
+  .planning-page .mpv4-meal-list { display: grid; }
+  .planning-page .mpv4-meal {
+    padding: 13px 14px;
+    border: 0;
+    border-bottom: 1px solid var(--plan-border);
+    border-radius: 0;
+    background: transparent;
+  }
+  .planning-page .mpv4-meal:last-child { border-bottom: 0; }
+  .planning-page .mpv4-meal-head { display: flex; align-items: center; gap: 9px; }
+  .planning-page .mpv4-meal-index { flex: 0 0 auto; color: var(--plan-nutrition); font-family: var(--font-mono, ui-monospace, monospace); font-size: .65rem; }
+  .planning-page .mpv4-meal-title { min-width: 0; color: var(--plan-text); font-size: .84rem; font-weight: 740; }
+  .planning-page .mpv4-food-lines { display: grid; gap: 0; margin: 9px 0 0; padding: 0; list-style: none; }
+  .planning-page .mpv4-food-lines li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-top: 1px solid color-mix(in srgb, var(--plan-border) 65%, transparent); color: var(--plan-muted); font-size: .7rem; }
+  .planning-page .mpv4-food-lines li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .planning-page .mpv4-food-lines li b { flex: 0 0 auto; color: var(--plan-nutrition); font-family: var(--font-mono, ui-monospace, monospace); font-size: .66rem; }
+
+  .planning-page .mpv4-export-card { box-shadow: none; border-radius: 12px; }
+  .planning-page .mpv4-export-card .mpv4-export-body { display: none; }
+  .planning-page .mpv4-export-card::after { content: "Export am Desktop verfügbar"; display: block; padding: 0 12px 12px; color: var(--plan-faint); font-size: .65rem; }
+}

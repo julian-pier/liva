@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LIVA Login</title>
+  <style>
+    body{margin:0;font-family:Arial,sans-serif;background:#050810;color:#e5e7eb;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+    .card{width:100%;max-width:420px;background:linear-gradient(180deg,#111827,#0b1220);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px}
+    h1{margin:0 0 8px;font-size:22px}
+    p{margin:0 0 14px;color:#94a3b8}
+    label{display:block;margin:10px 0 6px;font-size:14px}
+    input{width:100%;box-sizing:border-box;padding:10px;border-radius:8px;border:1px solid #475569;background:#0f172a;color:#e5e7eb}
+    button{margin-top:14px;width:100%;padding:10px;border:0;border-radius:8px;background:#22c55e;color:#052e16;font-weight:700;cursor:pointer}
+    .err{background:#7f1d1d;color:#fecaca;border-radius:8px;padding:8px 10px;margin-bottom:12px}
+  </style>
+</head>
+<body>
+  <form method="POST" class="card">
+    <h1>LIVA Login</h1>
+    <p>Master-Passwort oder Access-Key eingeben.</p>
+    {% if error %}<div class="err">{{ error }}</div>{% endif %}
+    <input type="hidden" name="next" value="{{ next_url }}">
+    <label for="password">Master-Passwort</label>
+    <input id="password" name="password" type="password" autofocus>
+    <label for="access_key">Access-Key (Gastzugang)</label>
+    <input id="access_key" name="access_key" type="password">
+    <button type="submit">Weiter</button>
+  </form>
+  <script>
+    (function () {
+      var nextUrl = {{ next_url|tojson }};
+      var target = nextUrl || "/";
+      var timer = null;
+      function recheck() {
+        if (document.hidden) return;
+        fetch("/_private_access/status?_ts=" + Date.now(), {
+          cache: "no-store",
+          credentials: "same-origin",
+          headers: { "Accept": "application/json" }
+        })
+          .then(function (response) { return response.ok ? response.json() : null; })
+          .then(function (payload) {
+            if (payload && payload.allowed) {
+              window.location.replace(target);
+            }
+          })
+          .catch(function () {});
+      }
+      window.addEventListener("online", recheck);
+      window.addEventListener("focus", recheck);
+      timer = setInterval(recheck, 2500);
+      window.addEventListener("pagehide", function () {
+        if (timer) window.clearInterval(timer);
+      });
+      recheck();
+    })();
+  </script>
+</body>
+</html>

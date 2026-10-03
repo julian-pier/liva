@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Auswertung{% endblock %}
+
+{% block head %}
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/training.css') }}?v=20260728_training_response_v14">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/makros.css') }}?v=20260609_header_spacing_fix_2">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auswertung.css') }}?v=20261003_pastel_series_v5">
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+{% endblock %}
+
+{% block content %}
+{% set requested_area = request.args.get('bereich') %}
+{% set active_area = requested_area if requested_area in ['gesamt', 'training', 'ernaehrung'] else 'gesamt' %}
+<div class="evaluation-workspace liva-subpage-shell" id="evaluation-workspace" data-area="{{ active_area }}" data-training-min="{{ timeline_mins.training or '' }}" data-ernaehrung-min="{{ timeline_mins.ernaehrung or '' }}" data-gesamt-min="{{ timeline_mins.gesamt or '' }}">
+  <header class="evaluation-hero liva-subpage-hero">
+    <div class="liva-subpage-hero-copy">
+      <h1 class="liva-subpage-title">Auswertung</h1>
+    </div>
+    <div class="evaluation-area-switch" role="tablist" aria-label="Auswertungsbereich auswählen">
+      <button class="evaluation-area-option{% if active_area == 'gesamt' %} is-active{% endif %}" id="evaluation-tab-gesamt" type="button" role="tab" data-area="gesamt" aria-controls="evaluation-panel-gesamt" aria-selected="{{ 'true' if active_area == 'gesamt' else 'false' }}">Gesamt</button>
+      <button class="evaluation-area-option{% if active_area == 'training' %} is-active{% endif %}" id="evaluation-tab-training" type="button" role="tab" data-area="training" aria-controls="evaluation-panel-training" aria-selected="{{ 'true' if active_area == 'training' else 'false' }}">Training</button>
+      <button class="evaluation-area-option{% if active_area == 'ernaehrung' %} is-active{% endif %}" id="evaluation-tab-ernaehrung" type="button" role="tab" data-area="ernaehrung" aria-controls="evaluation-panel-ernaehrung" aria-selected="{{ 'true' if active_area == 'ernaehrung' else 'false' }}">Ernährung</button>
+    </div>
+  </header>
+
+  <section class="evaluation-timeline" aria-label="Auswertungszeitraum">
+    <div class="evaluation-timeline-meta">
+      <span class="evaluation-timeline-label">Zeitraum</span>
+      <strong id="evaluation-range-value">—</strong>
+      <span class="evaluation-range-live" aria-label="Live aktualisiert"><i></i> live</span>
+    </div>
+    <div class="evaluation-timeline-control" id="evaluation-timeline-control">
+      <div class="evaluation-timeline-track" aria-hidden="true">
+        <span class="evaluation-timeline-selection" id="evaluation-timeline-selection"></span>
+        <span class="evaluation-timeline-pin evaluation-timeline-pin--start"></span>
+        <span class="evaluation-timeline-pin evaluation-timeline-pin--end"></span>
+      </div>
+      <div class="evaluation-timeline-ticks" id="evaluation-timeline-ticks" aria-hidden="true"></div>
+      <output class="evaluation-pin-label evaluation-pin-label--start" id="evaluation-start-label" for="evaluation-range-start">—</output>
+      <output class="evaluation-pin-label evaluation-pin-label--end" id="evaluation-end-label" for="evaluation-range-end">—</output>
+      <input class="evaluation-range-input evaluation-range-input--start" id="evaluation-range-start" type="range" min="0" max="730" value="550" step="1" aria-label="Startdatum">
+      <input class="evaluation-range-input evaluation-range-input--end" id="evaluation-range-end" type="range" min="0" max="730" value="730" step="1" aria-label="Enddatum">
+    </div>
+    <div class="evaluation-range-presets" aria-label="Schnellauswahl Zeitraum">
+      <button type="button" data-evaluation-range="7">7 Tage</button>
+      <button type="button" data-evaluation-range="28">28 Tage</button>
+      <button type="button" data-evaluation-range="90" class="is-active">90 Tage</button>
+      <button type="button" data-evaluation-range="180">180 Tage</button>
+    </div>
+  </section>
+
+  <div class="evaluation-stage">
+      <section class="evaluation-panel" id="evaluation-panel-gesamt" role="tabpanel" aria-labelledby="evaluation-tab-gesamt"{% if active_area != 'gesamt' %} hidden{% endif %}>
+        {% include "partials/_overall_analysis_content.html" %}
+      </section>
+      <section class="evaluation-panel" id="evaluation-panel-training" role="tabpanel" aria-labelledby="evaluation-tab-training"{% if active_area != 'training' %} hidden{% endif %}>
+        {% include "partials/_training_analysis_content.html" %}
+      </section>
+
+      <section class="evaluation-panel" id="evaluation-panel-ernaehrung" role="tabpanel" aria-labelledby="evaluation-tab-ernaehrung"{% if active_area != 'ernaehrung' %} hidden{% endif %}>
+        {% include "partials/_nutrition_evaluation_content.html" %}
+      </section>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script defer src="{{ url_for('static', filename='js/auswertung.js') }}?v=20261003_lazy_panels_v6"></script>
+<script defer src="{{ url_for('static', filename='js/overall_analysis.js') }}?v=20261003_solid_pastel_v8"></script>
+<script defer src="{{ url_for('static', filename='js/table.js') }}?v=20260413_perf_cache_v1"></script>
+<script defer src="{{ url_for('static', filename='js/makros.js') }}?v=20261003_lazy_panel_v2"></script>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}CORE Training{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/core_training_gate.css') }}?v=20260316_core_training_gate_v1">
+{% endblock %}
+{% block content %}
+<div class="core-training-gate">
+  <div class="core-training-gate-backdrop" aria-hidden="true"></div>
+  <section class="core-training-gate-modal" role="dialog" aria-modal="true" aria-labelledby="core-training-gate-title">
+    <p class="core-training-gate-kicker">CORE Training</p>
+    <h1 id="core-training-gate-title">Karteikarten-Training</h1>
+    <p class="core-training-gate-sub">Hier startet das CORE-Training mit dem Calibration Deck.</p>
+    <div class="core-training-gate-actions">
+      <a class="core-training-gate-btn is-primary" href="{{ url_for('core_training_bp.core_training_cards_page') }}">
+        <span>Karteikarten-Training</span>
+        <small>Calibration Deck</small>
+      </a>
+    </div>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/core_training_gate.js') }}?v=20260316_core_training_gate_v1"></script>
+{% endblock %}

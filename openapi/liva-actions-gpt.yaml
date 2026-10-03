@@ -1,0 +1,3204 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "LIVA GPT Actions API (Slim)",
+    "version": "2.0.0-gpt",
+    "description": "Slim Custom GPT schema exposing readLiva/actLiva plus typed plan and logging actions. Existing nutrition plans must use getNutritionPlanDetailDirect followed by patchNutritionPlanDirect with slot_path-based operations and a verified readback; legacy operator tools are not part of this surface."
+  },
+  "servers": [
+    {
+      "url": "https://liva.example.com",
+      "description": "LIVA LIVA host"
+    }
+  ],
+  "paths": {
+    "/api/v2/actions/liva/read": {
+      "post": {
+        "operationId": "readLiva",
+        "summary": "Unified LIVA read facade",
+        "description": "Unified LIVA read facade for snapshots, state, context, training, nutrition, recovery, cardio, weight, endurance and memory. Choose the correct mode and optional filters from LivaReadRequest.",
+        "x-openai-isConsequential": false,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LivaReadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Read result"
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v2/actions/liva/act": {
+      "post": {
+        "operationId": "actLiva",
+        "summary": "Unified LIVA write facade",
+        "description": "Official LIVA write facade. Send domain, command, and helper fields via top-level, value, or payload. For plan changes use dry_run=true first. patch_training_plan accepts operations, value.operations, or payload.operations.",
+        "x-openai-isConsequential": false,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LivaActRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Write result"
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/v2/actions/core/morning-context": {
+      "get": {
+        "operationId": "getCoreMorningContext",
+        "summary": "Read CORE morning context",
+        "description": "Returns a compact GPT-safe morning context so the daily board payload can stay short and use the correct session label. Always call this first for morning triggers like 'Gewicht & HRV sind drin', 'Check CORE' or 'Morgencheck'.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Morning context date as YYYY-MM-DD. Defaults to today."
+          }
+        ]
+      }
+    },
+    "/api/v2/actions/core/board/build": {
+      "post": {
+        "operationId": "buildCoreBoard",
+        "summary": "Build CORE Daily Board",
+        "description": "Persists the GPT/LIVA machine briefing and human decision copy for the day, and can optionally build a persisted CORE Training-Card. Only call this after getCoreMorningContext in the same turn. For morning flows use mode='gpt_fast', memory_mode='skip', build_training_card=true and persist=true.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoreBoardBuildRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/actions/core/training-card": {
+      "get": {
+        "operationId": "getCoreTrainingCard",
+        "summary": "Read CORE Training-Card",
+        "description": "Read the persisted CORE Training-Card for the requested day. Use this when the user asks what today's Training-Card looks like or what today's training says.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Training-card date as YYYY-MM-DD. Defaults to today."
+          }
+        ]
+      }
+    },
+    "/api/v2/actions/training/adjust": {
+      "post": {
+        "operationId": "logGymSession",
+        "summary": "Log gym session from raw text",
+        "description": "Preview gym logs with dry_run=true first. Include date, session_name and structured exercises; every work set may carry its own rpe. Missing set RPE is reported as incomplete. Write live only after confirmation, then verify with training data.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrainingAdjustRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/actions/training/workout/{workout_id}/coach-view": {
+      "get": {
+        "operationId": "getWorkoutCoachView",
+        "summary": "Read logged workout coach view",
+        "description": "Returns a coach-facing view of a logged workout with exercise indices, set indices and comparison to the latest comparable session.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "workout_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/actions/training/edit-logged-workout-exercise": {
+      "post": {
+        "operationId": "editLoggedWorkoutExercise",
+        "summary": "Edit logged workout exercise",
+        "description": "Edits identity, variation or authored notes of a historical logged exercise by workout_id and zero-based exercise_index without changing the active training plan. Successful live writes include canonical_readback; never claim success unless it matches.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditLoggedWorkoutExerciseRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/actions/training/edit-logged-set": {
+      "post": {
+        "operationId": "editLoggedSet",
+        "summary": "Edit logged set",
+        "description": "Edits a historical logged set by workout_id, exercise_index and set_index without changing the active training plan.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EditLoggedSetRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/actions/training/plans": {
+      "get": {
+        "operationId": "listTrainingPlansDirect",
+        "summary": "List training plans",
+        "description": "Lists training plans with compact counts and totals. Use detail endpoints before patching.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/actions/training/plans/active/detail": {
+      "get": {
+        "operationId": "getActiveTrainingPlanDetailDirect",
+        "summary": "Read active training plan detail",
+        "description": "Always call this detail-read before patching a training plan. Returns full days, workouts, exercises and set targets.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/actions/training/plans/{plan_id}/detail": {
+      "get": {
+        "operationId": "getTrainingPlanDetailDirect",
+        "summary": "Read training plan detail",
+        "description": "Always call this detail-read before patching a training plan. Returns full days, workouts, exercises and set targets for one plan_id.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "plan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/actions/training/plans/{plan_id}/patch": {
+      "post": {
+        "operationId": "patchTrainingPlanDirect",
+        "summary": "Patch training plan",
+        "description": "Patch a training plan with top-level dry_run and operations. This endpoint performs live writes when dry_run=false. Always call detail-read before patching a plan. Use exercise_path/set_path for targeted training changes. Training writes persist to the real training plan source.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrainingPlanPatchRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "plan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/actions/nutrition/foods/search": {
+      "get": {
+        "operationId": "searchNutritionFoodsDirect",
+        "summary": "Search nutrition foods",
+        "description": "Search concrete foods with ids and macros per 100g so GPT can resolve food_id safely.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/actions/nutrition/plans": {
+      "get": {
+        "operationId": "listNutritionPlansDirect",
+        "summary": "List nutrition plans",
+        "description": "Lists nutrition plans with is_active, status, archived, deleted and compact counts/totals. Use detail endpoints before patching.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/actions/nutrition/plans/active/detail": {
+      "get": {
+        "operationId": "getActiveNutritionPlanDetailDirect",
+        "summary": "Read active nutrition plan detail",
+        "description": "Always call this detail-read before patching a nutrition plan. Returns full days, meals and slots. Slots are addressed primarily by slot_path, not slot_id.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/actions/nutrition/plans/{plan_id}/detail": {
+      "get": {
+        "operationId": "getNutritionPlanDetailDirect",
+        "summary": "Read nutrition plan detail",
+        "description": "Always call this detail-read before patching a nutrition plan. Returns full days, meals and slots for one plan_id. slot_path is the preferred stable slot address; slot_id may be null when no unique item id exists.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "plan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/actions/nutrition/plans/{plan_id}/patch": {
+      "post": {
+        "operationId": "patchNutritionPlanDirect",
+        "summary": "Patch nutrition plan",
+        "description": "Read plan detail first, then patch with operations using stable slot_path values. Use dry_run=true before live writes and verify afterward. Supports meal/slot edits, delete_meal and delete_empty_meals.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NutritionPlanPatchRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "plan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/api/v2/actions/nutrition/data": {
+      "post": {
+        "operationId": "getNutritionData",
+        "summary": "Read nutrition data",
+        "description": "Logged meals, planned meals, targets and remaining macros.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NutritionDataRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/actions/nutrition/control": {
+      "post": {
+        "operationId": "writeNutrition",
+        "summary": "Write nutrition targets or meals",
+        "description": "Writes targets, planned meals, free meals or meal edits.",
+        "x-openai-isConsequential": false,
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful compact response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NutritionControlRequest"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "required": [
+          "ok",
+          "error"
+        ],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "LivaReadRequest": {
+        "type": "object",
+        "required": [
+          "mode"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "analysis_phase_detail",
+              "analysis_phase_overview",
+              "bodycomp_cut_status",
+              "bodyweight_phase_report",
+              "calendar_range",
+              "calendar_search",
+              "calendar_today",
+              "capabilities",
+              "cardio_data",
+              "cardio_state",
+              "cardio_summary",
+              "checkin_today",
+              "context",
+              "core_board",
+              "core_morning_context",
+              "core_state",
+              "core_training_card",
+              "daily_context",
+              "daily_snapshot",
+              "endurance_approval",
+              "endurance_calendar",
+              "endurance_fitness",
+              "endurance_plan",
+              "endurance_plan_diff",
+              "endurance_plans",
+              "endurance_session",
+              "endurance_sync_state",
+              "endurance_week",
+              "exercise_history",
+              "life_today",
+              "memory",
+              "nutrition_data",
+              "nutrition_foods",
+              "nutrition_meal_template_detail",
+              "nutrition_meal_templates",
+              "nutrition_plan",
+              "nutrition_plans",
+              "nutrition_state",
+              "nutrition_timing",
+              "progression_compare",
+              "progression_data",
+              "progression_summary",
+              "recovery_data",
+              "recovery_state",
+              "state",
+              "training_data",
+              "training_deep_dive",
+              "training_exercise_detail",
+              "training_exercises",
+              "training_plan",
+              "training_plans",
+              "training_state",
+              "training_today_card",
+              "training_today_decision_context",
+              "training_today_decision_context_full",
+              "training_today_loads",
+              "training_workout_coach_view",
+              "weekly_feedback",
+              "weight_data",
+              "weight_state"
+            ],
+            "description": "Read mode selector. Use capabilities for the current contract matrix. nutrition_data requires nutrition_mode; exercise_history/progression modes accept exercise_names or exercise."
+          },
+          "focus": {
+            "type": "string",
+            "enum": [
+              "overview",
+              "muscle_volume",
+              "exercise_progression",
+              "stagnation",
+              "best_phases",
+              "weak_points",
+              "all"
+            ],
+            "description": "For mode=training_deep_dive: choose which compact coach view to emphasize."
+          },
+          "muscle_group": {
+            "type": "string",
+            "enum": [
+              "chest",
+              "back",
+              "shoulders",
+              "biceps",
+              "triceps",
+              "legs",
+              "calves",
+              "core",
+              "other"
+            ],
+            "description": "For mode=training_deep_dive: optional muscle group filter."
+          },
+          "canonical_id": {
+            "type": "string",
+            "description": "For mode=training_deep_dive: optional exercise canonical_id filter, especially useful with focus=exercise_progression."
+          },
+          "exercise_names": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For exercise_history, progression_data and progression_compare: names to resolve against logged training history."
+          },
+          "nutrition_mode": {
+            "type": "string",
+            "enum": [
+              "daily_totals",
+              "meals",
+              "planned_meals"
+            ],
+            "description": "Required for mode=nutrition_data; selects aggregate totals, logged meals or the active plan's meals."
+          },
+          "progression_mode": {
+            "type": "string",
+            "enum": [
+              "by_exercise",
+              "by_group"
+            ],
+            "description": "For mode=progression_data; by_exercise is the supported detailed series mode."
+          },
+          "metrics": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "e1rm",
+                "top_set_weight",
+                "top_set_reps",
+                "volume_load"
+              ]
+            },
+            "description": "For progression_data: requested point metrics."
+          },
+          "compare_type": {
+            "type": "string",
+            "enum": [
+              "time_ranges"
+            ],
+            "description": "For progression_compare: use time_ranges together with range_a and range_b."
+          },
+          "range_a": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "date_from": {
+                "type": "string",
+                "format": "date"
+              },
+              "date_to": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          },
+          "range_b": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "date_from": {
+                "type": "string",
+                "format": "date"
+              },
+              "date_to": {
+                "type": "string",
+                "format": "date"
+              }
+            }
+          },
+          "workout_id": {
+            "type": "integer",
+            "description": "For mode=training_workout_coach_view: read full coach-view for a logged workout by workout_id, including exercises, canonical IDs, sets, and comparison_to_last."
+          },
+          "exercise_id": {
+            "type": "integer",
+            "description": "For training_exercise_detail: exact movement-library exercise id."
+          },
+          "template_id": {
+            "type": "integer",
+            "description": "For nutrition_plan or nutrition_meal_template_detail: exact template id."
+          },
+          "plan_id": {
+            "description": "Integer for legacy training plans; use the ep_... string returned by endurance_plans for Endurance."
+          },
+          "endurance_plan_id": {
+            "type": "string",
+            "pattern": "^ep_",
+            "description": "Canonical Endurance plan id; plan_id is a supported alias."
+          },
+          "id": {
+            "type": "integer",
+            "description": "Optional generic id alias for read modes that target one specific entity, such as a training plan or nutrition template."
+          },
+          "detail": {
+            "type": "string",
+            "description": "For training_plan use compact, day, exercise or full. For plan mutations prefer day or exercise and avoid full unless the user explicitly asks for the whole plan."
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "date_from": {
+            "type": "string",
+            "format": "date"
+          },
+          "date_to": {
+            "type": "string",
+            "format": "date"
+          },
+          "start": {
+            "type": "string",
+            "format": "date",
+            "description": "Calendar range/search start."
+          },
+          "end": {
+            "type": "string",
+            "format": "date",
+            "description": "Calendar range/search end."
+          },
+          "calendar_id": {
+            "type": "string"
+          },
+          "days": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 365
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "day": {
+            "type": "string",
+            "description": "Used by training_plan detail=day or detail=exercise to narrow the active plan to one weekday like Mo or Mi."
+          },
+          "exercise": {
+            "type": "string",
+            "description": "Used by training_plan detail=exercise together with day to read one matched exercise target instead of the full plan."
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For mode=memory with usememos enabled: all listed free-text keywords must match content or snippet."
+          },
+          "query": {
+            "type": "string",
+            "description": "For mode=memory with usememos enabled: local text search across memo content, snippet and name."
+          },
+          "include_archived": {
+            "type": "boolean",
+            "description": "For training_plans or nutrition_plans: include archived or inactive historical plans in the compact list output."
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For mode=memory with usememos enabled: optional local tag filter."
+          },
+          "all_tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For mode=memory with usememos enabled: AND tag filter."
+          },
+          "any_tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For mode=memory with usememos enabled: OR tag filter."
+          },
+          "exclude_tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "For mode=memory with usememos enabled: exclude memos carrying any of these tags."
+          },
+          "include_gpt": {
+            "type": "boolean",
+            "description": "For mode=memory with usememos enabled: true returns only #gpt memos, false excludes them."
+          },
+          "only_gpt_mutable": {
+            "type": "boolean",
+            "description": "For mode=memory with usememos enabled: only return memos that GPT may mutate because they begin with #gpt."
+          },
+          "lifecycle_tag": {
+            "type": "string",
+            "description": "For mode=memory with usememos enabled: filter by lifecycle tag like #kurzfristig, #diese_woche, #temporär, #dauerhaft or #projekt."
+          },
+          "topic_tag": {
+            "type": "string",
+            "description": "For mode=memory with usememos enabled: filter by topic tag like #krankheit, #hrv, #training, #liva or #privat."
+          },
+          "page_size": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "description": "For mode=memory with usememos enabled: page size for direct list reads."
+          },
+          "page_token": {
+            "type": "string",
+            "description": "For mode=memory with usememos enabled: next-page token for direct list reads."
+          },
+          "filter": {
+            "type": "string",
+            "description": "For mode=memory with usememos enabled: forwarded list filter expression."
+          },
+          "order_by": {
+            "type": "string",
+            "description": "For mode=memory with usememos enabled: forwarded list order expression."
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "NutritionDataRequest": {
+        "type": "object",
+        "required": [
+          "mode"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "daily_totals",
+              "meals",
+              "planned_meals"
+            ]
+          },
+          "date_from": {
+            "type": "string",
+            "format": "date"
+          },
+          "date_to": {
+            "type": "string",
+            "format": "date"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "max_results": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "group_by": {
+            "type": "string",
+            "enum": [
+              "day",
+              "meal"
+            ]
+          }
+        }
+      },
+      "EditLoggedSetRequest": {
+        "type": "object",
+        "required": [
+          "workout_id",
+          "exercise_index",
+          "set_index"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "workout_id": {
+            "type": "integer"
+          },
+          "exercise_index": {
+            "type": "integer"
+          },
+          "set_index": {
+            "type": "integer"
+          },
+          "weight": {
+            "type": "number"
+          },
+          "reps": {
+            "type": "integer"
+          },
+          "rpe": {
+            "type": "number"
+          },
+          "dry_run": {
+            "type": "boolean"
+          }
+        }
+      },
+      "LivaActRequest": {
+        "type": "object",
+        "required": [
+          "domain",
+          "command"
+        ],
+        "additionalProperties": true,
+        "properties": {
+          "domain": {
+            "type": "string",
+            "enum": [
+              "access",
+              "cardio",
+              "core",
+              "endurance",
+              "memory",
+              "nutrition",
+              "recovery",
+              "remote",
+              "training",
+              "weight"
+            ],
+            "description": "actLiva domains. Use training or nutrition for all plan operators; details, ids, operations and replacement payloads can be sent as top-level fields, inside value, or inside payload."
+          },
+          "command": {
+            "type": "string",
+            "enum": [
+              "activate_nutrition_plan",
+              "activate_scene",
+              "activate_training_plan",
+              "add_exercise",
+              "adjust_targets",
+              "annotate_day",
+              "append_log_entry",
+              "append_section_note",
+              "apply_write_plan",
+              "archive",
+              "archive_nutrition_plan",
+              "archive_training_plan",
+              "build_board",
+              "change_rep_range",
+              "change_rpe",
+              "change_sets",
+              "change_variation",
+              "cleanup_expired",
+              "clear_override",
+              "create_cardio_session",
+              "create_endurance_plan",
+              "create_food",
+              "create_guest_key",
+              "create_nutrition_plan",
+              "create_run",
+              "create_training_plan",
+              "delete_cardio_session",
+              "delete_logged_meal",
+              "delete_logged_workout",
+              "delete_nutrition_plan",
+              "delete_run",
+              "delete_training_plan",
+              "delete_weight",
+              "device_set_power",
+              "device_toggle",
+              "edit_cardio_session",
+              "edit_logged_meal",
+              "edit_logged_set",
+              "edit_logged_workout_exercise",
+              "edit_run",
+              "edit_weight",
+              "log_gym_session",
+              "log_planned_meal",
+              "log_weight",
+              "mark_stale",
+              "patch_endurance_plan",
+              "patch_nutrition_plan",
+              "patch_training_plan",
+              "pc_action",
+              "quick_log_meal",
+              "remove_entry",
+              "remove_exercise",
+              "reorder_exercise",
+              "replace_exercise",
+              "replace_nutrition_plan",
+              "replace_section",
+              "replace_training_plan",
+              "save_training_decision",
+              "set_alcohol_flag",
+              "set_brightness",
+              "set_color",
+              "set_execution_mode",
+              "set_override",
+              "set_sickness_flag",
+              "set_sleep_flag",
+              "setup_bodyweight_phase",
+              "store_fact",
+              "store_pattern",
+              "store_preference",
+              "update_entry",
+              "update_exercise_target"
+            ],
+            "description": "Allowed actLiva command. Plan writes stay on create/replace/patch/activate/archive/delete commands; granular meal, slot, food, template, workout, exercise and set mutations go through operations or payload. For targeted edits on existing training plans, prefer patch_training_plan over replace_training_plan."
+          },
+          "payload": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "confirm": {
+            "type": "boolean"
+          },
+          "dry_run": {
+            "type": "boolean"
+          },
+          "weight": {
+            "type": "number"
+          },
+          "weight_kg": {
+            "type": "number"
+          },
+          "phase_type": {
+            "type": "string",
+            "enum": [
+              "cut",
+              "bulk",
+              "maintenance"
+            ]
+          },
+          "phase_start": {
+            "type": "string",
+            "format": "date"
+          },
+          "phase_start_weight": {
+            "type": "number"
+          },
+          "value": {
+            "description": "Flexible command value. May be primitive for simple flags or structured object/array for plan creation, replacement and operator payloads."
+          },
+          "source_message": {
+            "type": "string"
+          },
+          "sport_type": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "string"
+          },
+          "duration_min": {
+            "type": "number"
+          },
+          "duration_s": {
+            "type": "integer"
+          },
+          "avg_hr": {
+            "type": "number"
+          },
+          "max_hr": {
+            "type": "number"
+          },
+          "avg_power_w": {
+            "type": "number"
+          },
+          "elevation_gain": {
+            "type": "number"
+          },
+          "pace": {
+            "type": "number"
+          },
+          "run_type": {
+            "type": "string"
+          },
+          "distance_km": {
+            "type": "number"
+          },
+          "distance_m": {
+            "type": "number"
+          },
+          "meal_number": {
+            "type": "integer"
+          },
+          "slot_id": {
+            "type": "integer"
+          },
+          "logged_meal_id": {
+            "type": "integer"
+          },
+          "workout_id": {
+            "type": "integer",
+            "description": "Logged workout id from training_workout_coach_view."
+          },
+          "session_id": {
+            "description": "Legacy cardio id or Endurance session id."
+          },
+          "exercise_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Zero-based exercise index from training_workout_coach_view."
+          },
+          "set_index": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Zero-based set index from training_workout_coach_view."
+          },
+          "run_id": {
+            "type": "integer"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "raw_text": {
+            "type": "string",
+            "description": "For log_gym_session: OCR/plain text import. For create_nutrition_plan it may be kept only as preview/notes and must not replace structured days for live writes."
+          },
+          "session_name": {
+            "type": "string"
+          },
+          "plan": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "For create_training_plan or replace_training_plan: structured training plan object with fixed_week days/base_week or rolling_sequence plus weeks. Planning endpoints manage plan structure only. They do not decide today's readiness and do not use recovery data."
+          },
+          "plan_name": {
+            "type": "string",
+            "description": "For create_training_plan or replace_training_plan: explicit plan display name."
+          },
+          "plan_id": {
+            "description": "Integer gym plan id, or ep_... Endurance plan id for endurance.patch_endurance_plan."
+          },
+          "endurance_plan_id": {
+            "type": "string",
+            "pattern": "^ep_",
+            "description": "Canonical Endurance plan id; plan_id is a supported alias."
+          },
+          "template_id": {
+            "type": "integer",
+            "description": "For nutrition lifecycle commands: exact nutrition_week_templates id to activate, patch, replace, archive or delete."
+          },
+          "food_id": {
+            "type": "integer",
+            "description": "For nutrition patch helpers or low-level mutation payloads that target one real food."
+          },
+          "exercise_id": {
+            "type": "integer",
+            "description": "For movement_library or targeted training payloads that reference one concrete exercise id."
+          },
+          "id": {
+            "type": "integer",
+            "description": "Optional generic alias for plan_id or template_id when the domain already makes the target type clear."
+          },
+          "name": {
+            "type": "string",
+            "description": "For create/replace plan commands: plan or template name."
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "description": "For create_training_plan: optional block start date stored in plan meta."
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "description": "For create_training_plan: optional block end date stored in plan meta."
+          },
+          "block_length": {
+            "type": "integer",
+            "description": "For create_training_plan: block length in weeks."
+          },
+          "set_active": {
+            "type": "boolean",
+            "description": "For create/replace plan commands: activate the new or replaced plan/template immediately."
+          },
+          "activate": {
+            "type": "boolean",
+            "description": "Alias hint for lifecycle commands that should switch the target plan/template active."
+          },
+          "replace_active": {
+            "type": "boolean",
+            "description": "For create_training_plan: alias hint that the active plan should be replaced."
+          },
+          "base_week": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "description": "For create_training_plan: legacy list form of weekly days."
+          },
+          "days": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "description": "For fixed_week training plans or create_nutrition_plan: structured weekday rows. Nutrition write accepts top-level days, value.days, or payload.days. Use structured days for real plan writes."
+          },
+          "sequence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "description": "For rolling_sequence training plans: ordered rotation events without weekdays."
+          },
+          "weeks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "description": "For create_training_plan: optional per-week modifiers."
+          },
+          "week_rules": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "For create_training_plan: optional week rules metadata."
+          },
+          "rules": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "For create_training_plan: optional rules JSON stored with the plan."
+          },
+          "blocks": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "For create_training_plan: optional blocks JSON stored with the plan."
+          },
+          "focus": {
+            "type": "string",
+            "description": "For create_training_plan: optional plan focus/goal summary."
+          },
+          "expected_updated_at": {
+            "type": "string",
+            "description": "For replace_training_plan: optional optimistic concurrency token that must match the current updated_at."
+          },
+          "hard_delete": {
+            "type": "boolean",
+            "description": "For delete_training_plan or delete_nutrition_plan: must be true to allow irreversible hard delete."
+          },
+          "archive_reason": {
+            "type": "string",
+            "description": "For archive_training_plan: optional human-readable archive reason."
+          },
+          "patch": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "For patch commands: operation-local patch object."
+          },
+          "operations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "description": "For patch_training_plan or patch_nutrition_plan: ordered mutation operations. Accepts top-level operations, value.operations, or payload.operations. For targeted training-plan edits prefer patch_training_plan over replace_training_plan. Example op: {\"op\":\"update_exercise_note\",\"match\":{\"day\":\"Mo\",\"exercise\":\"Schrägbankdrücken\",\"variation\":\"KH\"},\"note\":\"...\"}"
+          },
+          "replace_with": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "For replace_training_plan or replace_nutrition_plan: full replacement payload."
+          },
+          "allow_partial": {
+            "type": "boolean",
+            "description": "For create/patch/replace plan commands: allow partial writes when unresolved items or invalid operations exist."
+          },
+          "execution_mode": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string",
+            "description": "Note field. For training.edit_logged_workout_exercise this aliases authored exercise notes."
+          },
+          "notes": {
+            "type": "string",
+            "description": "For training.edit_logged_workout_exercise: replace authored exercise notes; send an empty string to clear them."
+          },
+          "new_notes": {
+            "type": "string",
+            "description": "Alias for notes when editing a logged exercise."
+          },
+          "reason": {
+            "type": "string"
+          },
+          "meals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "description": "For create_nutrition_plan: optional top-level meals list in payload helpers."
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "description": "For patch_training_plan helpers: explicit event replacement payload for one day."
+          },
+          "slots": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "description": "For nutrition patch helpers: explicit slot payloads when the caller already works in slot form."
+          },
+          "week_template": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "For create_nutrition_plan: structured nutrition template object."
+          },
+          "meal_slots": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "description": "For create_nutrition_plan: optional alias for structured slot input."
+          },
+          "macro_targets": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "For create_nutrition_plan: optional kcal/p/c/f targets persisted into the created template's macro settings and day targets."
+          },
+          "target_kcal": {
+            "type": "number",
+            "description": "For create_nutrition_plan: optional day target kcal copied onto the created template's 7 day rows."
+          },
+          "target_p": {
+            "type": "number",
+            "description": "For create_nutrition_plan: optional day target protein copied onto the created template's 7 day rows."
+          },
+          "target_c": {
+            "type": "number",
+            "description": "For create_nutrition_plan: optional day target carbs copied onto the created template's 7 day rows."
+          },
+          "target_f": {
+            "type": "number",
+            "description": "For create_nutrition_plan: optional day target fat copied onto the created template's 7 day rows."
+          },
+          "logical_file": {
+            "type": "string"
+          },
+          "section": {
+            "type": "string"
+          },
+          "entry_id": {
+            "type": "string"
+          },
+          "memo_name": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string",
+            "description": "For domain=memory store commands, alias for text. If usememos is active, #gpt is auto-prepended when missing."
+          },
+          "text": {
+            "type": "string",
+            "description": "For domain=memory store commands, written to markdown memory or usememos. If usememos is active, GPT memos are automatically prefixed with #gpt."
+          },
+          "topic": {
+            "type": "string",
+            "description": "For domain=memory store commands, helps route markdown targets or enrich usememos tag prefixes."
+          },
+          "match_text": {
+            "type": "string",
+            "description": "For domain=memory update/remove/archive/mark_stale with usememos enabled: search text used only when no explicit memo id/name is provided."
+          },
+          "max_age_days": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 90,
+            "description": "For domain=memory command=cleanup_expired: TTL threshold in days for short-term #gpt memos."
+          },
+          "exact_text": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "expires_in_hours": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 168
+          },
+          "day": {
+            "type": "string"
+          },
+          "weekday": {
+            "type": "string"
+          },
+          "exercise": {
+            "type": "string"
+          },
+          "exercise_name": {
+            "type": "string"
+          },
+          "target_exercise": {
+            "type": "string"
+          },
+          "new_exercise": {},
+          "variation": {
+            "type": "string"
+          },
+          "new_variation": {
+            "type": "string"
+          },
+          "device": {
+            "type": "string"
+          },
+          "new_device": {
+            "type": "string"
+          },
+          "sets": {
+            "type": "integer"
+          },
+          "reps": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "min": {
+                "type": "integer"
+              },
+              "max": {
+                "type": "integer"
+              }
+            }
+          },
+          "rep_range": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "min": {
+                "type": "integer"
+              },
+              "max": {
+                "type": "integer"
+              }
+            }
+          },
+          "rpe": {},
+          "rpe_list": {
+            "type": "array",
+            "items": {}
+          },
+          "position": {
+            "type": "integer"
+          },
+          "workout_index": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "index": {
+            "type": "integer"
+          }
+        },
+        "x-domain-command-matrix": {
+          "access": [
+            "create_guest_key"
+          ],
+          "cardio": [
+            "create_cardio_session",
+            "create_run",
+            "delete_cardio_session",
+            "delete_run",
+            "edit_cardio_session",
+            "edit_run"
+          ],
+          "core": [
+            "build_board",
+            "clear_override",
+            "set_override"
+          ],
+          "endurance": [
+            "create_endurance_plan",
+            "patch_endurance_plan",
+            "set_execution_mode"
+          ],
+          "memory": [
+            "append_log_entry",
+            "append_section_note",
+            "apply_write_plan",
+            "archive",
+            "cleanup_expired",
+            "mark_stale",
+            "remove_entry",
+            "replace_section",
+            "store_fact",
+            "store_pattern",
+            "store_preference",
+            "update_entry"
+          ],
+          "nutrition": [
+            "activate_nutrition_plan",
+            "adjust_targets",
+            "archive_nutrition_plan",
+            "create_food",
+            "create_nutrition_plan",
+            "delete_logged_meal",
+            "delete_nutrition_plan",
+            "edit_logged_meal",
+            "log_planned_meal",
+            "patch_nutrition_plan",
+            "quick_log_meal",
+            "replace_nutrition_plan"
+          ],
+          "recovery": [
+            "annotate_day",
+            "set_alcohol_flag",
+            "set_sickness_flag",
+            "set_sleep_flag"
+          ],
+          "remote": [
+            "activate_scene",
+            "device_set_power",
+            "device_toggle",
+            "pc_action",
+            "set_brightness",
+            "set_color"
+          ],
+          "training": [
+            "activate_training_plan",
+            "add_exercise",
+            "archive_training_plan",
+            "change_rep_range",
+            "change_rpe",
+            "change_sets",
+            "change_variation",
+            "create_training_plan",
+            "delete_logged_workout",
+            "delete_training_plan",
+            "edit_logged_set",
+            "edit_logged_workout_exercise",
+            "log_gym_session",
+            "patch_training_plan",
+            "remove_exercise",
+            "reorder_exercise",
+            "replace_exercise",
+            "replace_training_plan",
+            "save_training_decision",
+            "update_exercise_target"
+          ],
+          "weight": [
+            "delete_weight",
+            "edit_weight",
+            "log_weight",
+            "setup_bodyweight_phase"
+          ]
+        }
+      },
+      "NutritionPlanPatchRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operations"
+        ],
+        "properties": {
+          "dry_run": {
+            "type": "boolean",
+            "description": "Use true for preview; use false only after confirmation."
+          },
+          "operations": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "op": {
+                  "type": "string",
+                  "description": "Operation name implemented by the selected plan domain."
+                },
+                "match": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "day": {
+                      "type": "string"
+                    },
+                    "day_index": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "meal_index": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "slot_index": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "workout_index": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "exercise_index": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "exercise_id": {
+                      "type": "string"
+                    },
+                    "canonical_id": {
+                      "type": "string"
+                    },
+                    "exercise": {
+                      "type": "string"
+                    },
+                    "exercise_path": {
+                      "type": "string"
+                    },
+                    "set_path": {
+                      "type": "string"
+                    },
+                    "slot_path": {
+                      "type": "string",
+                      "description": "Preferred stable nutrition slot address from the detail read."
+                    },
+                    "meal_path": {
+                      "type": "string"
+                    },
+                    "food_id": {
+                      "type": "integer"
+                    },
+                    "food_name": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "patch": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "replacement": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "food_id": {
+                      "type": "integer",
+                      "description": "Canonical nutrition_foods id for replace_slot_food."
+                    },
+                    "amount": {
+                      "type": "number"
+                    },
+                    "amount_g": {
+                      "type": "number"
+                    },
+                    "unit": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "canonical_id": {
+                      "type": "string"
+                    },
+                    "variation": {
+                      "type": "string"
+                    },
+                    "exercise_id": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "target": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "day_index": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "meal_index": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "slot_index": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                },
+                "food_id": {
+                  "type": "integer",
+                  "description": "Canonical nutrition_foods id for add_slot."
+                },
+                "amount": {},
+                "amount_g": {
+                  "type": "number"
+                },
+                "unit": {
+                  "type": "string"
+                },
+                "note": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "NutritionControlRequest": {
+        "type": "object",
+        "required": [
+          "command"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "command": {
+            "type": "string",
+            "enum": [
+              "activate_nutrition_plan",
+              "adjust_targets",
+              "archive_nutrition_plan",
+              "create_food",
+              "create_nutrition_plan",
+              "delete_logged_meal",
+              "delete_nutrition_plan",
+              "edit_logged_meal",
+              "log_planned_meal",
+              "patch_nutrition_plan",
+              "quick_log_meal",
+              "replace_nutrition_plan"
+            ]
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "log_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "logged_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "custom_logged_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "time": {
+            "type": "string",
+            "description": "Optional meal time hint, e.g. 21:00."
+          },
+          "query": {
+            "type": "string",
+            "description": "Text hint for resolving a planned meal, e.g. Reis Hähnchen."
+          },
+          "description": {
+            "type": "string",
+            "description": "Text hint for resolving a planned meal."
+          },
+          "text": {
+            "type": "string",
+            "description": "Text hint for resolving a planned meal."
+          },
+          "meal_id": {},
+          "logged_meal_id": {},
+          "id": {},
+          "meal_name": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "meal_slot": {
+            "type": "string"
+          },
+          "slot": {},
+          "meal": {
+            "description": "For log_planned_meal: meal number or label, e.g. 1 or Meal 1."
+          },
+          "meal_number": {
+            "type": "integer",
+            "description": "For log_planned_meal: 1-based planned meal number."
+          },
+          "slot_id": {
+            "description": "Planned meal slot id."
+          },
+          "planned_slot_id": {
+            "description": "Alias for slot_id."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NutritionMealItem"
+            },
+            "description": "Food items for quick_log_meal or edit_logged_meal."
+          },
+          "food_items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NutritionMealItem"
+            },
+            "description": "Alias item array."
+          },
+          "add": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NutritionMealItem"
+            },
+            "description": "Alias item array for edit_logged_meal append."
+          },
+          "append": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NutritionMealItem"
+            },
+            "description": "Alias item array for edit_logged_meal append."
+          },
+          "append_items": {
+            "type": "boolean",
+            "description": "For edit_logged_meal: append items instead of replacing the meal."
+          },
+          "add_items": {
+            "type": "boolean",
+            "description": "Alias for append_items."
+          },
+          "merge_items": {
+            "type": "boolean",
+            "description": "Alias for append_items."
+          },
+          "substitutions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NutritionMealSubstitution"
+            }
+          },
+          "substitution": {
+            "$ref": "#/components/schemas/NutritionMealSubstitution"
+          },
+          "all_planned": {
+            "type": "boolean",
+            "description": "For log_planned_meal: log all open planned meals for the date."
+          },
+          "all_meals": {
+            "type": "boolean",
+            "description": "Alias for all_planned."
+          },
+          "log_all": {
+            "type": "boolean",
+            "description": "Alias for all_planned."
+          },
+          "all": {
+            "type": "boolean",
+            "description": "Alias for all_planned."
+          },
+          "override_items": {
+            "type": "boolean",
+            "description": "For log_planned_meal only. False by default; planned items are used unless true."
+          },
+          "time_mode": {
+            "type": "string"
+          },
+          "custom_time_text": {
+            "type": "string"
+          },
+          "is_favorite": {
+            "type": "boolean"
+          },
+          "kcal": {
+            "type": "number"
+          },
+          "calories": {
+            "type": "number"
+          },
+          "protein": {
+            "type": "number"
+          },
+          "carbs": {
+            "type": "number"
+          },
+          "fat": {
+            "type": "number"
+          },
+          "sugar": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "NutritionMealSubstitution": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "old_food": {
+            "type": "string"
+          },
+          "from_food": {
+            "type": "string"
+          },
+          "replace": {
+            "type": "string"
+          },
+          "new_food": {
+            "type": "string"
+          },
+          "to_food": {
+            "type": "string"
+          },
+          "food": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "string"
+          }
+        }
+      },
+      "NutritionMealItem": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "food_id": {
+            "description": "Optional canonical food id."
+          },
+          "food_name": {
+            "type": "string",
+            "description": "Food name to resolve, e.g. Hähnchenbrust."
+          },
+          "food": {
+            "type": "string",
+            "description": "Alias for food_name."
+          },
+          "name": {
+            "type": "string",
+            "description": "Alias for food_name."
+          },
+          "amount": {
+            "description": "Amount, e.g. 70 or '300 ml'."
+          },
+          "qty": {
+            "description": "Alias for amount."
+          },
+          "quantity": {
+            "description": "Alias for amount."
+          },
+          "unit": {
+            "type": "string",
+            "description": "Unit such as g, ml, pcs or kcal."
+          },
+          "item_type": {
+            "type": "string",
+            "enum": [
+              "food",
+              "kcal_only"
+            ]
+          },
+          "kcal": {
+            "type": "number"
+          },
+          "calories": {
+            "type": "number"
+          },
+          "protein": {
+            "type": "number"
+          },
+          "carbs": {
+            "type": "number"
+          },
+          "fat": {
+            "type": "number"
+          },
+          "sugar": {
+            "type": "number"
+          }
+        }
+      },
+      "TrainingPlanPatchRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operations"
+        ],
+        "properties": {
+          "dry_run": {
+            "type": "boolean",
+            "description": "Use true for preview; use false only after confirmation."
+          },
+          "operations": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "op": {
+                  "type": "string",
+                  "description": "Operation name implemented by the selected plan domain."
+                },
+                "match": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "day": {
+                      "type": "string"
+                    },
+                    "day_index": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "meal_index": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "slot_index": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "workout_index": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "exercise_index": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "exercise_id": {
+                      "type": "string"
+                    },
+                    "canonical_id": {
+                      "type": "string"
+                    },
+                    "exercise": {
+                      "type": "string"
+                    },
+                    "exercise_path": {
+                      "type": "string"
+                    },
+                    "set_path": {
+                      "type": "string"
+                    },
+                    "slot_path": {
+                      "type": "string",
+                      "description": "Preferred stable nutrition slot address from the detail read."
+                    },
+                    "meal_path": {
+                      "type": "string"
+                    },
+                    "food_id": {
+                      "type": "integer"
+                    },
+                    "food_name": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "patch": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "replacement": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "food_id": {
+                      "type": "integer",
+                      "description": "Canonical nutrition_foods id for replace_slot_food."
+                    },
+                    "amount": {
+                      "type": "number"
+                    },
+                    "amount_g": {
+                      "type": "number"
+                    },
+                    "unit": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "canonical_id": {
+                      "type": "string"
+                    },
+                    "variation": {
+                      "type": "string"
+                    },
+                    "exercise_id": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "target": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "day_index": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "meal_index": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "slot_index": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                },
+                "food_id": {
+                  "type": "integer",
+                  "description": "Canonical nutrition_foods id for add_slot."
+                },
+                "amount": {},
+                "amount_g": {
+                  "type": "number"
+                },
+                "unit": {
+                  "type": "string"
+                },
+                "note": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "EditLoggedWorkoutExerciseRequest": {
+        "type": "object",
+        "required": [
+          "workout_id",
+          "exercise_index"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "workout_id": {
+            "type": "integer"
+          },
+          "exercise_index": {
+            "type": "integer"
+          },
+          "new_name": {
+            "type": "string"
+          },
+          "new_variation": {
+            "type": "string"
+          },
+          "canonical_id": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Authored exercise note. Send an empty string to clear it; automatic progression-exclusion context remains visible in canonical readback."
+          },
+          "note": {
+            "type": "string",
+            "description": "Alias for notes."
+          },
+          "new_notes": {
+            "type": "string",
+            "description": "Alias for notes."
+          },
+          "dry_run": {
+            "type": "boolean"
+          }
+        }
+      },
+      "TrainingAdjustRequest": {
+        "type": "object",
+        "required": [
+          "command"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "command": {
+            "type": "string",
+            "enum": [
+              "log_gym_session"
+            ]
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "date_iso": {
+            "type": "string",
+            "format": "date"
+          },
+          "session_name": {
+            "type": "string",
+            "description": "Workout/session name, e.g. Push or Pull."
+          },
+          "name": {
+            "type": "string",
+            "description": "Alias for session_name."
+          },
+          "day_type": {
+            "type": "string",
+            "description": "Alias for session_name."
+          },
+          "raw_text": {
+            "type": "string",
+            "description": "Raw line-preserving OCR/plain text. Do not normalize sets; LIVA parses forms like Flys: 1. 9x72,8 2. 9x65,8."
+          },
+          "ocr_text": {
+            "type": "string",
+            "description": "Alias for raw_text."
+          },
+          "text": {
+            "type": "string",
+            "description": "Alias for raw_text."
+          },
+          "content": {
+            "type": "string",
+            "description": "Alias for raw_text."
+          },
+          "exercises": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrainingExerciseInput"
+            }
+          },
+          "notes": {
+            "type": "string"
+          },
+          "dry_run": {
+            "type": "boolean",
+            "description": "Use true first for GPT preview flows. Only use false after the user confirms the parsed session."
+          },
+          "source_message": {
+            "type": "string",
+            "description": "Optional user hint such as 'Foto vom Notizbuch loggen'."
+          },
+          "plan_id": {},
+          "template_id": {},
+          "session_key": {
+            "type": "string"
+          }
+        }
+      },
+      "TrainingExerciseInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "exercise_name": {
+            "type": "string"
+          },
+          "variation": {
+            "type": "string"
+          },
+          "variation_user_locked": {
+            "type": "boolean",
+            "description": "True only when the athlete explicitly confirmed the variant. Otherwise false so LIVA can resolve it from plan and weight history."
+          },
+          "notes": {
+            "type": "string"
+          },
+          "progression_excluded": {
+            "type": "boolean",
+            "description": "Exclude every set of this exercise from the current progression quote/comparison."
+          },
+          "progression_exclusion_reason": {
+            "type": "string",
+            "maxLength": 240,
+            "description": "Required when the exercise is excluded; inherited by all its sets."
+          },
+          "sets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrainingSetInput"
+            }
+          }
+        }
+      },
+      "TrainingSetInput": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reps": {},
+          "weight": {},
+          "rpe": {
+            "description": "Actual RPE for this set. Send it per set when known; if omitted, the set is stored with rpe=null and the write response reports missing_rpe/incomplete_fields."
+          },
+          "set_number": {
+            "type": "integer"
+          },
+          "raw_token": {
+            "type": "string"
+          },
+          "progression_excluded": {
+            "type": "boolean",
+            "description": "Exclude only this set from the current progression quote/comparison."
+          },
+          "progression_exclusion_reason": {
+            "type": "string",
+            "maxLength": 240,
+            "description": "Required when progression_excluded=true, e.g. Technik geändert or anderer Seilzug."
+          }
+        }
+      },
+      "CoreBoardBuildRequest": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "day_iso": {
+            "type": "string",
+            "format": "date"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "gpt_fast",
+              "full"
+            ],
+            "description": "Use gpt_fast for morning check-ins when GPT only needs a compact confirmation response."
+          },
+          "fast": {
+            "type": "boolean",
+            "description": "Alias for mode='gpt_fast'."
+          },
+          "memory_mode": {
+            "type": "string",
+            "enum": [
+              "skip",
+              "sync"
+            ],
+            "description": "For gpt_fast, defaults to 'skip' so memory building does not block the response. Use 'sync' to force the legacy synchronous memory build."
+          },
+          "debug_timing": {
+            "type": "boolean",
+            "description": "Include compact timing measurements in the response."
+          },
+          "source": {
+            "type": "string",
+            "default": "gpt_checkin"
+          },
+          "trigger": {
+            "type": "string",
+            "description": "Short machine trigger, e.g. weight_hrv_checkin."
+          },
+          "source_message": {
+            "type": "string",
+            "description": "The athlete's raw check-in sentence or GPT-visible prompt context."
+          },
+          "message": {
+            "type": "string",
+            "description": "Alias for source_message."
+          },
+          "human_headline": {
+            "type": "string",
+            "description": "Short human-facing decision headline."
+          },
+          "human_summary": {
+            "type": "string",
+            "description": "Short human-facing why text."
+          },
+          "decision_intent": {
+            "type": "string",
+            "enum": [
+              "full_send",
+              "train_normal",
+              "train_controlled",
+              "reduce_volume",
+              "technique_only",
+              "recovery_only",
+              "hard_stop",
+              "unknown"
+            ]
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "machine_briefing": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "briefing": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "visible_reasons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "training_card": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Optional GPT-authored training-card hints that get stored on the CORE Board and can seed the persisted CORE Training-Card. May include title, summary, items and today_changed_lines.",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "session_type": {
+                "type": "string"
+              },
+              "session_label": {
+                "type": "string"
+              },
+              "decision_intent": {
+                "type": "string"
+              },
+              "today_changed_lines": {
+                "type": "array",
+                "maxItems": 3,
+                "items": {
+                  "type": "string"
+                },
+                "description": "Short, concrete day-specific change lines written by GPT for the visible CORE-Prognose. Use this instead of generic mode text whenever concrete signals exist."
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "data_status": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "legacy_core": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "build_training_card": {
+            "type": "boolean"
+          },
+          "force_training_card": {
+            "type": "boolean"
+          },
+          "memory_candidates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "timeframe": {
+                  "type": "string",
+                  "enum": [
+                    "today",
+                    "week",
+                    "phase",
+                    "year",
+                    "global"
+                  ]
+                },
+                "category": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "confidence": {
+                  "type": "number"
+                },
+                "evidence": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "write_policy": {
+                  "type": "string",
+                  "enum": [
+                    "auto_log",
+                    "candidate",
+                    "manual_review",
+                    "never_auto"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "OkResponse": {
+        "type": "object",
+        "required": [
+          "ok"
+        ],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "data_status": {
+            "type": "string"
+          },
+          "resolution": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Resolution"
+            }
+          },
+          "execution": {
+            "$ref": "#/components/schemas/Execution"
+          }
+        },
+        "additionalProperties": true
+      },
+      "Resolution": {
+        "type": "object",
+        "properties": {
+          "requested": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "resolved",
+              "ambiguous_resolved",
+              "unresolved"
+            ]
+          },
+          "resolved_to": {
+            "properties": {
+              "exercise_key": {
+                "type": "string"
+              },
+              "display_name": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "variation": {},
+              "device": {},
+              "laterality": {}
+            },
+            "additionalProperties": true
+          },
+          "match_type": {},
+          "alternatives": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        "additionalProperties": true
+      },
+      "Execution": {
+        "type": "object",
+        "required": [
+          "mode",
+          "live_state_changed",
+          "affected_resources"
+        ],
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "applied_live",
+              "applied_sidecar",
+              "logged_only",
+              "dry_run",
+              "no_change",
+              "write"
+            ]
+          },
+          "live_state_changed": {
+            "type": "boolean"
+          },
+          "affected_resources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

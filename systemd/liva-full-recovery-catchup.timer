@@ -1,0 +1,10 @@
+[Unit]
+Description=Evaluate LIVA full recovery catch-up every 30 minutes
+
+[Timer]
+OnCalendar=*-*-* *:00,30:00
+Persistent=true
+Unit=liva-full-recovery-catchup.service
+
+[Install]
+WantedBy=timers.target

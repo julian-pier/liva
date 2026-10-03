@@ -1,0 +1,17 @@
+[Unit]
+Description=LIVA encrypted full recovery backup
+Documentation=file:///opt/liva/config/full-recovery.toml.example
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/liva
+ExecStart=/opt/liva/.venv/bin/python -m recovery.automation backup --config /etc/liva/recovery/config.toml --target /mnt/liva-recovery/backups/full-recovery
+Nice=10
+IOSchedulingClass=best-effort
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=read-only
+ReadWritePaths=/mnt/liva-recovery /var/lib/liva-recovery /opt/liva/database

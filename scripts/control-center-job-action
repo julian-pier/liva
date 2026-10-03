@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Root-owned, deliberately tiny broker for the Control Center job registry.
+set -euo pipefail
+
+[[ $# -eq 2 ]] || { echo "invalid action request" >&2; exit 64; }
+job_id="$1"
+action="$2"
+
+case "$job_id:$action" in
+  full-recovery:run) unit="liva-full-recovery.service"; verb=start ;;
+  full-recovery:pause) unit="liva-full-recovery.timer"; verb=disable-now ;;
+  full-recovery:resume) unit="liva-full-recovery.timer"; verb=enable-now ;;
+  full-recovery-catchup:run) unit="liva-full-recovery-catchup.service"; verb=start ;;
+  full-recovery-catchup:pause) unit="liva-full-recovery-catchup.timer"; verb=disable-now ;;
+  full-recovery-catchup:resume) unit="liva-full-recovery-catchup.timer"; verb=enable-now ;;
+  daily-sqlite-backup:run) unit="liva-daily-backup.service"; verb=start ;;
+  daily-sqlite-backup:pause) unit="liva-daily-backup.timer"; verb=disable-now ;;
+  daily-sqlite-backup:resume) unit="liva-daily-backup.timer"; verb=enable-now ;;
+  legacy-db-tar:run) unit="liva-db-backup.service"; verb=start ;;
+  legacy-db-tar:pause) unit="liva-db-backup.timer"; verb=disable-now ;;
+  legacy-db-tar:resume) unit="liva-db-backup.timer"; verb=enable-now ;;
+  endurance-intervals:run) unit="liva-endurance-intervals-sync.service"; verb=start ;;
+  endurance-intervals:pause) unit="liva-endurance-intervals-sync.timer"; verb=disable-now ;;
+  endurance-intervals:resume) unit="liva-endurance-intervals-sync.timer"; verb=enable-now ;;
+  garmin-sync:run) unit="liva-garmin-sync.service"; verb=start ;;
+  garmin-sync:pause) unit="liva-garmin-sync.timer"; verb=disable-now ;;
+  garmin-sync:resume) unit="liva-garmin-sync.timer"; verb=enable-now ;;
+  polar-sync:run) unit="liva-polar-smart-sync.service"; verb=start ;;
+  polar-sync:pause) unit="liva-polar-smart-sync.timer"; verb=disable-now ;;
+  polar-sync:resume) unit="liva-polar-smart-sync.timer"; verb=enable-now ;;
+  telegram-inbox:run) unit="liva-telegram-inbox.service"; verb=start ;;
+  telegram-inbox:pause) unit="liva-telegram-inbox.timer"; verb=disable-now ;;
+  telegram-inbox:resume) unit="liva-telegram-inbox.timer"; verb=enable-now ;;
+  system-telegram-watch:run) unit="liva-system-telegram-watch.service"; verb=start ;;
+  system-telegram-watch:pause) unit="liva-system-telegram-watch.timer"; verb=disable-now ;;
+  system-telegram-watch:resume) unit="liva-system-telegram-watch.timer"; verb=enable-now ;;
+  liva-watchdog:run) unit="liva-watchdog.service"; verb=start ;;
+  liva-watchdog:pause) unit="liva-watchdog.timer"; verb=disable-now ;;
+  liva-watchdog:resume) unit="liva-watchdog.timer"; verb=enable-now ;;
+  availability-watchdog:run) unit="liva-availability-watchdog.service"; verb=start ;;
+  availability-watchdog:pause) unit="liva-availability-watchdog.timer"; verb=disable-now ;;
+  availability-watchdog:resume) unit="liva-availability-watchdog.timer"; verb=enable-now ;;
+  webuntis:run) unit="liva-webuntis-update-watch.service"; verb=start ;;
+  webuntis:pause) unit="liva-webuntis-update-watch.timer"; verb=disable-now ;;
+  webuntis:resume) unit="liva-webuntis-update-watch.timer"; verb=enable-now ;;
+  training-calendar:run) unit="liva-training-calendar-sync.service"; verb=start ;;
+  training-calendar:pause) unit="liva-training-calendar-sync.timer"; verb=disable-now ;;
+  training-calendar:resume) unit="liva-training-calendar-sync.timer"; verb=enable-now ;;
+  control-center-collector:run) unit="liva-control-center-collector.service"; verb=start ;;
+  control-center-collector:pause) unit="liva-control-center-collector.timer"; verb=disable-now ;;
+  control-center-collector:resume) unit="liva-control-center-collector.timer"; verb=enable-now ;;
+  core-liva:restart) unit="liva.service"; verb=restart ;;
+  core-liva-mcp:restart) unit="liva-mcp-remote.service"; verb=restart ;;
+  *) echo "action is not allowlisted" >&2; exit 64 ;;
+esac
+
+case "$verb" in
+  start) exec /bin/systemctl start "$unit" ;;
+  disable-now) exec /bin/systemctl disable --now "$unit" ;;
+  enable-now) exec /bin/systemctl enable --now "$unit" ;;
+  restart) exec /bin/systemctl restart "$unit" ;;
+esac

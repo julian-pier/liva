@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% block title %}CORE{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/core.css') }}?v=20260301_control_room_v9">
+{% endblock %}
+{% block content %}
+<div class="core-room-page layout-shell" data-core-key="{{ core_key or '' }}">
+    <header class="core-room-hero">
+        <div>
+            <div class="core-room-kicker">CORE</div>
+            <h1>Control Room</h1>
+            <p>Memory Library, Decisions und Health auf einen Blick. Klar, steuerbar, ohne Blackbox.</p>
+        </div>
+        <div class="core-room-hero-meta">
+            <div class="core-room-meta-label">Stand</div>
+            <div class="core-room-meta-value" id="core-generated-at">-</div>
+            <a class="primary-btn" id="core-lab-start-btn" href="{{ url_for('core_training_bp.core_training_cards_page') }}">CORE Training</a>
+        </div>
+    </header>
+
+    <section class="core-room-tabs" aria-label="CORE Fokus">
+        <button type="button" class="core-tab is-active" data-core-focus="heute">Heute</button>
+        <button type="button" class="core-tab" data-core-focus="entscheidungen">Decisions</button>
+        <button type="button" class="core-tab" data-core-focus="memory">Memory</button>
+        <button type="button" class="core-tab" data-core-focus="health">Health</button>
+    </section>
+
+    <div class="core-room-shell" id="core-room-shell">
+        <section class="core-room-main">
+            <section class="core-room-layout">
+                <aside class="core-room-column core-room-left">
+                    <article class="core-room-panel core-status-card" id="core-status-panel">
+                        <div class="core-panel-head">
+                            <div>
+                                <div class="core-panel-eyebrow">Status</div>
+                                <div class="core-panel-title">CORE Status</div>
+                            </div>
+                            <button type="button" class="core-inline-link" id="core-open-heute">Heute öffnen</button>
+                        </div>
+                        <div class="core-status-main">
+                            <div class="core-status-pill" id="core-status-pill">-</div>
+                            <div class="core-status-plan" id="core-status-plan">-</div>
+                        </div>
+                        <div class="core-status-grid">
+                            <div class="core-kv">
+                                <span>CORE greift ein?</span>
+                                <b id="core-status-intervening">-</b>
+                            </div>
+                            <div class="core-kv">
+                                <span>Datenlage</span>
+                                <b id="core-status-data-quality">-</b>
+                            </div>
+                        </div>
+                        <div class="core-reason-list" id="core-status-why"></div>
+                    </article>
+
+                    <article class="core-room-panel core-health-card" id="core-health-panel">
+                        <div class="core-panel-head">
+                            <div>
+                                <div class="core-panel-eyebrow">Health</div>
+                                <div class="core-panel-title">Health & Datenlage</div>
+                            </div>
+                        </div>
+                        <div class="core-health-bars" id="core-health-bars"></div>
+                        <div class="core-health-metrics" id="core-health-metrics"></div>
+                        <div class="core-health-note" id="core-health-note"></div>
+                        <div class="core-health-principles" id="core-health-principles"></div>
+                    </article>
+                </aside>
+
+                <section class="core-room-column core-room-center">
+                    <article class="core-room-panel core-today-card" id="core-today-panel">
+                        <div class="core-panel-head">
+                            <div>
+                                <div class="core-panel-eyebrow">Heute</div>
+                                <div class="core-panel-title">Was gilt heute?</div>
+                            </div>
+                        </div>
+                        <div class="core-decision-structure" id="core-today-structure">
+                            <section class="core-decision-block">
+                                <div class="core-decision-label">Problem</div>
+                                <div class="core-decision-value is-problem" id="core-today-problem">-</div>
+                            </section>
+                            <section class="core-decision-block">
+                                <div class="core-decision-label">Heute gilt</div>
+                                <div class="core-decision-value is-decision" id="core-today-decision">-</div>
+                                <div class="core-rule-list" id="core-today-rules"></div>
+                            </section>
+                            <section class="core-decision-block">
+                                <div class="core-decision-label">Warum</div>
+                                <div class="core-decision-copy" id="core-today-why">-</div>
+                            </section>
+                            <section class="core-decision-block">
+                                <div class="core-decision-label">Genutzte Erkenntnisse</div>
+                                <div class="core-chip-row" id="core-today-memory"></div>
+                            </section>
+                            <section class="core-decision-block">
+                                <div class="core-decision-label">Neubewertung</div>
+                                <div class="core-decision-value" id="core-today-check">-</div>
+                            </section>
+                        </div>
+                    </article>
+
+                    <article class="core-room-panel core-decisions-card" id="core-decisions-panel">
+                        <div class="core-panel-head">
+                            <div>
+                                <div class="core-panel-eyebrow">Verlauf</div>
+                                <div class="core-panel-title">Decisions</div>
+                            </div>
+                        </div>
+                        <div class="core-filter-grid">
+                            <div class="core-control-group">
+                                <span>Zeitraum</span>
+                                <div class="core-segmented" id="core-filter-range">
+                                    <button type="button" class="core-segment is-active" data-range="7">7T</button>
+                                    <button type="button" class="core-segment" data-range="30">30T</button>
+                                    <button type="button" class="core-segment" data-range="90">90T</button>
+                                    <button type="button" class="core-segment" data-range="3650">Alle</button>
+                                </div>
+                            </div>
+                            <div class="core-control-group">
+                                <span>Typ</span>
+                                <div class="core-chip-controls" id="core-filter-type">
+                                    <button type="button" class="core-toggle-chip is-active" data-type="Training">Training</button>
+                                    <button type="button" class="core-toggle-chip is-active" data-type="Run">Run</button>
+                                    <button type="button" class="core-toggle-chip is-active" data-type="Recovery">Recovery</button>
+                                    <button type="button" class="core-toggle-chip is-active" data-type="Nutrition">Ernährung</button>
+                                    <button type="button" class="core-toggle-chip is-active" data-type="System">System</button>
+                                </div>
+                            </div>
+                            <div class="core-control-group">
+                                <span>Schwere</span>
+                                <div class="core-chip-controls" id="core-filter-severity">
+                                    <button type="button" class="core-toggle-chip is-active" data-severity="Daily micro">Daily</button>
+                                    <button type="button" class="core-toggle-chip is-active" data-severity="Major">Major</button>
+                                </div>
+                            </div>
+                            <div class="core-control-group">
+                                <span>Flags</span>
+                                <div class="core-chip-controls">
+                                    <button type="button" class="core-toggle-chip" id="core-filter-memory-only">nur Memory</button>
+                                    <button type="button" class="core-toggle-chip" id="core-filter-override-only">nur Override</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="core-decision-list" id="core-decision-list"></div>
+                    </article>
+                </section>
+
+                <aside class="core-room-column core-room-right">
+                    <article class="core-room-panel core-memory-card" id="core-memory-panel">
+                        <div class="core-panel-head">
+                            <div>
+                                <div class="core-panel-eyebrow">Memory</div>
+                                <div class="core-panel-title">Memory Library</div>
+                            </div>
+                        </div>
+                        <div class="core-memory-toolbar">
+                            <input id="core-memory-search" type="search" placeholder="Titel oder Typ durchsuchen">
+                            <select id="core-memory-type">
+                                <option value="all">Alle Typen</option>
+                                <option value="Principle">Prinzip</option>
+                                <option value="Exercise">Übung</option>
+                                <option value="Response">Reaktion</option>
+                                <option value="Pairing">Pairing</option>
+                                <option value="Compliance">Compliance</option>
+                            </select>
+                            <select id="core-memory-sort">
+                                <option value="confidence">Confidence</option>
+                                <option value="updated">Zuletzt aktualisiert</option>
+                                <option value="impact">Impact</option>
+                            </select>
+                            <div class="core-chip-controls">
+                                <button type="button" class="core-toggle-chip" id="core-memory-active-only">nur aktive</button>
+                                <button type="button" class="core-toggle-chip" id="core-memory-impact-only">nur genutzt</button>
+                            </div>
+                        </div>
+                        <div class="core-memory-list" id="core-memory-list"></div>
+                    </article>
+                </aside>
+            </section>
+        </section>
+
+        <aside class="core-memory-sidebar is-hidden" id="core-memory-sidebar" aria-hidden="true">
+            <div class="core-memory-sidebar-panel">
+                <div class="core-panel-head">
+                    <div>
+                        <div class="core-panel-eyebrow" id="core-drawer-type">Memory</div>
+                        <div class="core-panel-title" id="core-drawer-title">-</div>
+                    </div>
+                    <button type="button" class="core-sidebar-close" id="core-drawer-close" aria-label="Sidebar schließen">×</button>
+                </div>
+                <div class="core-drawer-meta" id="core-drawer-meta"></div>
+                <div class="core-drawer-section">
+                    <div class="core-drawer-label">Warum CORE das glaubt</div>
+                    <div class="core-drawer-copy" id="core-drawer-why"></div>
+                </div>
+                <div class="core-drawer-section">
+                    <div class="core-drawer-label">Scope</div>
+                    <div class="core-drawer-copy" id="core-drawer-scope"></div>
+                </div>
+                <div class="core-drawer-section">
+                    <div class="core-drawer-label">Action</div>
+                    <div class="core-drawer-copy" id="core-drawer-action"></div>
+                </div>
+                <div class="core-drawer-section">
+                    <div class="core-drawer-label">Evidence</div>
+                    <div class="core-chip-row" id="core-drawer-evidence"></div>
+                </div>
+                <div class="core-drawer-section">
+                    <div class="core-drawer-label">Wird genutzt in</div>
+                    <button type="button" class="core-inline-link core-impact-link" id="core-drawer-impact-link">0 Decisions anzeigen</button>
+                </div>
+                <div class="core-drawer-actions">
+                    <button type="button" class="core-memory-action is-primary" data-memory-action="testing">Testen (2 Wochen)</button>
+                    <button type="button" class="core-memory-action is-secondary" data-memory-action="always">Immer beachten</button>
+                    <button type="button" class="core-memory-action is-tertiary" data-memory-action="ignored">Ignorieren</button>
+                    <button type="button" class="core-memory-action is-tertiary" data-memory-action="archived">Archivieren</button>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script id="core-bootstrap" type="application/json">{{ core_bootstrap|tojson }}</script>
+<script defer src="{{ url_for('static', filename='js/core.js') }}?v=20260301_control_room_v10"></script>
+{% endblock %}

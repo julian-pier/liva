@@ -1,0 +1,16 @@
+[Unit]
+Description=LIVA direct Garmin Connect activity sync
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=/var/lib/liva/.config/liva/garmin/garmin_tokens.json
+
+[Service]
+Type=oneshot
+User=liva
+WorkingDirectory=/opt/liva
+EnvironmentFile=-/etc/liva.env
+ExecStart=/opt/liva/venv/bin/python -m jobs.garmin_sync
+Nice=10
+
+[Install]
+WantedBy=multi-user.target

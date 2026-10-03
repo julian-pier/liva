@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "LIVA Activity Browser Context",
+  "version": "0.4.0",
+  "description": "Sends only the focused tab domain and title to the local LIVA Activity agent.",
+  "permissions": ["tabs", "storage", "alarms"],
+  "host_permissions": ["http://127.0.0.1/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_page": "options.html",
+  "action": {
+    "default_title": "LIVA Activity"
+  },
+  "content_scripts": [{
+    "matches": [
+      "*://*.youtube.com/*", "*://*.youtu.be/*", "*://*.twitch.tv/*",
+      "*://*.netflix.com/*", "*://*.primevideo.com/*", "*://*.amazon.de/*",
+      "*://*.disneyplus.com/*", "*://*.joyn.de/*", "*://*.rtlplus.de/*",
+      "*://*.dazn.com/*", "*://*.spotify.com/*", "*://*.soundcloud.com/*",
+      "*://*.vimeo.com/*", "*://*.ardmediathek.de/*", "*://*.zdf.de/*"
+    ],
+    "js": ["media_state.js"],
+    "run_at": "document_idle"
+  }]
+}

@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Cardio{% endblock %}
+{% block head %}
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="cardio-page page-container liva-subpage-shell" id="cardio-app">
+  <header class="cardio-topbar liva-subpage-hero">
+    <div class="cardio-title-block liva-subpage-hero-copy">
+      <p class="liva-subpage-kicker">Ausdauer</p>
+      <div class="dashboard-title liva-subpage-title">Cardio</div>
+      <div class="cardio-subtitle liva-subpage-subtitle">Laufen, Ergo und Stair Master, geführt über Minuten, Puls und Verlauf.</div>
+    </div>
+    <section class="cardio-controls liva-subpage-actions" aria-label="Cardio Filter">
+      <button type="button" class="primary-button cardio-sync-button" id="cardio-sync" title="Neue Aktivitaeten direkt von Garmin Connect abrufen">Garmin synchronisieren</button>
+      <label><span>Zeitraum</span><select id="cardio-range" class="select"><option value="7">7 Tage</option><option value="30">30 Tage</option><option value="90">90 Tage</option><option value="365">Jahr</option><option value="all" selected>Alle</option></select></label>
+      <label><span>Modus</span><select id="cardio-sport" class="select"><option value="all" selected>Alle</option><option value="run">Laufen</option><option value="ergo">Ergo</option><option value="stair">Stair Master</option></select></label>
+      <label><span>Ansicht</span><select id="cardio-data-mode" class="select"><option value="minutes" selected>Minuten</option><option value="hr">Herzfrequenz</option></select></label>
+    </section>
+  </header>
+
+  <div class="cardio-error" id="cardio-error"></div>
+
+  <section class="cardio-ribbon" aria-label="Cardio Kennzahlen">
+    <article class="cardio-ribbon-item is-primary" id="cardio-kpi-primary">
+      <span class="cardio-kpi-label" id="cardio-primary-label">Aktive Minuten</span>
+      <strong id="cardio-load-total">--</strong>
+      <small id="cardio-primary-sub"><span id="cardio-load-week">--</span> / Woche · <span id="cardio-load-compare">--</span></small>
+    </article>
+    <article class="cardio-ribbon-item">
+      <span class="cardio-kpi-label">Aktive Minuten</span>
+      <strong id="cardio-active-total">--</strong>
+      <small>Ø <span id="cardio-avg-duration">--</span> · längste <span id="cardio-longest">--</span></small>
+    </article>
+    <article class="cardio-ribbon-item">
+      <span class="cardio-kpi-label">Sessions</span>
+      <strong id="cardio-session-count">--</strong>
+      <small><span id="cardio-sessions-week">--</span> / Woche · <span id="cardio-active-days">--</span> aktive Tage</small>
+    </article>
+    <article class="cardio-ribbon-item">
+      <span class="cardio-kpi-label">Z2-Zeit</span>
+      <strong id="cardio-z2-total">--</strong>
+      <small><span id="cardio-z2-share">--</span> Gesamtzeit</small>
+      <div class="cardio-mini-split" id="cardio-intensity-bars"></div>
+    </article>
+    <article class="cardio-ribbon-item cardio-last">
+      <span class="cardio-kpi-label">Letzte Einheit</span>
+      <div class="cardio-last-head"><strong id="cardio-last-title">--</strong><small id="cardio-last-meta">--</small></div>
+      <div class="cardio-last-details" id="cardio-last-details"></div>
+    </article>
+  </section>
+
+  <section class="cardio-analysis-grid">
+    <article class="dashboard-card cardio-main-chart">
+      <div class="cardio-card-toolbar">
+        <div>
+        <div class="card-title" id="cardio-weekly-title">Minuten pro Woche</div>
+          <div class="cardio-chart-note" id="cardio-weekly-note">Gestapelt nach Laufen und Indoor Cardio.</div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="cardio-weekly-chart"></canvas></div>
+    </article>
+    <aside class="cardio-side-analysis">
+      <article class="dashboard-card cardio-structure-card">
+        <div class="card-title">Pulszonen</div>
+        <div class="cardio-zone-summary" id="cardio-intensity-list"></div>
+      </article>
+    </aside>
+  </section>
+
+  <section class="dashboard-card cardio-performance-card">
+    <div class="cardio-card-toolbar">
+      <div>
+        <div class="card-title">Leistungsentwicklung</div>
+        <div class="cardio-chart-note" id="cardio-performance-note"></div>
+      </div>
+      <div class="cardio-performance-tabs" id="cardio-performance-tabs"></div>
+    </div>
+    <div class="cardio-performance-layout">
+      <div class="chart-wrap"><canvas id="cardio-performance-chart"></canvas></div>
+      <div class="cardio-performance-facts" id="cardio-performance-facts"></div>
+    </div>
+  </section>
+
+  <section class="cardio-detail-block">
+    <div class="cardio-section-title">Laufen / Indoor Cardio</div>
+    <div class="cardio-sport-summary" id="cardio-sport-summary"></div>
+  </section>
+
+  <section class="dashboard-card cardio-table-card">
+    <div class="card-head">
+      <div>
+        <div class="card-title">Cardio Sessions</div>
+        <div class="cardio-table-meta" id="cardio-table-meta">--</div>
+      </div>
+      <button type="button" class="primary-button" id="cardio-add">+ Neue Zeile</button>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table cardio-table">
+        <thead><tr id="cardio-table-head"></tr></thead>
+        <tbody id="cardio-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script defer src="{{ url_for('static', filename='js/cardio.js') }}?v=20260907_garmin_sync"></script>
+{% endblock %}

@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools==80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "liva-mcp-controlled"
+version = "0.6.0"
+description = "Controlled MCP facade for LIVA"
+requires-python = ">=3.11"
+dependencies = [
+    "argon2-cffi==25.1.0",
+    "mcp==1.28.1",
+    "PyJWT[crypto]==2.13.0",
+]
+
+[project.scripts]
+liva-mcp-readonly = "liva_mcp.server:main"
+liva-mcp-remote = "liva_mcp.remote_server:main"
+liva-mcp-generate-remote-config = "liva_mcp.remote_setup:main"
+liva-mcp-dcr-admin = "liva_mcp.dcr_admin:main"
+liva-mcp-memory-audit = "liva_mcp.memory_audit:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.package-data]
+liva_mcp = ["agent_policy.md"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

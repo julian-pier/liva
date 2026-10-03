@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="de" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LIVA Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="private-access-wrapper" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <form method="POST" class="settings-card" style="width:100%;max-width:460px;">
+      <h2 style="margin-top:0;">Login</h2>
+      <p class="settings-text">Access Key (read-only) oder Master (full access).</p>
+      {% if error %}
+      <div class="export-error" style="display:block;">{{ error }}</div>
+      {% endif %}
+      <input type="hidden" name="next" value="{{ next_url }}">
+
+      <label class="export-field" style="display:block;margin-top:10px;">
+        <span>Access Key</span>
+        <input type="password" name="access_key" autocomplete="off">
+      </label>
+
+      <label class="export-field" style="display:block;margin-top:10px;">
+        <span>Master Secret</span>
+        <input type="password" name="master_secret" autocomplete="off">
+      </label>
+
+      <label class="export-field" style="display:block;margin-top:10px;">
+        <span>Access Token (optional)</span>
+        <input type="password" name="access_token" autocomplete="off">
+      </label>
+
+      <div class="export-actions" style="margin-top:14px;">
+        <button type="submit" class="primary-btn">Login</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

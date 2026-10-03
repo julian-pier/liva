@@ -1,0 +1,168 @@
+/* LIVA UI foundation: shared rhythm, sizing and responsive shell. */
+:root {
+  --background: #e7ecf2;
+  --foreground: #18212f;
+  --card: #f3f7fb;
+  --popover: #ffffff;
+  --muted: #dfe6ee;
+  --muted-foreground: #6d7b90;
+  --primary: #126a9b;
+  --border: rgba(24, 33, 47, 0.13);
+  --status-good: #087f5b;
+  --status-warn: #9a6700;
+  --status-bad: #c43d45;
+  --chart-1: #087f5b;
+  --chart-2: #9a6700;
+  --chart-3: #c43d45;
+  --chart-4: #126a9b;
+  --chart-5: #6d7b90;
+  --card-shadow: 0 8px 24px rgba(30, 43, 58, 0.06);
+  --th-space-1: 0.25rem;
+  --th-space-2: 0.5rem;
+  --th-space-3: 0.75rem;
+  --th-space-4: 1rem;
+  --th-space-5: 1.25rem;
+  --th-space-6: 1.5rem;
+  --th-space-8: 2rem;
+  --th-space-10: 2.5rem;
+  --th-page-gutter: clamp(0.75rem, 2.4vw, 2rem);
+  --th-page-block: clamp(1rem, 2.2vw, 2rem);
+  --th-content-max: 90rem;
+  --th-radius-sm: 0.625rem;
+  --th-radius-md: 0.875rem;
+  --th-radius-lg: 1.125rem;
+  --th-control-min: 2.5rem;
+  --th-motion-fast: 140ms;
+  --th-motion-normal: 200ms;
+  --th-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html.dark {
+  --background: #0e1013;
+  --foreground: #e7e9ee;
+  --card: #1a1d22;
+  --popover: #1f2329;
+  --muted: #252a31;
+  --muted-foreground: #a1a7b3;
+  --primary: #80cdf7;
+  --border: rgba(231, 233, 238, 0.1);
+  --status-good: #2ce4aa;
+  --status-warn: #ffd25a;
+  --status-bad: #ef7378;
+  --chart-1: #2ce4aa;
+  --chart-2: #ffd25a;
+  --chart-3: #ef7378;
+  --chart-4: #80cdf7;
+  --chart-5: #a1a7b3;
+  --card-shadow: none;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  text-rendering: optimizeLegibility;
+}
+
+.app-page-shell {
+  width: 100%;
+  max-width: var(--th-content-max);
+  margin-inline: auto;
+  padding-inline: var(--th-page-gutter);
+}
+
+.page-container {
+  padding-block: var(--th-page-block);
+}
+
+@media (min-width: 64rem) {
+  .main-content {
+    scrollbar-gutter: stable;
+  }
+}
+
+@media (max-width: 39.999rem) {
+  :root {
+    --th-page-gutter: 0.75rem;
+    --th-page-block: 0.875rem;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: max(1rem, 16px);
+  }
+
+  /*
+   * iOS Safari zooms the visual viewport when a form control is smaller than
+   * 16px. Keep the native control size at the platform minimum; individual
+   * screens may still use a smaller surrounding label or helper text.
+   */
+  input,
+  select,
+  textarea,
+  button,
+  a,
+  summary,
+  [role="button"],
+  [role="tab"],
+  [role="menuitem"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button,
+  a[href],
+  summary,
+  [role="button"],
+  [role="tab"],
+  [role="menuitem"],
+  label[for] {
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+  }
+
+  /* LIVA is an app shell: ordinary labels, values and card copy should not
+   * become a text-selection target during a press gesture. Explicit content
+   * that benefits from copying can opt back in with data-selectable. */
+  body.has-mobile-dock :is(.app-page-shell, dialog) {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Text entry remains fully selectable for editing and copy/paste. */
+  input,
+  textarea,
+  [contenteditable="true"],
+  [data-selectable],
+  pre,
+  code {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  @media (hover: none) {
+    button:hover,
+    a[href]:hover,
+    summary:hover,
+    [role="button"]:hover,
+    [role="tab"]:hover,
+    [role="menuitem"]:hover {
+      /* Avoid touch browsers retaining desktop hover paint after a tap. */
+      transition: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

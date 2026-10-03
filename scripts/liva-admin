@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Installed root-owned as /usr/local/sbin/liva-admin.  Arguments are parsed by
+# the fixed Python allowlist; this wrapper never evaluates user input.
+set -euo pipefail
+exec /opt/liva/.venv/bin/python -m control_center.emergency "$@"

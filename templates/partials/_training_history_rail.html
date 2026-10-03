@@ -1,0 +1,40 @@
+<aside class="training-rail training-sidebar" id="training-history-rail">
+  <div class="training-rail-head">
+    <div>
+      <div class="training-rail-kicker">Verlauf</div>
+      <h2 class="training-rail-title">Letzte Einheiten</h2>
+    </div>
+    <button id="new-session-btn" class="primary-btn training-new-session-btn" type="button">Neue Einheit</button>
+  </div>
+  <div class="history-list">
+    {% if not workouts %}
+    <div class="history-list-status muted" role="status">Einheiten werden geladen…</div>
+    {% endif %}
+    {% for w in workouts %}
+    <div class="workout-card"
+         data-testid="training-exercise-row"
+         data-id="{{ w.id }}"
+         data-session-key="{{ w.session_key or '' }}"
+         data-date-iso="{{ w.date_iso }}">
+      <div class="wc-row">
+        <div class="wc-left">
+          <div class="wc-name">{{ w.name }}</div>
+          <div class="wc-date">{{ w.date }}</div>
+        </div>
+        <div class="wc-stats">
+          <span class="wc-sets">{{ w.total_sets }} Sets</span>
+          <span class="dot">·</span>
+          <span class="wc-progress">{% if w.progress and w.progress.progress_rate is not none %}{{ (w.progress.progress_rate * 100)|round|int }} %{% else %}—{% endif %}</span>
+        </div>
+      </div>
+      <button class="delete-btn"
+              onclick="deleteWorkout(event, {{ w.id }})"
+              aria-label="Einheit löschen">
+        ✕
+      </button>
+
+      <div class="wc-details" id="wc-details-{{ w.id }}"></div>
+    </div>
+    {% endfor %}
+  </div>
+</aside>

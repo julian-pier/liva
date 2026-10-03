@@ -1,0 +1,13 @@
+[Unit]
+Description=LIVA nightly Google Calendar sync for training sessions
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/liva
+EnvironmentFile=-/opt/liva/.env
+ExecStart=/opt/liva/venv/bin/python -m jobs.training_calendar_sync
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=Run LIVA training calendar sync nightly
+
+[Timer]
+OnCalendar=*-*-* 03:30:00
+RandomizedDelaySec=300
+Persistent=true
+Unit=liva-training-calendar-sync.service
+
+[Install]
+WantedBy=timers.target

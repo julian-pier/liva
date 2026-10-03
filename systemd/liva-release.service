@@ -1,0 +1,11 @@
+[Unit]
+Description=LIVA controlled release executor
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=liva
+WorkingDirectory=/opt/liva
+EnvironmentFile=-/opt/liva/.env
+ExecStart=/opt/liva/.venv/bin/python -m control_center.release_executor
+TimeoutStartSec=10min

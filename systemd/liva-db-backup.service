@@ -1,0 +1,14 @@
+[Unit]
+Description=LIVA SQLite database backup
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=liva
+WorkingDirectory=/opt/liva
+ExecStart=/opt/liva/venv/bin/python /opt/liva/scripts/backup_liva_databases.py
+Nice=10
+
+[Install]
+WantedBy=multi-user.target

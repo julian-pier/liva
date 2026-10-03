@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Operations Cockpit{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/settings_cockpit.css') }}?v=20260924_ops_v4">
+{% endblock %}
+{% block content %}
+<main class="ops-shell" data-ops-cockpit data-section="{{ cockpit_section }}" data-csrf-token="{{ csrf_token }}" data-auth-level="{{ auth_level }}">
+  <header class="ops-header">
+    <div><p class="ops-eyebrow">LIVA · Operations</p><h1>System Cockpit</h1><p>Technischer Zustand, sichere Aktionen und nachvollziehbare Evidenz.</p></div>
+    <div class="ops-header-actions"><span class="ops-role">{{ role_label }}</span><button class="ops-button" type="button" data-refresh>Aktualisieren</button></div>
+  </header>
+  <div class="ops-layout">
+    <nav class="ops-sections" aria-label="Operationsbereiche">
+      {% set navigation = [("overview","Übersicht"),("notifications","Notifications"),("recovery","Recovery & Backups"),("jobs","Jobs & Automations"),("self-healing","Self-Healing"),("releases","Releases"),("integrations","Integrationen"),("config","Technical Config"),("secrets","Secrets / Status"),("logs","Logs / Raw Data")] %}
+      {% for key, label in navigation %}<a href="{{ '/settings' if key == 'overview' else '/settings/' + key }}" class="{% if cockpit_section == key %}is-active{% endif %}"><span>{{ label }}</span><b data-nav-badge="{{ key }}"></b></a>{% endfor %}
+      <a class="ops-legacy-link" href="/settings?legacy=1">Weitere Einstellungen</a>
+    </nav>
+    <section class="ops-workspace" aria-live="polite">
+      <div class="ops-workspace-head"><div><p class="ops-eyebrow" data-view-kicker>Live-Ansicht</p><h2 data-view-title>Wird geladen …</h2></div><p data-generated-at></p></div>
+      <div data-view-content class="ops-content"><div class="ops-loading">Echte Betriebsdaten werden geladen …</div></div>
+    </section>
+    <aside class="ops-context" aria-label="Kontext und Aktionen">
+      <div class="ops-context-head"><p class="ops-eyebrow">Kontext</p><h2 data-context-title>Status</h2></div>
+      <div data-context-content class="ops-context-content"><p>Die Kontextdaten werden mit der gewählten Ansicht geladen.</p></div>
+    </aside>
+  </div>
+</main>
+<script src="{{ url_for('static', filename='js/settings_cockpit.js') }}?v=20260924_ops_v4" defer></script>
+{% endblock %}

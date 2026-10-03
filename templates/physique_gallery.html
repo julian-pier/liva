@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}Physique Galerie{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/physique_gallery.css') }}?v=20260724_physique_viewer_actions_v36">
+{% endblock %}
+
+{% block content %}
+<section class="physique-page liva-subpage-shell" data-csrf-token="{{ csrf_token }}">
+    <header class="physique-hero liva-subpage-hero">
+        <div class="liva-subpage-hero-copy">
+            <p class="physique-kicker liva-subpage-kicker">Private Tailscale Galerie</p>
+            <h1 class="liva-subpage-title">Physique Updates</h1>
+            <p class="physique-subtitle liva-subpage-subtitle">Website-Upload oder Telegram-Foto im Training-Chat. Caption optional mit <code>front</code>, <code>back</code>, <code>side</code>, <code>relaxed</code>, <code>flexed</code>, <code>86,4 kg</code>.</p>
+        </div>
+        <a class="physique-backlink" href="{{ url_for('settings') }}">Zurück zu Settings</a>
+    </header>
+
+    <section class="physique-feed-card">
+        <div class="physique-card-head">
+            <h2>Galerie</h2>
+            <span id="physique-count-label">lädt ...</span>
+        </div>
+        <form id="physique-filter-form" class="physique-toolbar">
+            <div class="physique-toolbar-row">
+                <label class="physique-toolbar-sort">
+                    <span>Sortieren nach</span>
+                    <select id="physique-filter-sort">
+                        <option value="date_desc">Datum (neu → alt)</option>
+                        <option value="date_asc">Datum (alt → neu)</option>
+                        <option value="weight_desc">Gewicht (hoch → niedrig)</option>
+                        <option value="weight_asc">Gewicht (niedrig → hoch)</option>
+                        <option value="liked_first">Favoriten zuerst</option>
+                    </select>
+                </label>
+
+                <label class="physique-toolbar-view">
+                    <span>Ansicht</span>
+                    <select id="physique-filter-view">
+                        <option value="">Alle</option>
+                    </select>
+                </label>
+                <button id="physique-compare-select" class="physique-compare-select" type="button">2 Fotos vergleichen</button>
+            </div>
+        </form>
+        <div id="physique-selection-bar" class="physique-selection-bar" hidden>
+            <span id="physique-selection-status">Erstes Foto auswählen</span>
+            <div>
+                <button type="button" data-selection-cancel="1">Abbrechen</button>
+                <button type="button" data-selection-open="1" disabled>Vergleich öffnen</button>
+            </div>
+        </div>
+        <div id="physique-feed" class="physique-feed"></div>
+    </section>
+
+    <details class="physique-upload-card physique-upload-collapsed">
+        <summary>
+            <strong>Neues Update</strong>
+            <span>aufklappen zum Upload</span>
+        </summary>
+
+        <form id="physique-upload-form" class="physique-upload-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <label class="physique-dropzone">
+                <input id="physique-file-input" name="photos" type="file" accept="image/*" multiple required>
+                <span class="physique-drop-title">Bilder wählen</span>
+                <span class="physique-drop-copy">Mehrere Bilder werden als ein Update gespeichert.</span>
+            </label>
+
+            <div class="physique-form-grid">
+                <label>
+                    <span>Pose</span>
+                    <select name="pose_label">
+                        <option value="">Automatisch</option>
+                        <option value="Front Relaxed">Front Relaxed</option>
+                        <option value="Front Tense">Front Tense</option>
+                        <option value="Front Abs">Front Abs</option>
+                        <option value="Front Arm">Front Arm</option>
+                        <option value="Side Tense">Side Tense</option>
+                        <option value="Back Relaxed">Back Relaxed</option>
+                        <option value="Back Tense">Back Tense</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </label>
+
+                <label>
+                    <span>Gewicht</span>
+                    <input name="weight_kg" type="text" inputmode="decimal" placeholder="86,4">
+                </label>
+
+                <label>
+                    <span>Datum</span>
+                    <input name="captured_at" type="datetime-local">
+                </label>
+            </div>
+
+            <label class="physique-note-field">
+                <span>Notiz</span>
+                <textarea name="note" rows="3" placeholder="Licht ok, morgens nüchtern, nach Push ..."></textarea>
+            </label>
+
+            <div class="physique-upload-actions">
+                <button class="primary-btn" type="submit">Upload speichern</button>
+                <span id="physique-upload-status" class="physique-upload-status"></span>
+            </div>
+        </form>
+    </details>
+
+    <div id="physique-viewer" class="physique-viewer" hidden>
+        <div class="physique-viewer-backdrop" data-viewer-close="1"></div>
+        <div class="physique-viewer-shell">
+            <div class="physique-viewer-topbar">
+                <button type="button" class="physique-viewer-round-btn" data-viewer-close="1" aria-label="Vollbild schließen">×</button>
+                <span id="physique-viewer-counter" class="physique-viewer-counter"></span>
+                <div class="physique-viewer-actions" hidden>
+                    <button type="button" class="physique-viewer-action physique-delete-btn" data-viewer-delete="1" aria-label="Bild löschen"></button>
+                    <button type="button" class="physique-viewer-action physique-like-btn" data-viewer-like="1" aria-label="Als Favorit markieren"></button>
+                </div>
+            </div>
+            <div class="physique-viewer-grid">
+                <button type="button" class="physique-viewer-pane is-active" data-pane-index="0">
+                    <img id="physique-viewer-img-0" src="" alt="Physique Vollbild links">
+                    <span id="physique-viewer-meta-0" class="physique-viewer-meta"></span>
+                </button>
+                <button type="button" class="physique-viewer-pane" data-pane-index="1">
+                    <img id="physique-viewer-img-1" src="" alt="Physique Vollbild rechts">
+                    <span id="physique-viewer-meta-1" class="physique-viewer-meta"></span>
+                </button>
+            </div>
+            <div class="physique-viewer-controls" aria-label="Galerie-Steuerung">
+                <button type="button" class="physique-viewer-control" data-viewer-prev="1" aria-label="Vorheriges Bild">‹</button>
+                <button type="button" class="physique-viewer-control physique-viewer-compare" data-viewer-compare="1">Vergleichen</button>
+                <button type="button" class="physique-viewer-control" data-viewer-next="1" aria-label="Nächstes Bild">›</button>
+            </div>
+            <div class="physique-viewer-hint">Links/rechts wischen: wechseln · hoch wischen: vergleichen · runter wischen: Vergleich schließen</div>
+        </div>
+    </div>
+</section>
+
+<script defer src="{{ url_for('static', filename='js/physique_gallery.js') }}?v=20260724_physique_viewer_actions_v36"></script>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Remote{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/remote_control.css') }}?v=20260914_remote_console_v7">
+{% endblock %}
+
+{% block content %}
+<section
+  class="remote-center layout-shell"
+  id="remote-center"
+  data-host="{{ remote_host }}"
+  data-port="{{ remote_port }}"
+  data-control-port="{{ remote_control_port }}"
+>
+  <article class="remote-board" aria-label="LIVA Fernsteuerung">
+    <header class="remote-board__head">
+      <div>
+        <p class="remote-header__eyebrow">Remote</p>
+        <h1 class="remote-header__title">Fernsteuerung</h1>
+        <p class="remote-header__subtitle">Arbeitsplatz und Raumgeräte.</p>
+      </div>
+      <div class="remote-status-chip is-checking" id="remote-devices-chip">
+        <span class="remote-status-chip__dot"></span>
+        <span id="remote-devices-chip-label">Lade…</span>
+      </div>
+    </header>
+
+    <div class="remote-board-grid">
+      <article class="remote-tile remote-tile--pc" id="remote-card" aria-label="Windows-PC Power Control">
+        <div class="remote-tile__head">
+          <div>
+            <p class="remote-tile__kicker">Arbeitsplatz</p>
+            <h2 class="remote-tile__title">Windows PC</h2>
+          </div>
+          <div class="remote-status-chip is-checking" id="remote-status-chip">
+            <span class="remote-status-chip__dot"></span>
+            <span id="remote-status-chip-label">Prüfe…</span>
+          </div>
+        </div>
+
+        <div class="remote-pc-control">
+          <div class="remote-pc-visual" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <rect x="3" y="4" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/>
+              <path d="M8 20h8M12 16v4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="remote-state-block">
+            <h3 class="remote-state-headline" id="remote-state-headline">Prüfe Status…</h3>
+            <p class="remote-state-copy" id="remote-state-copy">Verbindung wird gerade verifiziert.</p>
+            <div class="remote-inline" id="remote-inline-feedback" aria-live="polite"></div>
+          </div>
+          <div class="remote-pc-actions">
+            {% if remote_shortcut_url %}
+            <div class="remote-ready-cta-wrap" id="remote-ready-cta-wrap" aria-live="polite">
+              <a class="remote-action-btn remote-action-btn--primary remote-ready-cta" href="{{ remote_shortcut_url }}">
+                Bildschirm öffnen
+              </a>
+            </div>
+            {% endif %}
+            <div class="remote-power-wrap">
+              <button class="remote-power-btn is-checking" id="remote-power-button" type="button" aria-label="Power">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2v9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                  <path d="M7.76 4.84a8 8 0 1 0 8.48 0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="remote-pc-foot">
+          <div class="remote-pc-signal"><span>Host</span><strong>{{ remote_host }}</strong></div>
+          <div class="remote-pc-signal"><span>Remote Desktop</span><strong>Port {{ remote_port }}</strong></div>
+          <div class="remote-pc-signal"><span>Steuerung</span><strong>Port {{ remote_control_port }}</strong></div>
+          <div class="remote-health-inline">
+            <span>Letzter Start <strong id="remote-last-wake">–</strong></span>
+            <span>Geprüft <strong id="remote-checked-at">–</strong></span>
+            <span class="remote-visually-hidden">Live <strong id="remote-polling-state">Inaktiv</strong></span>
+          </div>
+        </div>
+      </article>
+
+      <section class="remote-room-panel" aria-labelledby="remote-room-title">
+        <header class="remote-room-head">
+          <div>
+            <p class="remote-tile__kicker">Smart Home</p>
+            <h2 id="remote-room-title">Raumgeräte</h2>
+          </div>
+          <button class="remote-room-off" id="remote-room-off" type="button">Alle ausschalten</button>
+        </header>
+        <div class="remote-device-grid" id="remote-device-grid" aria-live="polite" data-testid="remote-device-tile"></div>
+        <div class="remote-govee-slot" id="remote-govee-slot" aria-live="polite"></div>
+      </section>
+    </div>
+
+    <div class="remote-inline remote-inline--board" id="remote-devices-feedback" aria-live="polite"></div>
+  </article>
+
+</section>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/remote_control.js') }}?v=20260914_remote_console_v6"></script>
+{% endblock %}

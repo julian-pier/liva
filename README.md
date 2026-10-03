@@ -113,4 +113,4 @@ migrations in a staging copy when the release notes call them out.
 
 ## License
 
-A license must be selected before the repository is opened for public reuse.
+[MIT](LICENSE) — use, modify, and share LIVA freely.
